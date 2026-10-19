@@ -1,0 +1,2904 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="oscuro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>Cámara de Germinación Inteligente — Plan Maestro v2.0 (Grupo 1 EPN)</title>
+  <meta name="theme-color" content="#10b981" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>" />
+  <style>
+    :root[data-theme="oscuro"] {
+      --bg-main: #0b111e;
+      --bg-panel: #131c2e;
+      --bg-card: #1a263d;
+      --bg-hover: #243452;
+      --bg-input: #0e1726;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border: #2a3b5c;
+      --accent: #10b981;
+      --accent-hover: #059669;
+      --accent-soft: rgba(16, 185, 129, 0.15);
+      --info: #3b82f6;
+      --info-soft: rgba(59, 130, 246, 0.16);
+      --warn: #f59e0b;
+      --warn-soft: rgba(245, 158, 11, 0.16);
+      --danger: #ef4444;
+      --danger-soft: rgba(239, 68, 68, 0.16);
+      --purple: #a855f7;
+      --purple-soft: rgba(168, 85, 247, 0.16);
+      --shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    :root[data-theme="claro"] {
+      --bg-main: #f1f5f9;
+      --bg-panel: #ffffff;
+      --bg-card: #f8fafc;
+      --bg-hover: #e2e8f0;
+      --bg-input: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --border: #cbd5e1;
+      --accent: #059669;
+      --accent-hover: #047857;
+      --accent-soft: rgba(5, 150, 105, 0.12);
+      --info: #2563eb;
+      --info-soft: rgba(37, 99, 235, 0.12);
+      --warn: #d97706;
+      --warn-soft: rgba(217, 119, 6, 0.14);
+      --danger: #dc2626;
+      --danger-soft: rgba(220, 38, 38, 0.12);
+      --purple: #7e22ce;
+      --purple-soft: rgba(126, 34, 206, 0.12);
+      --shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-size: 14px;
+    }
+
+    /* TOPBAR */
+    .topbar {
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon {
+      width: 36px; height: 36px; border-radius: 9px;
+      background: var(--accent-soft); border: 1px solid var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 19px; flex-shrink: 0;
+    }
+    .brand-title { font-weight: 700; font-size: 15px; letter-spacing: -0.01em; }
+    .brand-sub { font-size: 11.5px; color: var(--text-muted); }
+    .topbar-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+    /* NAV TABS */
+    .nav-tabs {
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      overflow-x: auto;
+      gap: 4px;
+      padding: 6px 12px;
+      scrollbar-width: thin;
+    }
+    .nav-btn {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid transparent;
+      padding: 7px 12px;
+      border-radius: 7px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
+    }
+    .nav-btn:hover { background: var(--bg-hover); color: var(--text-main); }
+    .nav-btn.active { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+
+    /* MAIN CONTAINER */
+    .main-container {
+      flex: 1;
+      padding: 16px;
+      max-width: 1600px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* GRID & CARDS */
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+
+    .card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .card-title { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+
+    /* BADGES */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 7px;
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+    .tag-PDF { background: var(--info-soft); color: var(--info); border: 1px solid var(--info); }
+    .tag-DISENO { background: var(--purple-soft); color: var(--purple); border: 1px solid var(--purple); }
+    .tag-VERIFICAR { background: var(--warn-soft); color: var(--warn); border: 1px solid var(--warn); }
+    .tag-OPCIONAL { background: rgba(148, 163, 184, 0.18); color: var(--text-muted); border: 1px solid var(--border); }
+
+    .status-Pendiente { background: rgba(148, 163, 184, 0.16); color: var(--text-muted); border: 1px solid var(--border); }
+    .status-En-curso { background: var(--info-soft); color: var(--info); border: 1px solid var(--info); }
+    .status-En-revision { background: var(--warn-soft); color: var(--warn); border: 1px solid var(--warn); }
+    .status-Hecha { background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent); }
+    .status-Bloqueada { background: var(--danger-soft); color: var(--danger); border: 1px solid var(--danger); }
+
+    /* PROGRESS */
+    .progress-wrap {
+      width: 100%;
+      background: var(--bg-input);
+      height: 9px;
+      border-radius: 99px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), #34d399);
+      transition: width 0.25s ease;
+    }
+
+    /* FORMS & BUTTONS */
+    input, select, textarea {
+      background: var(--bg-input);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 7px 10px;
+      font-size: 13px;
+      font-family: inherit;
+      width: 100%;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: 2px solid var(--accent);
+      border-color: transparent;
+    }
+    input[type="checkbox"] {
+      width: 17px;
+      height: 17px;
+      cursor: pointer;
+      accent-color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .btn {
+      background: var(--bg-card);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      padding: 7px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12.5px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .btn:hover { background: var(--bg-hover); }
+    .btn-primary { background: var(--accent); color: #ffffff; border-color: var(--accent); }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-danger { background: var(--danger-soft); color: var(--danger); border-color: var(--danger); }
+    .btn-warn { background: var(--warn-soft); color: var(--warn); border-color: var(--warn); }
+    .btn-sm { padding: 4px 8px; font-size: 11.5px; }
+
+    /* TASK ITEM */
+    .task-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: transform 0.12s, border-color 0.12s;
+    }
+    .task-item:hover {
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+    .task-item.blocked { border-left: 4px solid var(--danger); }
+    .task-item.done { border-left: 4px solid var(--accent); }
+    .task-id { font-family: monospace; font-weight: 700; font-size: 12.5px; color: var(--accent); }
+
+    /* KANBAN */
+    .kanban-board {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(270px, 1fr));
+      gap: 14px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+    .kanban-col {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      min-height: 480px;
+    }
+    .kanban-col-header {
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .kanban-dropzone { padding: 10px; flex: 1; }
+    .kanban-dropzone.drag-over {
+      background: var(--accent-soft);
+      border: 2px dashed var(--accent);
+      border-radius: 8px;
+    }
+
+    /* TREE */
+    .tree-node {
+      margin-left: 18px;
+      padding-left: 14px;
+      border-left: 2px solid var(--border);
+      position: relative;
+      margin-top: 6px;
+    }
+    .tree-node::before {
+      content: "";
+      position: absolute;
+      left: -2px;
+      top: 14px;
+      width: 14px;
+      height: 10px;
+      border-bottom: 2px solid var(--border);
+      border-bottom-left-radius: 8px;
+    }
+    .tree-header {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      cursor: pointer;
+    }
+    .tree-header:hover { border-color: var(--accent); }
+
+    /* TABLES & WRAPPERS */
+    .table-wrap { width: 100%; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td {
+      border-bottom: 1px solid var(--border);
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: var(--bg-card);
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    /* MODAL */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.72);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      max-width: 920px;
+      width: 100%;
+      max-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .modal-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .modal-body { padding: 16px 18px; overflow-y: auto; flex: 1; }
+    .acceptance-banner {
+      background: var(--accent-soft);
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .subtabs {
+      display: flex;
+      gap: 6px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 14px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+    }
+
+    /* PRINT */
+    @media print {
+      .topbar, .nav-tabs, .no-print { display: none !important; }
+      body { background: #ffffff; color: #000000; }
+      .card { box-shadow: none; border: 1px solid #999; break-inside: avoid; }
+    }
+
+    @media (max-width: 768px) {
+      .main-container { padding: 10px; }
+      .modal-panel { max-height: 96vh; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BARRA SUPERIOR -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-icon" title="Cámara de Germinación Inteligente">🌱</div>
+      <div>
+        <div class="brand-title">Cámara de Germinación Inteligente — Grupo 1 (EPN)</div>
+        <div class="brand-sub" id="topbar-subtitle">Sistemas IoT 2026-B • PhD. Soraya Sinche • Plan Maestro v2.0</div>
+      </div>
+      <a href="https://github.com/Anghel01" target="_blank" rel="noopener" class="badge tag-PDF" style="text-decoration:none; margin-left:6px;" title="Ver perfil GitHub de Angelo Conterón">
+        🐙 @Anghel01
+      </a>
+    </div>
+
+    <div class="topbar-controls">
+      <div style="display:flex; align-items:center; gap:6px;">
+        <label for="user-selector" style="font-size:12px; color:var(--text-muted); white-space:nowrap;">Vista de:</label>
+        <select id="user-selector" style="width:auto; min-width:180px;" onchange="App.setActiveUser(this.value)" aria-label="Seleccionar integrante activo">
+          <option value="Angelo Conterón" selected>⭐ Angelo Conterón (Tú)</option>
+          <option value="Xavier Anatoa">🔧 Xavier Anatoa (Hardware)</option>
+          <option value="Fernando Guarderas">☁️ Fernando Guarderas (Servidor)</option>
+          <option value="Todos">👥 Todos (Equipo Grupo 1)</option>
+        </select>
+      </div>
+      <span id="sync-indicator" class="badge status-Pendiente" title="Almacenamiento local activo">💾 LocalStorage</span>
+      <button class="btn btn-sm" onclick="App.toggleTheme()" title="Cambiar modo claro/oscuro">🌓 Tema</button>
+      <button class="btn btn-sm btn-primary" onclick="App.switchTab('bitacora')">+ Bitácora</button>
+    </div>
+  </header>
+
+  <!-- PESTAÑAS DE MÓDULOS -->
+  <nav class="nav-tabs" aria-label="Módulos del sistema">
+    <button class="nav-btn active" data-tab="panel" onclick="App.switchTab('panel')">📊 1. Panel Principal</button>
+    <button class="nav-btn" data-tab="arbol" onclick="App.switchTab('arbol')">🌿 2. Vista Árbol</button>
+    <button class="nav-btn" data-tab="tablero" onclick="App.switchTab('tablero')">📋 3. Tablero Kanban</button>
+    <button class="nav-btn" data-tab="cronograma" onclick="App.switchTab('cronograma')">📅 4. Cronograma Gantt</button>
+    <button class="nav-btn" data-tab="semana" onclick="App.switchTab('semana')">🗓️ 5. Vista Semana y Hoy</button>
+    <button class="nav-btn" data-tab="dependencias" onclick="App.switchTab('dependencias')">🕸️ 6. Dependencias y Ruta Crítica</button>
+    <button class="nav-btn" data-tab="bitacora" onclick="App.switchTab('bitacora')">📓 8. Bitácora y Plantillas</button>
+    <button class="nav-btn" data-tab="compras" onclick="App.switchTab('compras')">🛒 9. Compras y Tienda</button>
+    <button class="nav-btn" data-tab="listas" onclick="App.switchTab('listas')">📑 10. Decisiones, Riesgos, Pruebas y Q&A</button>
+    <button class="nav-btn" data-tab="referencia" onclick="App.switchTab('referencia')">📖 Plan Maestro v2.0 (Íntegro)</button>
+    <button class="nav-btn" data-tab="config" onclick="App.switchTab('config')">⚙️ 11. Configuración y Sync</button>
+  </nav>
+
+  <!-- CONTENEDOR DE VISTAS -->
+  <main class="main-container" id="app-view"></main>
+
+  <!-- MODAL DETALLE DE TAREA (MÓDULO 7) -->
+  <div class="modal-backdrop" id="task-modal" role="dialog" aria-modal="true" aria-labelledby="modal-task-title">
+    <div class="modal-panel" id="task-modal-content"></div>
+  </div>
+
+  <script>
+    /* ============================================================================
+       PLAN MAESTRO v2.0 — FUENTE DE VERDAD INICIAL
+       ============================================================================ */
+    const PLAN_MAESTRO_TEXTO_INTEGRO = `==============================================================================
+PLAN MAESTRO Y BITÁCORA DE TRABAJO - PROYECTO IoT, GRUPO 1
+CÁMARA DE GERMINACIÓN INTELIGENTE PARA SEMILLEROS
+Versión 2.0 - actualizada el 18 de octubre de 2026
+==============================================================================
+Institución: Escuela Politécnica Nacional (EPN), Facultad de Ingeniería Eléctrica y Electrónica
+Carrera: Tecnologías de la Información | Asignatura: Sistemas IoT (2026-B)
+Docente: PhD. Soraya Sinche | Grupo: Grupo 1
+Integrantes en ficha: Xavier Anatoa, Angelo Conterón, Fernando Guarderas
+Semilla de estudio: Fréjol | Servidor local: Raspberry Pi 4 (prestada 1 vez por semana)
+
+Objetivo general (2.1 del PDF): Desarrollar una cámara de germinación automatizada de bajo costo que mantenga las condiciones óptimas de humedad del sustrato y humedad relativa para acelerar la etapa de imbibición en semillas de fréjol.
+Objetivo específico (2.2 del PDF): Implementar una interfaz de control visual e histórica para evaluar el porcentaje de germinación de semillas sin alterar el microclima interno.
+
+TABLA OFICIAL DE PINES ESP32 DEVKIT V1 (Sección 6.4):
+- Regla crítica: con el Wi-Fi activo, el ADC2 deja de funcionar. Todo sensor analógico va en pines del ADC1 (GPIO 32, 33, 34, 35, 36, 39).
+- Sensor capacitivo de sustrato v1.2: AOUT -> GPIO 34 (ADC1), VCC -> 3V3 del ESP32, GND -> GND.
+- DHT22: DATA -> GPIO 4, VCC -> 3V3 del ESP32, GND -> GND (ubicar en parte alta, lejos del chorro de niebla).
+- MQ-135: A0 -> GPIO 35 (ADC1) a través de divisor 10 kΩ (desde A0 al GPIO) y 15 kΩ (desde GPIO a GND). VCC -> 5 V fuente externa, GND -> GND común.
+- Pantalla OLED 0,96" I2C (0x3C): SDA -> GPIO 21, SCL -> GPIO 22, VCC -> 3V3, GND -> GND.
+- Módulo relé 2 canales (sin jumper JD-VCC): IN1 (humidificador) -> GPIO 26, IN2 (tira LED) -> GPIO 27, JD-VCC (bobinas) -> 5 V fuente externa, VCC (lógica) -> 3V3 del ESP32, GND -> GND común. Activo en bajo (escribir HIGH antes de pinMode OUTPUT).
+- Sensor de nivel de agua: SIGNAL -> GPIO 32 (ADC1), VCC -> GPIO 33 (salida digital activada solo ~150 ms al medir), GND -> GND.
+- Pulsador del humidificador [OPCIONAL]: Base transistor 2N2222 u optoacoplador PC817 -> GPIO 25.
+
+PROTOCOLO MQTT (Sección 7.3) - Broker Mosquitto puerto 1883 con usuario y contraseña:
+- Tópico 1 Telemetría (ESP32 -> Raspberry, QoS 0, cada 10-30 s): epn/iot/grupo1/sensores
+  JSON: {"hum_sustrato_rel": 76.5, "temp_amb_c": 20.4, "hum_amb_rel": 84.0, "mq135_ratio": 1.12, "agua_ok": true, "rele_hum": false, "rele_led": true}
+- Tópico 2 Comandos (Raspberry -> ESP32, QoS 1): epn/iot/grupo1/comandos -> {"cmd": "preparar_foto"} / {"cmd": "fin_foto"}
+- Tópico 3 Estado (ESP32 -> Raspberry y ESP32-CAM, QoS 1): epn/iot/grupo1/estado -> {"estado": "foto_listo"}
+
+MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
+1. Raspberry publica {"cmd": "preparar_foto"}.
+2. ESP32 apaga humidificador, enciende tira LED (guardando estado previo) e inicia temporizador de seguridad de 6 minutos.
+3. Tras 3-4 min de asentamiento de niebla [A VERIFICAR], ESP32 publica {"estado": "foto_listo"}.
+4. ESP32-CAM toma 2-3 fotos, conserva la última y la envía por HTTP POST a /upload.
+5. Raspberry responde 200, analiza con OpenCV y publica {"cmd": "fin_foto"}.
+6. ESP32 restaura estado previo de tira LED y retoma control del humidificador.`;
+
+    function crearDatosIniciales() {
+      const ahora = "2026-10-18T19:00:00.000Z";
+      const tareasRaw = [
+        // PARTE 1
+        { id: "T1.01", titulo: "Reunión de arranque", parte: 1, fase: "Planificación y Arranque", rol_responsable: "Todos", revisor: "Todos (revisión grupal)", depende_de: [], etiquetas: ["[DISEÑO]"], semana_inicio: 1, semana_fin: 1, descripcion: "Reunión inicial del equipo para asignar roles, confirmar Plan A y definir el lote piloto.", pasos: ["Asignar nombres a Integrante 1, 2 y 3.", "Confirmar el Plan A con revisión cruzada.", "Crear el repositorio Git y el grupo de WhatsApp.", "Decidir en la casa de quién vive el piloto.", "Decidir la variedad de fréjol."], criterio_aceptacion: "Roles con nombres, repositorio creado, dueño del piloto definido." },
+        { id: "T1.02", titulo: "Consultar a la Ing. Sinche", parte: 1, fase: "Planificación y Arranque", rol_responsable: "Todos", revisor: "Integrante 1", depende_de: ["T1.01"], etiquetas: ["[A VERIFICAR]"], semana_inicio: 1, semana_fin: 1, descripcion: "Consultar Q1 a Q6 de la Sección 17 a la docente PhD. Soraya Sinche.", pasos: ["Hacer las preguntas de la Sección 17 (Q1 a Q6) a la Ing. Sinche.", "Anotar las respuestas y las fechas oficiales de entrega de Parte 1 y Parte 2."], criterio_aceptacion: "Respuestas anotadas en la bitácora, con fechas de entrega." },
+        { id: "T1.03", titulo: "Compras de la Parte 1 con pruebas en tienda", parte: 1, fase: "Hardware y Prototipado", rol_responsable: "Integrante 1", revisor: "Integrante 2", depende_de: ["T1.01"], etiquetas: ["[PDF]", "[A VERIFICAR]"], semana_inicio: 1, semana_fin: 1, descripcion: "Adquirir materiales 6.1 verificando en el mostrador los puntos críticos de Sección 18.", pasos: ["Usar la lista de materiales 6.1 (Electrónica, Lote piloto y Servidor local).", "Aplicar la lista de verificación en la tienda de la Sección 18.", "Pedir en la tienda que conecten el humidificador ultrasónico a 5 V directos y comprobar que lanza niebla sin pulsar nada.", "Comprobar que el módulo relé de 2 canales tenga optoacoplador y jumper JD-VCC."], criterio_aceptacion: "Humidificador probado a 5 V directos, relé con jumper JD-VCC, todos los módulos comprados." },
+        { id: "T1.04", titulo: "Entorno de desarrollo en la laptop gemela", parte: 1, fase: "Servidor y Comunicaciones", rol_responsable: "Integrante 3", revisor: "Integrante 2", depende_de: ["T1.01"], etiquetas: ["[DISEÑO]"], semana_inicio: 1, semana_fin: 1, descripcion: "Configurar laptop gemela de la Raspberry Pi y programar script simulador.", pasos: ["Instalar Docker o WSL, broker Mosquitto, entorno de Python y estructurar el repositorio Git.", "Crear el script simulador en Python que publique telemetría falsa en epn/iot/grupo1/sensores y responda a comandos."], criterio_aceptacion: "El simulador publica telemetría y el receptor la recibe." },
+        { id: "T1.05", titulo: "Simulación del firmware en Wokwi", parte: 1, fase: "Firmware y Control", rol_responsable: "Integrante 2", revisor: "Integrante 1", depende_de: ["T1.01"], etiquetas: ["[DISEÑO]", "[A VERIFICAR]"], semana_inicio: 1, semana_fin: 1, descripcion: "Simular firmware del ESP32 antes de armar para detectar errores de código y pines.", pasos: ["Simular lectura de ADC1 (con potenciómetro), DHT22 y pantalla OLED SSD1306 en Wokwi.", "Simular control de relé con histéresis y arranque seguro (escribir HIGH antes de pinMode OUTPUT).", "Verificar formato del JSON de telemetría por puerto serie."], criterio_aceptacion: "El proyecto compila y muestra el JSON de prueba." },
+        { id: "T1.06", titulo: "Impermeabilización y pruebas de mesa", parte: 1, fase: "Hardware y Prototipado", rol_responsable: "Integrante 1", revisor: "Integrante 2", depende_de: ["T1.03"], etiquetas: ["[PDF]", "[DISEÑO]"], semana_inicio: 2, semana_fin: 2, descripcion: "Sellar sensores capacitivos y probar etapa de potencia aislada.", pasos: ["Sellar los dos sensores capacitivos v1.2 con esmalte de uñas transparente o silicona en la electrónica superior (sin cubrir zona de medición).", "Probar humidificador y módulo relé de forma aislada con la fuente externa de 5 V / 3 A."], criterio_aceptacion: "Esmalte seco sin tapar la zona de medición, y relé y humidificador funcionando." },
+        { id: "T1.07", titulo: "Diagrama técnico de pines y alimentación", parte: 1, fase: "Hardware y Prototipado", rol_responsable: "Integrante 1", revisor: "Integrante 2 (compara diagrama vs código)", depende_de: ["T1.03"], etiquetas: ["[PDF]", "[DISEÑO]"], semana_inicio: 2, semana_fin: 2, descripcion: "Esquema Fritzing/KiCad con pines oficiales 6.4 y reglas 6.5.", pasos: ["Dibujar esquema con Fritzing/KiCad usando tabla 6.4 (sensores analógicos en ADC1) y reglas 6.5.", "Dibujar todos los componentes aunque no estén en protoboard.", "Revisión cruzada: Integrante 2 compara el diagrama contra el código."], criterio_aceptacion: "Imagen de alta resolución con tierras unidas y VIN libre." },
+        { id: "T1.08", titulo: "Armado en protoboard", parte: 1, fase: "Hardware y Prototipado", rol_responsable: "Integrante 1", revisor: "Integrante 2", depende_de: ["T1.06", "T1.07"], etiquetas: ["[PDF]"], semana_inicio: 2, semana_fin: 2, descripcion: "Montar circuito prototipo con alimentación separada.", pasos: ["Conectar ESP32 alimentado solo por USB con sensor capacitivo (GPIO 34), DHT22 (GPIO 4) y pantalla OLED I2C (GPIO 21/22).", "Cablear etapa de potencia (relé sin jumper JD-VCC, humidificador y condensador de 220-470 µF) con fuente de 5 V / 3 A y GND común."], criterio_aceptacion: "El ESP32 enciende y apaga el humidificador sin reiniciarse." },
+        { id: "T1.09", titulo: "Firmware: calibración, control y pantalla", parte: 1, fase: "Firmware y Control", rol_responsable: "Integrante 2", revisor: "Integrante 1 (prueba en hardware real)", depende_de: ["T1.05", "T1.08"], etiquetas: ["[PDF]", "[DISEÑO]", "[A VERIFICAR]"], semana_inicio: 3, semana_fin: 3, descripcion: "Firmware C++ con calibración aire/agua, DHT22, lazo con tiempos y OLED.", pasos: ["Calibración aire seco (0%) / agua (100%) promediando 16 a 32 lecturas.", "Implementar lectura del DHT22 y visualización en OLED.", "Programar control con histéresis, t_min_on (30 s), t_min_off (60 s) y t_max_on (10 min)."], criterio_aceptacion: "Tabla de ADC registrada, porcentaje de 0 a 100 en la pantalla y relé funcionando con histéresis." },
+        { id: "T1.10", titulo: "Broker, receptor y Firebase", parte: 1, fase: "Servidor y Comunicaciones", rol_responsable: "Integrante 3", revisor: "Integrante 2", depende_de: ["T1.04"], etiquetas: ["[PDF]", "[DISEÑO]"], semana_inicio: 3, semana_fin: 3, descripcion: "Mosquitto con usuario/contraseña, receptor Python, respaldo CSV y Firebase.", pasos: ["Configurar broker Mosquitto con usuario y contraseña en puerto 1883.", "Programar script receptor en Python con validación y registro local CSV/SQLite.", "Configurar envío a Firebase Realtime Database por HTTPS con variables en .env."], criterio_aceptacion: "El simulador guarda datos de prueba en Firebase y en el CSV." },
+        { id: "T1.11", titulo: "Telemetría MQTT real", parte: 1, fase: "Servidor y Comunicaciones", rol_responsable: "Integrante 2", revisor: "Integrante 3", depende_de: ["T1.09", "T1.10"], etiquetas: ["[PDF]"], semana_inicio: 4, semana_fin: 4, descripcion: "Publicación real del ESP32 hacia el broker y Firebase.", pasos: ["Conectar ESP32 a Wi-Fi y publicar en epn/iot/grupo1/sensores cada 10-30 s con reconexión automática.", "Confirmar que receptor guarda en local y en Firebase."], criterio_aceptacion: "Lecturas reales del sensor y del DHT22 visibles en Firebase." },
+        { id: "T1.12", titulo: "Montaje y siembra del lote piloto", parte: 1, fase: "Lote Piloto", rol_responsable: "Integrante 1", revisor: "Integrante 3", depende_de: ["T1.09"], etiquetas: ["[DISEÑO]", "[A VERIFICAR]"], semana_inicio: 3, semana_fin: 4, descripcion: "Montar tupper con paño cuadriculado y sembrar 20-25 semillas de fréjol según Sección 10.", pasos: ["Preparar tupper con orificio de cables, paño con cuadrícula 4x5 o 5x5 e hilo, y depósito con marca.", "Instalar sensor capacitivo en sustrato y DHT22 en parte alta lejos de la niebla.", "Sembrar 20 a 25 semillas de fréjol (una por celda) y tomar primera foto con fecha y hora."], criterio_aceptacion: "Piloto sembrado, humedad estable y primera foto con fecha y hora." },
+        { id: "T1.13", titulo: "Monitoreo del piloto (4 a 5 días)", parte: 1, fase: "Lote Piloto", rol_responsable: "Integrante 1", revisor: "Integrante 3 (datos y conteo)", depende_de: ["T1.11", "T1.12"], etiquetas: ["[DISEÑO]", "[A VERIFICAR]"], semana_inicio: 4, semana_fin: 5, descripcion: "Revisar agua a diario, fotos 2 a 4 veces al día y mantener receptor encendido.", pasos: ["Revisar agua todos los días (humidificador nunca sin agua).", "Tomar fotos desde arriba 2 a 4 veces al día (ej. piloto_d1_08h.jpg).", "Receptor encendido sin suspensión; contar semillas con radícula (>= 2 mm) y cruzar con Firebase."], criterio_aceptacion: "Bitácora completa, fotos diarias y serie de temperatura y humedad sin huecos." },
+        { id: "T1.14", titulo: "Redacción de secciones del informe", parte: 1, fase: "Documentación y Entrega", rol_responsable: "Todos", revisor: "Integrante 3 (al 1), 1 (al 2), 2 (al 3)", depende_de: ["T1.07", "T1.09", "T1.10"], etiquetas: ["[PDF]"], semana_inicio: 5, semana_fin: 5, descripcion: "Redactar secciones individuales del informe técnico 1 según Sección 16.", pasos: ["Integrante 1: redactar hardware, esquemas, consumo y montaje piloto.", "Integrante 2: redactar firmware y curvas de calibración.", "Integrante 3: redactar comunicaciones, receptor, estructura de datos y bitácora piloto.", "Revisión cruzada entre integrantes."], criterio_aceptacion: "Tres secciones listas y revisadas por otro integrante." },
+        { id: "T1.15", titulo: "Consolidación del informe y paquete de código", parte: 1, fase: "Documentación y Entrega", rol_responsable: "Integrante 2", revisor: "Integrante 3", depende_de: ["T1.13", "T1.14"], etiquetas: ["[PDF]"], semana_inicio: 6, semana_fin: 6, descripcion: "Unificar informe en PDF y dejar repo limpio con README.", pasos: ["Unir secciones, resultados del piloto y limitaciones en un solo documento.", "Dejar repositorio limpio, con README y sin credenciales (.env y secrets.h fuera)."], criterio_aceptacion: "PDF del informe, código C++ y script receptor listos." },
+        { id: "T1.16", titulo: "Ensayo de entrega", parte: 1, fase: "Documentación y Entrega", rol_responsable: "Todos", revisor: "Todos", depende_de: ["T1.15"], etiquetas: ["[PDF]"], semana_inicio: 6, semana_fin: 6, descripcion: "Prueba integral de arranque en frío de la Parte 1.", pasos: ["Apagar y encender todo desde cero.", "Comprobar que prototipo funciona y ensayar la demostración."], criterio_aceptacion: "Demostración completa sin intervención manual." },
+
+        // PARTE 2
+        { id: "T2.01", titulo: "Revisión posterior a la Parte 1", parte: 2, fase: "Planificación y Compras P2", rol_responsable: "Todos", revisor: "Todos", depende_de: ["T1.13"], etiquetas: ["[DISEÑO]", "[A VERIFICAR]"], semana_inicio: 1, semana_fin: 1, descripcion: "Ajustar umbrales y lecciones aprendidas tras el piloto.", pasos: ["Revisar lecciones del piloto.", "Fijar valores definitivos de H_on, H_off, RH_on, RH_off y tiempos.", "Fijar variedad de fréjol y criterio de germinación (radícula >= 2 mm)."], criterio_aceptacion: "Lista de ajustes y valores definitivos de H_on, H_off, RH_on, RH_off y tiempos." },
+        { id: "T2.02", titulo: "Compras de la Parte 2", parte: 2, fase: "Planificación y Compras P2", rol_responsable: "Integrante 1", revisor: "Integrante 2", depende_de: ["T1.02", "T2.01"], etiquetas: ["[PDF]", "[DISEÑO]", "[A VERIFICAR]"], semana_inicio: 1, semana_fin: 1, descripcion: "Comprar lista 6.2 tras respuesta de docente sobre cámara y nivel.", pasos: ["Verificar respuestas Q1 y Q2.", "Comprar lista 6.2 (ESP32-CAM, MQ-135, tira LED, nivel de agua, acrílico, filamento PETG/ASA, conectores)."], criterio_aceptacion: "Componentes de la lista 6.2 comprados, con la respuesta de la docente sobre ESP32-CAM y sensor de nivel." },
+        { id: "T2.03", titulo: "Pruebas individuales en protoboard", parte: 2, fase: "Hardware, PCB y Estructura", rol_responsable: "Integrante 1", revisor: "Integrante 2 (cámara y firmware)", depende_de: ["T2.02"], etiquetas: ["[PDF]", "[DISEÑO]", "[A VERIFICAR]"], semana_inicio: 2, semana_fin: 2, descripcion: "Probar MQ-135 con divisor 10k/15k, tira LED, sensor de nivel y ESP32-CAM.", pasos: ["MQ-135 con divisor: nunca > 3.0 V en GPIO 35.", "Tira LED 5 V controlada por segundo relé (GPIO 27).", "Sensor de nivel de agua en depósito vacío y lleno.", "ESP32-CAM (enfoque a 15-25 cm, captura y POST HTTP) y medir consumo."], criterio_aceptacion: "Cada componente funciona por separado y se anota su consumo." },
+        { id: "T2.04", titulo: "Diseño de la PCB", parte: 2, fase: "Hardware, PCB y Estructura", rol_responsable: "Integrante 1", revisor: "Integrante 2 (revisión cruzada)", depende_de: ["T2.03"], etiquetas: ["[PDF]"], semana_inicio: 2, semana_fin: 4, descripcion: "Diseño en KiCad/EasyEDA con borneras para sensores y actuadores.", pasos: ["Diseñar esquemático y layout con borneras y hembras para ESP32.", "Revisión cruzada del esquema antes de exportar Gerbers.", "Enviar PCB a fabricar (S4)."], criterio_aceptacion: "Archivos de fabricación listos y revisados." },
+        { id: "T2.05", titulo: "Firmware completo del ESP32 principal", parte: 2, fase: "Firmware y Visión", rol_responsable: "Integrante 2", revisor: "Integrante 1 (hardware real)", depende_de: ["T2.03"], etiquetas: ["[PDF]", "[DISEÑO]"], semana_inicio: 2, semana_fin: 3, descripcion: "Fotoperíodo, MQ-135 (Rs/R0), nivel de agua y modo foto con temporizador 6 min.", pasos: ["Integrar fotoperíodo, MQ-135 y nivel de agua.", "Máquina de estados modo foto (apagar humidificador, encender LED, esperar 3-4 min y foto_listo).", "Temporizador de seguridad de 6 min y restauración de LED tras fin_foto."], criterio_aceptacion: "El ESP32 responde a preparar_foto, se recupera solo a los 6 minutos y mantiene el control autónomo." },
+        { id: "T2.06", titulo: "Firmware de la ESP32-CAM", parte: 2, fase: "Firmware y Visión", rol_responsable: "Integrante 2", revisor: "Integrante 3", depende_de: ["T2.03"], etiquetas: ["[PDF]", "[DISEÑO]"], semana_inicio: 2, semana_fin: 3, descripcion: "Nodo de visión independiente sincronizado por MQTT y POST HTTP.", pasos: ["Configurar brownout, PSRAM y suscripción a epn/iot/grupo1/estado.", "Tomar 2-3 fotos al recibir foto_listo y conservar la última.", "Enviar foto por POST HTTP a /upload con reintento."], criterio_aceptacion: "Una imagen nítida llega a la Raspberry cada vez que se pide." },
+        { id: "T2.07", titulo: "Servidor Flask", parte: 2, fase: "Servidor, Modelo y Servicios", rol_responsable: "Integrante 3", revisor: "Integrante 2", depende_de: ["T1.10"], etiquetas: ["[DISEÑO]"], semana_inicio: 2, semana_fin: 3, descripcion: "Servidor HTTP en Raspberry para recibir, guardar y servir fotos.", pasos: ["Rutas /upload (con token), /fotos/<f> y /salud.", "Guardar fotos con timestamp, encolar OpenCV y publicar fin_foto por MQTT."], criterio_aceptacion: "El servidor recibe una foto y la deja disponible para el panel." },
+        { id: "T2.08", titulo: "Script OpenCV", parte: 2, fase: "Firmware y Visión", rol_responsable: "Integrante 2", revisor: "Integrante 3", depende_de: ["T2.07", "T1.13"], etiquetas: ["[PDF]", "[DISEÑO]", "[A VERIFICAR]"], semana_inicio: 3, semana_fin: 3, descripcion: "Detección de radícula como brote alargado (evitar confundir con hinchazón).", pasos: ["Recorte de celdas, umbralización y apertura morfológica con fotos del piloto.", "Detectar brote alargado (relación largo/ancho > 2 y longitud >= 2 mm).", "Recalibrar umbral con foto real en caja acrílica y documentar error vs manual."], criterio_aceptacion: "Error de conteo documentado frente al conteo manual." },
+        { id: "T2.09", titulo: "Modelo de tiempo óptimo", parte: 2, fase: "Servidor, Modelo y Servicios", rol_responsable: "Integrante 3", revisor: "Integrante 2", depende_de: ["T1.13"], etiquetas: ["[PDF]", "[DISEÑO]", "[A VERIFICAR]"], semana_inicio: 3, semana_fin: 3, descripcion: "Script Python de grados-hora hidrotermales acumulados.", pasos: ["Calcular GDDh = max(0, T - T_base) acumulando solo si H_sustrato >= H_umbral.", "Ajustar curva logística con datos del piloto.", "Estimar horas restantes para llegar al 80% y publicar en Firebase."], criterio_aceptacion: "El script estima horas restantes para el 80% y se presenta como modelo preliminar." },
+        { id: "T2.10", titulo: "Panel y alertas", parte: 2, fase: "Servidor, Modelo y Servicios", rol_responsable: "Integrante 3", revisor: "Integrante 2", depende_de: ["T2.07", "T1.10"], etiquetas: ["[PDF]", "[DISEÑO]"], semana_inicio: 4, semana_fin: 4, descripcion: "Panel web conectado a Firebase y alertas Telegram/email.", pasos: ["Panel web (sustrato, luz, temp/hum aire, MQ-135, curva germinación, fotos, predicción).", "Alertas Telegram y SMTP para depósito sin agua, sustrato seco y nodo caído (con cooldown 30 min y resuelto)."], criterio_aceptacion: "El panel muestra datos en vivo y llega un aviso al vaciar el depósito." },
+        { id: "T2.11", titulo: "Diseño 3D y estructura acrílica", parte: 2, fase: "Hardware, PCB y Estructura", rol_responsable: "Integrante 1", revisor: "Todos (coordinación medidas)", depende_de: ["T2.03", "T2.04"], etiquetas: ["[PDF]", "[DISEÑO]", "[A VERIFICAR]"], semana_inicio: 4, semana_fin: 5, descripcion: "Cámara acrílica con zona húmeda y zona seca separadas y piezas en PETG/ASA.", pasos: ["Definir tamaño PCB y modelar en CAD soportes (cámara, humidificador, sensor, OLED, LED).", "Imprimir piezas en PETG o ASA (no PLA).", "Cortar y armar estructura acrílica con zona seca y húmeda separadas."], criterio_aceptacion: "Estructura armada con zona húmeda y zona seca." },
+        { id: "T2.12", titulo: "Fabricación y soldadura de la PCB", parte: 2, fase: "Hardware, PCB y Estructura", rol_responsable: "Integrante 1", revisor: "Integrante 2", depende_de: ["T2.04"], etiquetas: ["[PDF]"], semana_inicio: 5, semana_fin: 5, descripcion: "Soldar componentes en PCB y verificar continuidades y cortos.", pasos: ["Soldar borneras, conectores y zócalos en la PCB fabricada.", "Verificar continuidad y ausencia de cortos antes de alimentar.", "Conectar módulos y comprobar funcionamiento."], criterio_aceptacion: "La PCB enciende y todos los módulos responden." },
+        { id: "T2.13", titulo: "Integración total y prueba en seco", parte: 2, fase: "Integración y Pruebas Reales", rol_responsable: "Todos", revisor: "Todos", depende_de: ["T2.05", "T2.06", "T2.08", "T2.11", "T2.12"], etiquetas: ["[PDF]", "[DISEÑO]"], semana_inicio: 6, semana_fin: 6, descripcion: "Ensamblar en caja acrílica y test continuo de 24 h sin semillas.", pasos: ["Montar PCB, sensores, humidificador, LED y ESP32-CAM en caja acrílica.", "Correr 24 horas continuas con niebla, luz y fotos cada 6 h."], criterio_aceptacion: "24 horas sin reinicios ni fallas y con fotos recibidas." },
+        { id: "T2.14", titulo: "Pruebas reales de germinación", parte: 2, fase: "Integración y Pruebas Reales", rol_responsable: "Integrante 1", revisor: "Integrante 3 (datos)", depende_de: ["T2.13"], etiquetas: ["[PDF]", "[A VERIFICAR]"], semana_inicio: 7, semana_fin: 8, descripcion: "Dos lotes reales de fréjol (5-6 días cada uno) 100% autónomos con fotos cada 6 h.", pasos: ["Asegurar préstamo largo de la Pi o servidor alterno sin suspensión.", "Correr Lote 1 de fréjol (5 a 6 días) en modo 100% autónomo.", "Correr Lote 2 de fréjol (5 a 6 días) en modo 100% autónomo."], criterio_aceptacion: "Base de datos completa con fotos cada 6 horas." },
+        { id: "T2.15", titulo: "Curvas reales y ajuste del modelo", parte: 2, fase: "Servidor, Modelo y Servicios", rol_responsable: "Integrante 3", revisor: "Integrante 2", depende_de: ["T2.14", "T2.09"], etiquetas: ["[PDF]", "[DISEÑO]"], semana_inicio: 7, semana_fin: 8, descripcion: "Generar curvas reales de germinación y reajustar modelo GDDh.", pasos: ["Generar curvas reales (% vs tiempo y vs GDDh).", "Ajustar modelo y documentar limitaciones estadísticas."], criterio_aceptacion: "Curvas de germinación reales y modelo ajustado con sus limitaciones." },
+        { id: "T2.16", titulo: "Manual de uso e informe final", parte: 2, fase: "Documentación y Defensa Final", rol_responsable: "Integrante 3", revisor: "Integrante 1 (manual) e Integrante 2", depende_de: ["T2.15"], etiquetas: ["[PDF]"], semana_inicio: 9, semana_fin: 9, descripcion: "Redactar Manual de Uso (Integrante 1) y consolidar Informe Final (Integrante 3).", pasos: ["Integrante 1: Manual de uso completo (encendido, siembra, agua, pantallas, fallas, seguridad).", "Integrante 3: Informe final completo con PCB, estructura, modo foto, visión y curvas reales."], criterio_aceptacion: "Informe final y manual entregados." },
+        { id: "T2.17", titulo: "Ensayo de defensa", parte: 2, fase: "Documentación y Defensa Final", rol_responsable: "Todos", revisor: "Todos", depende_de: ["T2.16"], etiquetas: ["[PDF]"], semana_inicio: 9, semana_fin: 9, descripcion: "Ensayo general de exposición y demostración en vivo.", pasos: ["Ensayar demo en vivo de cámara y Raspberry Pi.", "Verificar que cada integrante pueda explicar cualquier parte del sistema."], criterio_aceptacion: "Cada integrante puede explicar cualquier parte del sistema." }
+      ];
+
+      const fechaBaseP1 = "2026-10-19";
+      const fechaBaseP2 = "2026-11-30";
+      const sumarDias = (f, d) => {
+        const dt = new Date(f + "T00:00:00");
+        dt.setDate(dt.getDate() + d);
+        return dt.toISOString().slice(0, 10);
+      };
+
+      const tareas = tareasRaw.map(t => {
+        const base = t.parte === 1 ? fechaBaseP1 : fechaBaseP2;
+        return {
+          ...t,
+          pasos: t.pasos.map((texto, idx) => ({ id: `${t.id}-P${idx + 1}`, texto, hecho: false })),
+          criterio_aprobado: false,
+          estado: "Pendiente",
+          fecha_inicio: sumarDias(base, (t.semana_inicio - 1) * 7),
+          fecha_fin: sumarDias(base, t.semana_fin * 7 - 1),
+          notas: "",
+          enlaces: [],
+          adjuntos: [],
+          historial: [{ fecha: ahora, autor: "Sistema", cambio: "Tarea cargada desde Plan Maestro v2.0" }],
+          creada: ahora,
+          actualizada: ahora
+        };
+      });
+
+      const decisiones = [
+        { id: "D01", titulo: "La cámara es una ESP32-CAM, nodo independiente.", etiquetas: ["[DISEÑO]", "[A VERIFICAR]"], por_que: "En el PDF la cámara aparece en la capa de dispositivos. Es un 'Thing' con Wi-Fi propia.", riesgo: "Segundo firmware, alimentación exigente, Wi-Fi débil.", mitigacion: "Fuente estable 5 V con condensador cerca, reintento de envío, antena externa si hace falta.", estado: "propuesta", notas: "Se confirma con docente (pregunta Q1)." },
+        { id: "D02", titulo: "DHT22 en lugar de DHT11.", etiquetas: ["[DISEÑO]"], por_que: "Más preciso en humedad relativa, variable central del proyecto.", riesgo: "Sensible a niebla directa.", mitigacion: "Ubicar en parte alta lejos del chorro.", estado: "confirmada", notas: "" },
+        { id: "D03", titulo: "Se añade un sensor de nivel de agua.", etiquetas: ["[DISEÑO]", "[A VERIFICAR]"], por_que: "PDF pide alertar si depósito se queda sin agua. Inferir por software es poco fiable.", riesgo: "Corrosión si es pistas expuestas.", mitigacion: "XKC-Y25 sin contacto o pistas expuestas por pulsos de 150 ms desde GPIO 33.", estado: "propuesta", notas: "Confirmar con docente (Q2)." },
+        { id: "D04", titulo: "Módulo relé 2 canales optoacoplado sin jumper JD-VCC.", etiquetas: ["[DISEÑO]", "[A VERIFICAR]"], por_que: "Bobinas a 5 V externos y lógica a 3,3 V del ESP32.", riesgo: "No todos traen jumper.", mitigacion: "Comprobar en tienda antes de pagar.", estado: "confirmada", notas: "" },
+        { id: "D05", titulo: "Alimentación separada.", etiquetas: ["[DISEÑO]"], por_que: "ESP32 por USB. Fuente 5 V / 3 A para potencia. GND común. VIN desconectado.", riesgo: "Devolver corriente a laptop.", mitigacion: "VIN desconectado siempre.", estado: "confirmada", notas: "" },
+        { id: "D06", titulo: "Comunicación híbrida (MQTT + HTTP POST + HTTPS).", etiquetas: ["[DISEÑO]"], por_que: "MQTT para telemetría liviana y HTTP POST para fotos pesadas.", riesgo: "Coordinación entre protocolos.", mitigacion: "Tópicos y endpoints bien definidos (7.3 y 7.5).", estado: "confirmada", notas: "" },
+        { id: "D07", titulo: "Modo foto con handshake y temporizador de seguridad.", etiquetas: ["[DISEÑO]"], por_que: "Apagar humidificador para no empañar foto.", riesgo: "Raspberry caída.", mitigacion: "Temporizador local de 6 minutos devuelve control si Pi no responde.", estado: "confirmada", notas: "" },
+        { id: "D08", titulo: "Una foto cada 6 horas (00:00, 06:00, 12:00, 18:00).", etiquetas: ["[DISEÑO]"], por_que: "Germinación lenta; pausas de 4-6 min de niebla no afectan.", riesgo: "Pérdida de toma.", mitigacion: "Reintento y próxima ventana.", estado: "confirmada", notas: "" },
+        { id: "D09", titulo: "Visión morfológica con OpenCV sin red neuronal.", etiquetas: ["[DISEÑO]"], por_que: "Cuadrícula física sobre paño oscuro. Buscar brote alargado.", riesgo: "Confundir hinchazón con radícula.", mitigacion: "Apertura morfológica y evaluar elongación (> 2 y >= 2 mm).", estado: "confirmada", notas: "" },
+        { id: "D10", titulo: "MQ-135 como índice relativo Rs/R0 (no ppm absoluto).", etiquetas: ["[DISEÑO]"], por_que: "Sensor de óxido metálico de banda ancha sensible a temp/hum.", riesgo: "Lecturas inestables.", mitigacion: "Precalentamiento previo y divisor 10k/15k.", estado: "confirmada", notas: "" },
+        { id: "D11", titulo: "Modelo de tiempo óptimo con grados-hora acumulados.", etiquetas: ["[DISEÑO]"], por_que: "GDDh = max(0, T - T_base) solo si sustrato húmedo.", riesgo: "Muestra pequeña.", mitigacion: "Presentar como modelo preliminar con honestidad estadística.", estado: "confirmada", notas: "" },
+        { id: "D12", titulo: "Lote piloto en la Parte 1.", etiquetas: ["[DISEÑO]"], por_que: "Tupper cerrado con paño cuadriculado y 20-25 semillas para calibrar.", riesgo: "Atraso en siembra.", mitigacion: "Sembrar en S3 apenas funcione el control.", estado: "confirmada", notas: "" },
+        { id: "D13", titulo: "Control con tiempos mínimos y máximos y apoyo DHT22.", etiquetas: ["[DISEÑO]"], por_que: "Niebla sube humedad del aire en min; sustrato responde en horas.", riesgo: "Exceso de humedad.", mitigacion: "t_min_on 30 s, t_min_off 60 s, t_max_on 10 min y umbrales aire.", estado: "confirmada", notas: "" },
+        { id: "D14", titulo: "Laptop como gemela de la Raspberry Pi.", etiquetas: ["[DISEÑO]"], por_que: "Pi se presta 1 vez por semana; piloto y pruebas duran varios días.", riesgo: "Suspensión de laptop.", mitigacion: "Desactivar suspensión y usar Pi para integrar y defender.", estado: "confirmada", notas: "" },
+        { id: "D15", titulo: "Fotos guardadas y servidas desde Flask en la Pi.", etiquetas: ["[DISEÑO]", "[A VERIFICAR]"], por_que: "Firebase solo guarda referencias y datos. Cloud Storage puede exigir pago.", riesgo: "Espacio en SD.", mitigacion: "MicroSD propia de 16 GB o más.", estado: "confirmada", notas: "" },
+        { id: "D16", titulo: "Seguridad básica (.env, Mosquitto con usuario, no Git).", etiquetas: ["[DISEÑO]"], por_que: "No exponer claves ni credenciales.", riesgo: "Filtración en repo.", mitigacion: ".gitignore desde el día 1.", estado: "confirmada", notas: "" },
+        { id: "D17", titulo: "Estructura acrílica con zona húmeda y seca (Parte 2).", etiquetas: ["[DISEÑO]"], por_que: "PCB en seco; piezas 3D en PETG/ASA (no PLA).", riesgo: "Condensación en PCB.", mitigacion: "Separación física y pasacables sellados.", estado: "confirmada", notas: "" },
+        { id: "D18", titulo: "Simulación de firmware en Wokwi antes de armar.", etiquetas: ["[DISEÑO]"], por_que: "Evitar dañar hardware y validar arranque seguro.", riesgo: "No simula cámara ni niebla.", mitigacion: "Usar potenciómetros para ADC1.", estado: "confirmada", notas: "" },
+        { id: "D19", titulo: "Organización Plan A por especialidad con revisión cruzada.", etiquetas: ["[DISEÑO]"], por_que: "Cada integrante construye lo suyo y otro lo valida.", riesgo: "Sobrecarga de Integrante 1.", mitigacion: "Redistribuir pruebas o manual si hace falta.", estado: "confirmada", notas: "" }
+      ];
+
+      const riesgos = [
+        { id: "R01", titulo: "Humidificador sin agua. Daña el disco piezoeléctrico.", mitigacion: "Depósito amplio con marca de nivel, revisión diaria en el piloto, sensor de nivel en Parte 2.", estado: "activo", notas: "" },
+        { id: "R02", titulo: "Noches frías en Quito. Retrasan germinación y favorecen hongos.", mitigacion: "DHT22 obligatorio en piloto, caja aislada en cuarto cerrado, avisar a docente si baja de 15 °C.", estado: "activo", notas: "" },
+        { id: "R03", titulo: "Relé no obedece a 3,3 V o se queda pegado.", mitigacion: "Probar en tienda sin jumper JD-VCC, polaridad comprobada.", estado: "activo", notas: "" },
+        { id: "R04", titulo: "Receptor apagado durante el piloto. Se pierden datos.", mitigacion: "Laptop sin suspensión, registro local de respaldo (CSV/SQLite).", estado: "activo", notas: "" },
+        { id: "R05", titulo: "Raspberry disponible solo una vez por semana.", mitigacion: "Laptop gemela, microSD propia, pedir préstamo largo para Parte 2.", estado: "activo", notas: "" },
+        { id: "R06", titulo: "Hinchazón confundida con radícula en OpenCV.", mitigacion: "Detectar brote alargado (apertura morfológica + largo/ancho > 2), validar con piloto.", estado: "activo", notas: "" },
+        { id: "R07", titulo: "Foto empañada por la niebla.", mitigacion: "Modo foto con humidificador apagado y espera de 3 a 4 minutos.", estado: "activo", notas: "" },
+        { id: "R08", titulo: "Raspberry caída durante modo foto.", mitigacion: "Temporizador de seguridad de 6 minutos en ESP32.", estado: "activo", notas: "" },
+        { id: "R09", titulo: "Exceso de humedad por control solo con sustrato.", mitigacion: "Tiempos mínimos/máximos y apoyo del DHT22.", estado: "activo", notas: "" },
+        { id: "R10", titulo: "ESP32-CAM con reinicios o mala señal.", mitigacion: "Fuente 5 V estable, condensador 220-470 µF, antena si hace falta, reintentos HTTP.", estado: "activo", notas: "" },
+        { id: "R11", titulo: "Wi-Fi de universidad aísla dispositivos.", mitigacion: "Hotspot de celular o router propio para pruebas.", estado: "activo", notas: "" },
+        { id: "R12", titulo: "Costo y espacio de fotos en la nube.", mitigacion: "Guardar fotos en Raspberry y verificar plan gratuito de Firebase.", estado: "activo", notas: "" },
+        { id: "R13", titulo: "Retraso por fabricación de PCB o impresión 3D.", mitigacion: "Pedir temprano; mantener protoboard de respaldo.", estado: "activo", notas: "" },
+        { id: "R14", titulo: "Pocos datos para el modelo.", mitigacion: "Presentar como modelo preliminar y mejorar con lotes Parte 2.", estado: "activo", notas: "" },
+        { id: "R15", titulo: "Filtración de claves en Git.", mitigacion: ".env y secrets.h fuera del repo; plantillas de ejemplo.", estado: "activo", notas: "" },
+        { id: "R16", titulo: "Sobrecarga del Integrante 1 en Parte 2.", mitigacion: "Redistribuir redacción de manual o pruebas.", estado: "activo", notas: "" }
+      ];
+
+      const pruebas = [
+        { id: "P1", categoria: "Hardware", titulo: "Humidificador a 5 V directos lanza niebla sin pulsar.", estado: "pendiente", resultado: "", fecha: "", notas: "" },
+        { id: "P2", categoria: "Hardware", titulo: "Relé obedece a 3,3 V y no se queda pegado.", estado: "pendiente", resultado: "", fecha: "", notas: "" },
+        { id: "P3", categoria: "Hardware", titulo: "Sensor capacitivo: lecturas distintas en aire y agua, estables con promedio.", estado: "pendiente", resultado: "", fecha: "", notas: "" },
+        { id: "P4", categoria: "Hardware", titulo: "Sin reinicios del ESP32 cuando se enciende el humidificador.", estado: "pendiente", resultado: "", fecha: "", notas: "" },
+        { id: "P5", categoria: "Hardware", titulo: "Divisor del MQ-135: nunca más de unos 3,0 V en el GPIO.", estado: "pendiente", resultado: "", fecha: "", notas: "" },
+        { id: "P6", categoria: "Hardware", titulo: "Sensor de nivel: distingue depósito vacío y lleno con umbral registrado.", estado: "pendiente", resultado: "", fecha: "", notas: "" },
+        { id: "P7", categoria: "Software", titulo: "El ESP32 se reconecta solo tras apagar y encender el router.", estado: "pendiente", resultado: "", fecha: "", notas: "" },
+        { id: "P8", categoria: "Software", titulo: "Mensajes MQTT llegan al receptor y se guardan en registro local y Firebase.", estado: "pendiente", resultado: "", fecha: "", notas: "" },
+        { id: "P9", categoria: "Software", titulo: "Sin internet, datos se guardan localmente y se sincronizan después.", estado: "pendiente", resultado: "", fecha: "", notas: "" },
+        { id: "P10", categoria: "Software", titulo: "Modo foto completo y recuperación a los 6 min si Pi no responde.", estado: "pendiente", resultado: "", fecha: "", notas: "" },
+        { id: "P11", categoria: "Software", titulo: "OpenCV: error de conteo aceptable frente al conteo manual.", estado: "pendiente", resultado: "", fecha: "", notas: "" },
+        { id: "P12", categoria: "Software", titulo: "Alertas llegan a Telegram y email al vaciar depósito o secar sustrato sin spam.", estado: "pendiente", resultado: "", fecha: "", notas: "" },
+        { id: "P13", categoria: "Sistema", titulo: "24 horas en seco sin fallas (Parte 2).", estado: "pendiente", resultado: "", fecha: "", notas: "" },
+        { id: "P14", categoria: "Sistema", titulo: "Pruebas reales de germinación en modo autónomo con al menos dos lotes.", estado: "pendiente", resultado: "", fecha: "", notas: "" }
+      ];
+
+      const preguntas = [
+        { id: "Q1", pregunta: "¿Podemos implementar la cámara como nodo propio con una ESP32-CAM por HTTP a la Pi en lugar de cámara conectada a la Pi?", estado: "pendiente", respuesta: "", fecha: "", notas: "Relacionada con D01 y T2.02" },
+        { id: "Q2", pregunta: "Para la alerta de depósito sin agua, ¿podemos añadir un sensor de nivel de agua al listado o se estima por software?", estado: "pendiente", respuesta: "", fecha: "", notas: "Relacionada con D03 y T2.02" },
+        { id: "Q3", pregunta: "¿Cuáles son las fechas de entrega de Parte 1 y Parte 2, y hay un formato o plantilla obligatoria para informes?", estado: "pendiente", respuesta: "", fecha: "", notas: "Al tener fechas, actualizar en Cronograma" },
+        { id: "Q4", pregunta: "Sobre la Raspberry Pi 4: ¿podemos usarla varios días seguidos para pruebas finales, con microSD propia y red propia?", estado: "pendiente", respuesta: "", fecha: "", notas: "Relacionada con Sección 8 y T2.14" },
+        { id: "Q5", pregunta: "En Parte 1, ¿es aceptable que el servidor del piloto sea una laptop gemela con el mismo código Python?", estado: "pendiente", respuesta: "", fecha: "", notas: "Relacionada con D06 y D14" },
+        { id: "Q6", pregunta: "¿Podemos usar piezas impresas en 3D (PETG/ASA) como parte de la estructura, además del acrílico?", estado: "pendiente", respuesta: "", fecha: "", notas: "Relacionada con D17 y Sección 14" }
+      ];
+
+      const compras = [
+        // 6.1
+        { id: "M1.01", parte: 1, subgrupo: "6.1 Electrónica", item: "ESP32 DevKit V1 (30 pines) con puerto USB", cantidad: "1", estado: "por comprar", precio: "", etiquetas: ["[PDF]"], notas: "" },
+        { id: "M1.02", parte: 1, subgrupo: "6.1 Electrónica", item: "Sensores capacitivos de suelo v1.2 (uno de respaldo)", cantidad: "2", estado: "por comprar", precio: "", etiquetas: ["[PDF]"], notas: "Con regulador visible en placa" },
+        { id: "M1.03", parte: 1, subgrupo: "6.1 Electrónica", item: "DHT22 módulo 3 pines (o suelto con R 4,7-10k pull-up)", cantidad: "1", estado: "por comprar", precio: "", etiquetas: ["[PDF]", "[DISEÑO]"], notas: "" },
+        { id: "M1.04", parte: 1, subgrupo: "6.1 Electrónica", item: "Módulo humidificador ultrasónico 5 V (microniebla)", cantidad: "1", estado: "por comprar", precio: "", etiquetas: ["[PDF]"], notas: "Probar a 5 V directos en tienda" },
+        { id: "M1.05", parte: 1, subgrupo: "6.1 Electrónica", item: "Módulo relé 2 canales con optoacoplador y jumper JD-VCC", cantidad: "1", estado: "por comprar", precio: "", etiquetas: ["[PDF]", "[DISEÑO]"], notas: "" },
+        { id: "M1.06", parte: 1, subgrupo: "6.1 Electrónica", item: "Pantalla OLED 0,96\" I2C (SSD1306, 4 pines)", cantidad: "1", estado: "por comprar", precio: "", etiquetas: ["[PDF]"], notas: "Dir 0x3C" },
+        { id: "M1.07", parte: 1, subgrupo: "6.1 Electrónica", item: "Fuente 5 V / 3 A con jack DC y adaptador a protoboard", cantidad: "1", estado: "por comprar", precio: "", etiquetas: ["[DISEÑO]"], notas: "" },
+        { id: "M1.08", parte: 1, subgrupo: "6.1 Electrónica", item: "Protoboards (1 o 2), cables dupont M-M y M-H", cantidad: "1 kit", estado: "por comprar", precio: "", etiquetas: ["[PDF]"], notas: "" },
+        { id: "M1.09", parte: 1, subgrupo: "6.1 Electrónica", item: "Condensadores 220-470 µF, 16 o 25 V", cantidad: "2", estado: "por comprar", precio: "", etiquetas: ["[DISEÑO]"], notas: "Para humidificador y cámara" },
+        { id: "M1.10", parte: 1, subgrupo: "6.1 Electrónica", item: "Resistencias de 10 kΩ, 15 kΩ y 4,7 kΩ", cantidad: "1 pack", estado: "por comprar", precio: "", etiquetas: ["[DISEÑO]"], notas: "Divisor MQ-135 y pull-up DHT22" },
+        { id: "M1.11", parte: 1, subgrupo: "6.1 Electrónica", item: "Cable USB de datos para ESP32", cantidad: "1", estado: "por comprar", precio: "", etiquetas: ["[PDF]"], notas: "" },
+        { id: "M1.12", parte: 1, subgrupo: "6.1 Electrónica", item: "Transistor 2N2222 u optoacoplador PC817 (si humidificador tiene pulsador)", cantidad: "1", estado: "por comprar", precio: "", etiquetas: ["[OPCIONAL]"], notas: "Para puenteo si no arranca directo" },
+        { id: "M1.13", parte: 1, subgrupo: "6.1 Electrónica", item: "Sensor de nivel de agua (si docente aprueba)", cantidad: "1", estado: "por comprar", precio: "", etiquetas: ["[OPCIONAL]", "[A VERIFICAR]"], notas: "" },
+        { id: "M1.14", parte: 1, subgrupo: "6.1 Lote piloto", item: "Tupper transparente grande con tapa y orificio de cables", cantidad: "1", estado: "por comprar", precio: "", etiquetas: ["[DISEÑO]"], notas: "" },
+        { id: "M1.15", parte: 1, subgrupo: "6.1 Lote piloto", item: "Paño oscuro (negro/café) e hilo para cuadrícula", cantidad: "1", estado: "por comprar", precio: "", etiquetas: ["[DISEÑO]"], notas: "Cuadrícula 4x5 o 5x5" },
+        { id: "M1.16", parte: 1, subgrupo: "6.1 Lote piloto", item: "Algodón o sustrato", cantidad: "1", estado: "por comprar", precio: "", etiquetas: ["[DISEÑO]"], notas: "" },
+        { id: "M1.17", parte: 1, subgrupo: "6.1 Lote piloto", item: "Semillas de fréjol (misma variedad)", cantidad: "25+", estado: "por comprar", precio: "", etiquetas: ["[PDF]", "[A VERIFICAR]"], notas: "" },
+        { id: "M1.18", parte: 1, subgrupo: "6.1 Lote piloto", item: "Esmalte transparente o silicona para sellar sensor", cantidad: "1", estado: "por comprar", precio: "", etiquetas: ["[DISEÑO]"], notas: "" },
+        { id: "M1.19", parte: 1, subgrupo: "6.1 Lote piloto", item: "Depósito amplio con marca de nivel mínimo (0,5 L+)", cantidad: "1", estado: "por comprar", precio: "", etiquetas: ["[DISEÑO]"], notas: "" },
+        { id: "M1.20", parte: 1, subgrupo: "6.1 Servidor local", item: "Tarjeta microSD propia (>= 16 GB) para Raspberry", cantidad: "1", estado: "por comprar", precio: "", etiquetas: ["[DISEÑO]"], notas: "Más laptop gemela" },
+        // 6.2
+        { id: "M2.01", parte: 2, subgrupo: "6.2 Parte 2", item: "ESP32-CAM (AI-Thinker, OV2640) con base USB/FTDI", cantidad: "1", estado: "por comprar", precio: "", etiquetas: ["[PDF]", "[DISEÑO]"], notas: "Antena IPEX opcional" },
+        { id: "M2.02", parte: 2, subgrupo: "6.2 Parte 2", item: "Sensor MQ-135 con resistencias de divisor", cantidad: "1", estado: "por comprar", precio: "", etiquetas: ["[PDF]"], notas: "" },
+        { id: "M2.03", parte: 2, subgrupo: "6.2 Parte 2", item: "Tira LED 5 V (~50 cm, blanca) y difusor", cantidad: "1", estado: "por comprar", precio: "", etiquetas: ["[PDF]"], notas: "" },
+        { id: "M2.04", parte: 2, subgrupo: "6.2 Parte 2", item: "Sensor de nivel de agua", cantidad: "1", estado: "por comprar", precio: "", etiquetas: ["[DISEÑO]", "[A VERIFICAR]"], notas: "" },
+        { id: "M2.05", parte: 2, subgrupo: "6.2 Parte 2", item: "Raspberry Pi 4 propia (solo si préstamo largo no es viable)", cantidad: "1", estado: "por comprar", precio: "", etiquetas: ["[OPCIONAL]", "[A VERIFICAR]"], notas: "" },
+        { id: "M2.06", parte: 2, subgrupo: "6.2 Parte 2", item: "PCB fabricada, borneras de tornillo, conectores", cantidad: "1 juego", estado: "por comprar", precio: "", etiquetas: ["[PDF]"], notas: "" },
+        { id: "M2.07", parte: 2, subgrupo: "6.2 Parte 2", item: "Láminas de acrílico y pegamento/silicona para acrílico", cantidad: "1 juego", estado: "por comprar", precio: "", etiquetas: ["[PDF]"], notas: "" },
+        { id: "M2.08", parte: 2, subgrupo: "6.2 Parte 2", item: "Filamento PETG o ASA para piezas 3D", cantidad: "1 rollo", estado: "por comprar", precio: "", etiquetas: ["[DISEÑO]"], notas: "No PLA en zona húmeda" },
+        { id: "M2.09", parte: 2, subgrupo: "6.2 Parte 2", item: "Pasacables, tornillería y separadores M3", cantidad: "1 kit", estado: "por comprar", precio: "", etiquetas: ["[DISEÑO]"], notas: "" },
+        // 6.3
+        { id: "M3.01", parte: 1, subgrupo: "6.3 Herramientas", item: "Multímetro digital", cantidad: "1", estado: "por comprar", precio: "", etiquetas: ["[DISEÑO]"], notas: "" },
+        { id: "M3.02", parte: 2, subgrupo: "6.3 Herramientas", item: "Soldador, estaño y pasta", cantidad: "1 kit", estado: "por comprar", precio: "", etiquetas: ["[PDF]"], notas: "" },
+        { id: "M3.03", parte: 1, subgrupo: "6.3 Herramientas", item: "Pistola de silicona, cutter y pelacables", cantidad: "1 kit", estado: "por comprar", precio: "", etiquetas: ["[DISEÑO]"], notas: "" }
+      ];
+
+      const checks_tienda = [
+        { id: "CT-01", texto: "ESP32 DevKit V1 de 30 pines con puerto USB.", hecho: false },
+        { id: "CT-02", texto: "Sensores capacitivos v1.2: dos unidades con regulador visible en placa.", hecho: false },
+        { id: "CT-03", texto: "DHT22 en módulo de 3 pines (o con pull-up).", hecho: false },
+        { id: "CT-04", texto: "OLED 0,96\" I2C de 4 pines (GND, VCC, SCL, SDA).", hecho: false },
+        { id: "CT-05", texto: "Módulo relé de 2 canales con optoacoplador y jumper JD-VCC.", hecho: false },
+        { id: "CT-06", texto: "PRUEBA EN TIENDA: Humidificador ultrasónico conectado a 5 V directos lanza niebla sin pulsar.", hecho: false },
+        { id: "CT-07", texto: "Fuente de 5 V / 3 A con jack y adaptador a protoboard.", hecho: false },
+        { id: "CT-08", texto: "Protoboard, cables dupont, condensadores 220-470 µF, resistencias 10k, 15k, 4,7k.", hecho: false },
+        { id: "CT-09", texto: "Tupper transparente con tapa, paño oscuro, hilo, esmalte transparente.", hecho: false },
+        { id: "CT-10", texto: "Si humidificador trae pulsador: transistor 2N2222 o PC817.", hecho: false },
+        { id: "CT-11", texto: "Parte 2: ESP32-CAM con base USB, MQ-135, tira LED 5 V, nivel, acrílico, filamento PETG/ASA.", hecho: false },
+        { id: "CT-12", texto: "Pedir siempre garantía o probar módulos antes de pagar.", hecho: false }
+      ];
+
+      const pendientes_inmediatos = [
+        { id: "PI-01", orden: 1, texto: "Asignar nombres a los tres roles y decidir en casa de quién vive el piloto.", hecho: false, notas: "" },
+        { id: "PI-02", orden: 2, texto: "Preguntar a la Ing. Sinche las preguntas de la Sección 17 y pedir fechas.", hecho: false, notas: "" },
+        { id: "PI-03", orden: 3, texto: "Coordinar préstamo semanal de la Raspberry y pedir uno largo para Parte 2.", hecho: false, notas: "" },
+        { id: "PI-04", orden: 4, texto: "Crear repositorio, laptop gemela y script simulador.", hecho: false, notas: "" },
+        { id: "PI-05", orden: 5, texto: "Simular firmware en Wokwi.", hecho: false, notas: "" },
+        { id: "PI-06", orden: 6, texto: "Comprar kit Parte 1 probando humidificador y relé en la tienda.", hecho: false, notas: "" },
+        { id: "PI-07", orden: 7, texto: "Armar protoboard y sembrar piloto lo antes posible.", hecho: false, notas: "" },
+        { id: "PI-08", orden: 8, texto: "Averiguar si hay acceso a impresora 3D (PETG/ASA).", hecho: false, notas: "" },
+        { id: "PI-09", orden: 9, texto: "Armar cronograma real con fechas de la docente.", hecho: false, notas: "" },
+        { id: "PI-10", orden: 10, texto: "[INCÓGNITA HARDWARE 1] Verificar temperatura nocturna de la cámara en Quito.", hecho: false, notas: "Avisar a docente si baja de 15 °C" },
+        { id: "PI-11", orden: 11, texto: "[INCÓGNITA HARDWARE 2] Verificar si relé conmuta bien a 3,3 V sin jumper JD-VCC.", hecho: false, notas: "" }
+      ];
+
+      const verificaciones_pendientes = [
+        { id: "VER-01", origen: "D01 / Q1", texto: "Confirmar con la docente el uso de ESP32-CAM como nodo independiente vía HTTP.", cerrado: false, nota_cierre: "" },
+        { id: "VER-02", origen: "D03 / Q2", texto: "Confirmar con la docente adición del sensor de nivel de agua al proyecto.", cerrado: false, nota_cierre: "" },
+        { id: "VER-03", origen: "Sección 1 / Q3", texto: "Obtener fechas oficiales de entrega de Parte 1 y Parte 2.", cerrado: false, nota_cierre: "" },
+        { id: "VER-04", origen: "Sección 8.2 / Q4", texto: "Confirmar préstamo largo (6-7 días) de Raspberry Pi para pruebas Parte 2.", cerrado: false, nota_cierre: "" },
+        { id: "VER-05", origen: "D15 / 7.8", texto: "Verificar límites de plan gratuito en Firebase y almacenamiento de fotos.", cerrado: false, nota_cierre: "" },
+        { id: "VER-06", origen: "Sección 6.5", texto: "Medir corriente real de cada módulo con multímetro (calefactor MQ-135 ~150 mA).", cerrado: false, nota_cierre: "" },
+        { id: "VER-07", origen: "Sección 6.9", texto: "Tiempo de precalentamiento de MQ-135 para estabilizar R0 en aire limpio.", cerrado: false, nota_cierre: "" },
+        { id: "VER-08", origen: "Sección 6.12", texto: "Evaluar si ESP32-CAM requiere antena IPEX externa y resistencia 0 Ω.", cerrado: false, nota_cierre: "" },
+        { id: "VER-09", origen: "Sección 7.2", texto: "Fijar umbrales H_on, H_off, RH_on (80%) y RH_off (90%) tras lote piloto.", cerrado: false, nota_cierre: "" },
+        { id: "VER-10", origen: "Sección 7.4", texto: "Medir tiempo real de disipación de niebla (3-4 min) antes de captura.", cerrado: false, nota_cierre: "" },
+        { id: "VER-11", origen: "Sección 7.6", texto: "Definir variedad de fréjol (color) y validar longitud de radícula >= 2 mm.", cerrado: false, nota_cierre: "" },
+        { id: "VER-12", origen: "Sección 7.7", texto: "Citar fuente bibliográfica para temperatura base de fréjol (~10 °C).", cerrado: false, nota_cierre: "" },
+        { id: "VER-13", origen: "Sección 8.4", texto: "Comprobar simulación de potenciómetros para ADC1 en Wokwi.", cerrado: false, nota_cierre: "" },
+        { id: "VER-14", origen: "Sección 8.7", texto: "Comprobar red Wi-Fi EPN y alistar hotspot de celular / router de respaldo.", cerrado: false, nota_cierre: "" },
+        { id: "VER-15", origen: "Sección 10 / R02", texto: "Verificar si temperatura nocturna en casa del piloto baja de 15 °C.", cerrado: false, nota_cierre: "" },
+        { id: "VER-16", origen: "Sección 14", texto: "Confirmar acceso a impresora 3D (PETG/ASA) y ventilación pasiva en cámara.", cerrado: false, nota_cierre: "" }
+      ];
+
+      const piloto_visitas = [
+        { id: "VIS-01", dia: 1, hora_bloque: "06:00", fecha_hora: "2026-11-02T06:00", temp_c: 19.5, hum_aire: 82, hum_sustrato: 74, gddh_acum: 9.5, radiculas_n: 0, porcentaje_germ: 0, agua_estado: "Sí", archivo_foto: "piloto_d1_06h.jpg", observaciones: "Siembra inicial de 25 semillas en paño cuadriculado." },
+        { id: "VIS-02", dia: 1, hora_bloque: "18:00", fecha_hora: "2026-11-02T18:00", temp_c: 21.2, hum_aire: 85, hum_sustrato: 78, gddh_acum: 125.0, radiculas_n: 1, porcentaje_germ: 4, agua_estado: "Sí", archivo_foto: "piloto_d1_18h.jpg", observaciones: "Semillas hinchadas por imbibición; 1 radícula emergente." },
+        { id: "VIS-03", dia: 2, hora_bloque: "06:00", fecha_hora: "2026-11-03T06:00", temp_c: 18.8, hum_aire: 86, hum_sustrato: 77, gddh_acum: 235.0, radiculas_n: 5, porcentaje_germ: 20, agua_estado: "Recargado", archivo_foto: "piloto_d2_06h.jpg", observaciones: "Se recarga agua en depósito." },
+        { id: "VIS-04", dia: 3, hora_bloque: "06:00", fecha_hora: "2026-11-04T06:00", temp_c: 20.5, hum_aire: 84, hum_sustrato: 76, gddh_acum: 470.0, radiculas_n: 14, porcentaje_germ: 56, agua_estado: "Sí", archivo_foto: "piloto_d3_06h.jpg", observaciones: "Brote visible > 2 mm en más de la mitad de celdas." },
+        { id: "VIS-05", dia: 4, hora_bloque: "06:00", fecha_hora: "2026-11-05T06:00", temp_c: 21.0, hum_aire: 85, hum_sustrato: 78, gddh_acum: 720.0, radiculas_n: 21, porcentaje_germ: 84, agua_estado: "Sí", archivo_foto: "piloto_d4_06h.jpg", observaciones: "Se supera umbral del 80% de germinación." }
+      ];
+
+      const bitacora = [
+        {
+          id: "BIT-001",
+          fecha_hora: "2026-10-18T19:00",
+          autor: "Todos",
+          tipo: "decisión",
+          plantilla: "decision_grupo",
+          tarea_id: "T1.01",
+          titulo: "Adopción formal del Plan Maestro v2.0 y Plan A",
+          texto: "Se aprueba el Plan A de especialidad con revisión cruzada y el uso de laptop gemela para cubrir el préstamo semanal de la Raspberry Pi 4.",
+          datos_plantilla: {
+            fecha: "2026-10-18",
+            decision: "División por especialidad: Integrante 1 (Hardware/Piloto), 2 (Firmware/Visión), 3 (Servidor/Datos)",
+            motivo: "Plan B (todos en todo) generaría retrasos en entregables paralelos.",
+            responsable: "Todos"
+          },
+          foto_base64: ""
+        }
+      ];
+
+      return {
+        schema_version: "2.0",
+        ultima_actualizacion: ahora,
+        config: {
+          proyecto: "Cámara de germinación inteligente para semilleros",
+          institucion: "Escuela Politécnica Nacional (EPN), Facultad de Ingeniería Eléctrica y Electrónica",
+          carrera: "Tecnologías de la Información",
+          asignatura: "Sistemas IoT (período 2026-B)",
+          docente: "PhD. Soraya Sinche",
+          grupo: "Grupo 1",
+          integrantes_ficha: "Xavier Anatoa, Angelo Conterón, Fernando Guarderas",
+          github_usuario: "Anghel01",
+          email_contacto: "angelo.conteron@epn.edu.ec",
+          semilla: "Fréjol",
+          variedad_frejol: "Por definir en T1.01 [A VERIFICAR]",
+          dueno_piloto: "Xavier Anatoa (Integrante 1)",
+          usuario_actual: "Angelo Conterón",
+          tema: "oscuro",
+          fecha_inicio_p1: fechaBaseP1,
+          fecha_inicio_p2: fechaBaseP2,
+          semana_actual_p1: 1,
+          parte_activa_semana: 1,
+          integrantes: {
+            "Integrante 1": { nombre: "Xavier Anatoa", especialidad: "Hardware, piloto y estructura" },
+            "Integrante 2": { nombre: "Angelo Conterón", especialidad: "Firmware y visión" },
+            "Integrante 3": { nombre: "Fernando Guarderas", especialidad: "Servidor, datos, modelo y servicios" }
+          },
+          piloto_config: { n_semillas: 25, variedad: "Por definir en T1.01", h_on: 65, h_off: 80, rh_on: 80, rh_off: 90, t_base: 10 },
+          firebase: { activo: false, databaseURL: "", apiKey: "", projectId: "", rutaNodo: "epn_iot_grupo1_camara", secretToken: "" }
+        },
+        tareas,
+        decisiones,
+        riesgos,
+        pruebas,
+        preguntas,
+        compras,
+        checks_tienda,
+        pendientes_inmediatos,
+        verificaciones_pendientes,
+        piloto_visitas,
+        bitacora,
+        calibracion: {
+          cap1_aire: 3200, cap1_agua: 1450, cap1_adc_prueba: 2150,
+          cap2_aire: 3240, cap2_agua: 1480, cap2_adc_prueba: 2200,
+          nivel_vacio: 100, nivel_lleno: 2850, nivel_umbral: 900,
+          mq135_r0_adc: 1100, mq135_rs_adc: 1265
+        },
+        checks_raspberry: {
+          antes_sd: false, antes_systemd: false, antes_script: false, antes_env: false,
+          durante_wifi: false, durante_telemetria: false, durante_post: false, durante_modofoto: false, durante_reboot: false, durante_notas: false,
+          despues_bitacora: false, despues_git: false
+        },
+        rutinas_hoy: {
+          agua_piloto: false, foto_00: false, foto_06: false, foto_12: false, foto_18: false,
+          receptor_activo: false, conteo_radiculas: false, reunion_equipo: false
+        }
+      };
+    }
+
+    /* ============================================================================
+       DATASTORE (LocalStorage + Adaptador Opcional Firebase Realtime)
+       ============================================================================ */
+    const STORAGE_KEY = "epn_iot_grupo1_camara_v2";
+
+    const DataStore = {
+      state: null,
+      syncTimer: null,
+
+      init() {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          try {
+            this.state = JSON.parse(raw);
+          } catch (e) {
+            this.state = crearDatosIniciales();
+          }
+        } else {
+          this.state = crearDatosIniciales();
+          this.save();
+        }
+        this.updateSyncBadge();
+      },
+
+      save() {
+        this.state.ultima_actualizacion = new Date().toISOString();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state));
+        this.updateSyncBadge();
+        if (this.state.config.firebase && this.state.config.firebase.activo) {
+          clearTimeout(this.syncTimer);
+          this.syncTimer = setTimeout(() => this.pushToFirebase(), 800);
+        }
+      },
+
+      reset() {
+        if (confirm("¿Estás seguro de restablecer todos los datos al Plan Maestro v2.0 inicial? Se sobrescribirá el estado actual.")) {
+          this.state = crearDatosIniciales();
+          this.save();
+          App.render();
+          alert("Datos restablecidos con éxito.");
+        }
+      },
+
+      updateSyncBadge() {
+        const el = document.getElementById("sync-indicator");
+        if (!el) return;
+        const fb = this.state?.config?.firebase;
+        if (fb && fb.activo && fb.databaseURL) {
+          el.className = "badge status-Hecha";
+          el.textContent = "☁️ Firebase Activo";
+        } else {
+          el.className = "badge status-Pendiente";
+          el.textContent = "💾 LocalStorage";
+        }
+      },
+
+      async pushToFirebase() {
+        const fb = this.state.config.firebase;
+        if (!fb || !fb.activo || !fb.databaseURL) return;
+        try {
+          const clean = fb.databaseURL.replace(/\/$/, "");
+          const auth = fb.secretToken ? `?auth=${encodeURIComponent(fb.secretToken)}` : "";
+          const url = `${clean}/${fb.rutaNodo || "epn_iot_grupo1_camara"}.json${auth}`;
+          const safeCopy = JSON.parse(JSON.stringify(this.state));
+          // Evitar subir token local dentro del nodo público
+          safeCopy.config.firebase = { activo: true, databaseURL: fb.databaseURL, rutaNodo: fb.rutaNodo };
+          await fetch(url, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(safeCopy) });
+        } catch (e) {
+          console.warn("Fallo sync Firebase:", e);
+        }
+      },
+
+      async pullFromFirebase() {
+        const fb = this.state.config.firebase;
+        if (!fb || !fb.databaseURL) {
+          alert("Ingresa primero la URL de Firebase en Configuración.");
+          return;
+        }
+        try {
+          const clean = fb.databaseURL.replace(/\/$/, "");
+          const auth = fb.secretToken ? `?auth=${encodeURIComponent(fb.secretToken)}` : "";
+          const url = `${clean}/${fb.rutaNodo || "epn_iot_grupo1_camara"}.json${auth}`;
+          const res = await fetch(url);
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          const data = await res.json();
+          if (data && data.tareas) {
+            const fbLocal = { ...this.state.config.firebase };
+            this.state = data;
+            this.state.config.firebase = fbLocal;
+            this.save();
+            App.render();
+            alert("Datos descargados correctamente de Firebase.");
+          } else {
+            alert("El nodo en Firebase está vacío. Usa 'Subir a Firebase' primero.");
+          }
+        } catch (e) {
+          alert("Error descargando de Firebase: " + e.message);
+        }
+      }
+    };
+
+    /* ============================================================================
+       LÓGICA DEL PROYECTO
+       ============================================================================ */
+    const Logic = {
+      getTaskProgress(t) {
+        if (!t.pasos || t.pasos.length === 0) return t.estado === "Hecha" ? 100 : 0;
+        const hechos = t.pasos.filter(p => p.hecho).length;
+        return Math.round((hechos / t.pasos.length) * 100);
+      },
+
+      isTaskBlocked(t) {
+        if (!t.depende_de || t.depende_de.length === 0) return false;
+        return t.depende_de.some(depId => {
+          const dep = DataStore.state.tareas.find(x => x.id === depId);
+          return dep && dep.estado !== "Hecha";
+        });
+      },
+
+      getBlockingIds(t) {
+        if (!t.depende_de) return [];
+        return t.depende_de.filter(depId => {
+          const dep = DataStore.state.tareas.find(x => x.id === depId);
+          return dep && dep.estado !== "Hecha";
+        });
+      },
+
+      isTaskOverdue(t) {
+        if (t.estado === "Hecha") return false;
+        const hoy = new Date().toISOString().slice(0, 10);
+        return t.fecha_fin && t.fecha_fin < hoy;
+      },
+
+      getWeightedProgress(lista) {
+        if (!lista || lista.length === 0) return 0;
+        let totalP = 0, sumP = 0;
+        lista.forEach(t => {
+          const peso = Math.max(1, (t.pasos ? t.pasos.length : 1));
+          totalP += peso;
+          sumP += this.getTaskProgress(t) * peso;
+        });
+        return totalP === 0 ? 0 : Math.round(sumP / totalP);
+      },
+
+      formatMemberName(rol) {
+        const m = DataStore.state.config.integrantes;
+        if (m && m[rol] && m[rol].nombre && m[rol].nombre !== rol) {
+          return `${rol} (${m[rol].nombre})`;
+        }
+        return rol;
+      },
+
+      taskBelongsToUser(t, u) {
+        if (!u || u === "Todos") return true;
+        if (t.rol_responsable === "Todos") return true;
+        const m = DataStore.state.config.integrantes;
+        for (const [rolKey, val] of Object.entries(m || {})) {
+          if ((u === rolKey || u === val.nombre) && (t.rol_responsable.includes(rolKey) || t.rol_responsable.includes(val.nombre))) {
+            return true;
+          }
+        }
+        return t.rol_responsable.includes(u);
+      },
+
+      changeTaskStatus(taskId, nuevoEstado) {
+        const t = DataStore.state.tareas.find(x => x.id === taskId);
+        if (!t || t.estado === nuevoEstado) return false;
+
+        // Alerta de bloqueo
+        if (nuevoEstado !== "Pendiente" && this.isTaskBlocked(t)) {
+          const f = this.getBlockingIds(t).join(", ");
+          const ok = confirm(`⚠️ TAREA BLOQUEADA: ${t.id} depende de [${f}] no terminadas.\n\n¿Deseas avanzar el estado a "${nuevoEstado}" con confirmación?`);
+          if (!ok) return false;
+        }
+
+        // Criterio de aceptación
+        if (nuevoEstado === "Hecha" && !t.criterio_aprobado) {
+          const ok = confirm(`⚠️ CRITERIO DE ACEPTACIÓN PENDIENTE:\n"${t.criterio_aceptacion}"\n\n¿Deseas aprobar el criterio y marcar la tarea como Hecha?`);
+          if (!ok) return false;
+          t.criterio_aprobado = true;
+        }
+
+        const ant = t.estado;
+        t.estado = nuevoEstado;
+        t.actualizada = new Date().toISOString();
+        const aut = DataStore.state.config.usuario_actual || "Equipo";
+        t.historial.unshift({ fecha: t.actualizada, autor: aut, cambio: `Estado: "${ant}" ➔ "${nuevoEstado}"` });
+        DataStore.save();
+        return true;
+      },
+
+      recalcularFechas() {
+        const p1 = DataStore.state.config.fecha_inicio_p1 || "2026-10-19";
+        const p2 = DataStore.state.config.fecha_inicio_p2 || "2026-11-30";
+        const sumar = (f, d) => {
+          const dt = new Date(f + "T00:00:00");
+          dt.setDate(dt.getDate() + d);
+          return dt.toISOString().slice(0, 10);
+        };
+        DataStore.state.tareas.forEach(t => {
+          const base = t.parte === 1 ? p1 : p2;
+          t.fecha_inicio = sumar(base, (t.semana_inicio - 1) * 7);
+          t.fecha_fin = sumar(base, t.semana_fin * 7 - 1);
+        });
+        DataStore.save();
+      },
+
+      calcularRutaCritica() {
+        const tareas = DataStore.state.tareas;
+        const nodes = {};
+        tareas.forEach(t => {
+          const dur = Math.max(1, (t.semana_fin - t.semana_inicio + 1));
+          nodes[t.id] = { id: t.id, dur, es: 0, ef: dur, ls: Infinity, lf: Infinity, deps: t.depende_de || [] };
+        });
+
+        let changed = true, g = 0;
+        while (changed && g++ < 100) {
+          changed = false;
+          tareas.forEach(t => {
+            const n = nodes[t.id];
+            let maxEf = 0;
+            n.deps.forEach(d => { if (nodes[d] && nodes[d].ef > maxEf) maxEf = nodes[d].ef; });
+            const es = maxEf, ef = es + n.dur;
+            if (es !== n.es || ef !== n.ef) { n.es = es; n.ef = ef; changed = true; }
+          });
+        }
+
+        const maxTot = Math.max(...Object.values(nodes).map(x => x.ef), 1);
+        Object.values(nodes).forEach(n => { n.lf = maxTot; n.ls = n.lf - n.dur; });
+
+        changed = true; g = 0;
+        while (changed && g++ < 100) {
+          changed = false;
+          tareas.forEach(t => {
+            const n = nodes[t.id];
+            const succ = tareas.filter(s => (s.depende_de || []).includes(n.id));
+            if (succ.length > 0) {
+              const minLs = Math.min(...succ.map(s => nodes[s.id].ls));
+              if (minLs !== n.lf) { n.lf = minLs; n.ls = n.lf - n.dur; changed = true; }
+            }
+          });
+        }
+
+        const criticos = new Set();
+        Object.values(nodes).forEach(n => {
+          if (Math.abs(n.ls - n.es) < 0.001) criticos.add(n.id);
+        });
+        return { criticos, nodes, totalSemanas: maxTot };
+      },
+
+      calcularMapADC(adc, aire, agua) {
+        const a = Number(adc), sAire = Number(aire), sAgua = Number(agua);
+        if (sAire === sAgua) return 0;
+        const r = ((a - sAire) * 100) / (sAgua - sAire);
+        return Math.max(0, Math.min(100, Math.round(r * 10) / 10));
+      }
+    };
+
+    /* ============================================================================
+       INTERFAZ DE USUARIO (11 MÓDULOS)
+       ============================================================================ */
+    const App = {
+      currentTab: "panel",
+      treeCollapsed: {},
+      kanbanFilters: { parte: "todas", responsable: "todos", etiqueta: "todas", busqueda: "" },
+      bitacoraSubtab: "listado",
+      bitacoraFilters: { tipo: "todos", autor: "todos", busqueda: "" },
+      listasSubtab: "decisiones",
+      comprasFiltroParte: "todas",
+      activeModalTaskId: null,
+      activeModalSubtab: "pasos",
+
+      init() {
+        DataStore.init();
+        document.documentElement.setAttribute("data-theme", DataStore.state.config.tema || "oscuro");
+        document.getElementById("user-selector").value = DataStore.state.config.usuario_actual || "Todos";
+        this.render();
+
+        window.addEventListener("keydown", e => {
+          if (e.key === "Escape" && this.activeModalTaskId) this.closeTaskModal();
+        });
+      },
+
+      escapeHtml(s) {
+        if (s === null || s === undefined) return "";
+        return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+      },
+
+      renderBadges(etiquetas) {
+        if (!etiquetas || !etiquetas.length) return "";
+        return etiquetas.map(tag => {
+          let c = "tag-OPCIONAL";
+          if (tag.includes("PDF")) c = "tag-PDF";
+          else if (tag.includes("DISEÑO")) c = "tag-DISENO";
+          else if (tag.includes("VERIFICAR")) c = "tag-VERIFICAR";
+          return `<span class="badge ${c}">${this.escapeHtml(tag)}</span>`;
+        }).join(" ");
+      },
+
+      renderStatusBadge(t) {
+        const bloq = Logic.isTaskBlocked(t) && t.estado !== "Hecha";
+        const c = "status-" + t.estado.replace(/\s+/g, "-").replace("ó", "o");
+        return `
+          <span class="badge ${c}">${this.escapeHtml(t.estado)}</span>
+          ${bloq ? `<span class="badge status-Bloqueada" title="Bloqueada por: ${Logic.getBlockingIds(t).join(', ')}">🔒 Bloqueada</span>` : ""}
+        `;
+      },
+
+      switchTab(tab) {
+        this.currentTab = tab;
+        document.querySelectorAll(".nav-btn").forEach(b => b.classList.toggle("active", b.getAttribute("data-tab") === tab));
+        this.render();
+      },
+
+      setActiveUser(u) {
+        DataStore.state.config.usuario_actual = u;
+        DataStore.save();
+        this.render();
+      },
+
+      toggleTheme() {
+        const t = DataStore.state.config.tema === "claro" ? "oscuro" : "claro";
+        DataStore.state.config.tema = t;
+        document.documentElement.setAttribute("data-theme", t);
+        DataStore.save();
+      },
+
+      render() {
+        const c = document.getElementById("app-view");
+        if (!c) return;
+        const i1 = Logic.formatMemberName("Integrante 1");
+        const i2 = Logic.formatMemberName("Integrante 2");
+        const i3 = Logic.formatMemberName("Integrante 3");
+        document.getElementById("topbar-subtitle").textContent =
+          `${DataStore.state.config.asignatura} • ${DataStore.state.config.docente} • ${i1} | ${i2} | ${i3}`;
+
+        switch (this.currentTab) {
+          case "panel": c.innerHTML = this.renderPanelPrincipal(); break;
+          case "arbol": c.innerHTML = this.renderVistaArbol(); break;
+          case "tablero": c.innerHTML = this.renderVistaTablero(); break;
+          case "cronograma": c.innerHTML = this.renderVistaCronograma(); break;
+          case "semana": c.innerHTML = this.renderVistaSemana(); break;
+          case "dependencias": c.innerHTML = this.renderVistaDependencias(); break;
+          case "bitacora": c.innerHTML = this.renderVistaBitacora(); break;
+          case "compras": c.innerHTML = this.renderVistaCompras(); break;
+          case "listas": c.innerHTML = this.renderVistaListas(); break;
+          case "referencia": c.innerHTML = this.renderVistaReferencia(); break;
+          case "config": c.innerHTML = this.renderVistaConfig(); break;
+        }
+      },
+
+      /* 1. PANEL PRINCIPAL */
+      renderPanelPrincipal() {
+        const st = DataStore.state;
+        const tareas = st.tareas;
+        const p1 = tareas.filter(t => t.parte === 1);
+        const p2 = tareas.filter(t => t.parte === 2);
+        const progTotal = Logic.getWeightedProgress(tareas);
+        const progP1 = Logic.getWeightedProgress(p1);
+        const progP2 = Logic.getWeightedProgress(p2);
+
+        const u = st.config.usuario_actual || "Todos";
+        const misTareas = tareas.filter(t => Logic.taskBelongsToUser(t, u) && t.estado !== "Hecha");
+        const sActiva = Number(st.config.semana_actual_p1 || 1);
+        const pActiva = Number(st.config.parte_activa_semana || 1);
+        const tareasSemana = tareas.filter(t => t.parte === pActiva && t.semana_inicio <= sActiva && t.semana_fin >= sActiva);
+        const tareasBloqueadas = tareas.filter(t => Logic.isTaskBlocked(t) && t.estado !== "Hecha");
+        const tareasAtrasadas = tareas.filter(t => Logic.isTaskOverdue(t));
+        const verPendientes = st.verificaciones_pendientes.filter(v => !v.cerrado);
+
+        return `
+          <div class="grid-4" style="margin-bottom:16px;">
+            <div class="card">
+              <div style="font-size:12px; color:var(--text-muted);">PROGRESO TOTAL</div>
+              <div style="font-size:28px; font-weight:800; color:var(--accent); margin:4px 0;">${progTotal}%</div>
+              <div class="progress-wrap"><div class="progress-bar" style="width:${progTotal}%"></div></div>
+              <div style="font-size:11.5px; color:var(--text-muted); margin-top:6px;">
+                ${tareas.filter(t => t.estado === "Hecha").length} de ${tareas.length} tareas hechas
+              </div>
+            </div>
+
+            <div class="card">
+              <div style="font-size:12px; color:var(--text-muted);">PARTE 1 (T1.01–T1.16)</div>
+              <div style="font-size:28px; font-weight:800; color:var(--info); margin:4px 0;">${progP1}%</div>
+              <div class="progress-wrap"><div class="progress-bar" style="width:${progP1}%; background:var(--info);"></div></div>
+              <div style="font-size:11.5px; color:var(--text-muted); margin-top:6px;">Prototipo en protoboard y piloto</div>
+            </div>
+
+            <div class="card">
+              <div style="font-size:12px; color:var(--text-muted);">PARTE 2 (T2.01–T2.17)</div>
+              <div style="font-size:28px; font-weight:800; color:var(--purple); margin:4px 0;">${progP2}%</div>
+              <div class="progress-wrap"><div class="progress-bar" style="width:${progP2}%; background:var(--purple);"></div></div>
+              <div style="font-size:11.5px; color:var(--text-muted); margin-top:6px;">PCB, acrílico, cámara y curvas</div>
+            </div>
+
+            <div class="card">
+              <div style="font-size:12px; color:var(--text-muted);">ESTADO DEL EQUIPO</div>
+              <div style="font-size:14px; font-weight:700; margin-top:6px;">3 Integrantes • Plan A</div>
+              <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">
+                🔴 ${tareasBloqueadas.length} bloqueadas • ⏰ ${tareasAtrasadas.length} atrasadas
+              </div>
+              <div style="margin-top:6px;">
+                <span class="badge tag-VERIFICAR">${verPendientes.length} [A VERIFICAR] abiertos</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-2" style="margin-bottom:16px;">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">👤 Mis Tareas Pendientes (${this.escapeHtml(u)})</div>
+                <span class="badge status-En-curso">${misTareas.length}</span>
+              </div>
+              ${misTareas.length === 0 ? `<p style="color:var(--text-muted);">No tienes tareas pendientes asignadas.</p>` : `
+                <div style="max-height:280px; overflow-y:auto;">
+                  ${misTareas.map(t => `
+                    <div class="task-item ${Logic.isTaskBlocked(t) ? 'blocked' : ''}" onclick="App.openTaskModal('${t.id}')">
+                      <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span class="task-id">${t.id}</span>
+                        ${this.renderStatusBadge(t)}
+                      </div>
+                      <div style="font-weight:600; margin:4px 0;">${this.escapeHtml(t.titulo)}</div>
+                      <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-muted);">
+                        <span>S${t.semana_inicio}-S${t.semana_fin} (${t.fecha_fin})</span>
+                        <span>${Logic.getTaskProgress(t)}% (${t.pasos.filter(p => p.hecho).length}/${t.pasos.length} pasos)</span>
+                      </div>
+                    </div>
+                  `).join("")}
+                </div>
+              `}
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">📅 Tareas de Esta Semana (Parte ${pActiva}, Semana ${sActiva})</div>
+                <div style="display:flex; gap:6px;">
+                  <button class="btn btn-sm" onclick="App.cambiarSemanaActiva(-1)">◀ S${Math.max(1, sActiva - 1)}</button>
+                  <button class="btn btn-sm" onclick="App.cambiarSemanaActiva(1)">S${sActiva + 1} ▶</button>
+                </div>
+              </div>
+              ${tareasSemana.length === 0 ? `<p style="color:var(--text-muted);">No hay tareas programadas para esta semana.</p>` : `
+                <div style="max-height:280px; overflow-y:auto;">
+                  ${tareasSemana.map(t => `
+                    <div class="task-item ${t.estado === 'Hecha' ? 'done' : ''} ${Logic.isTaskBlocked(t) ? 'blocked' : ''}" onclick="App.openTaskModal('${t.id}')">
+                      <div style="display:flex; justify-content:space-between;">
+                        <span class="task-id">${t.id}</span>
+                        <span>${this.escapeHtml(t.rol_responsable)} • ${this.renderStatusBadge(t)}</span>
+                      </div>
+                      <div style="font-weight:600; margin:4px 0;">${this.escapeHtml(t.titulo)}</div>
+                      <div class="progress-wrap"><div class="progress-bar" style="width:${Logic.getTaskProgress(t)}%"></div></div>
+                    </div>
+                  `).join("")}
+                </div>
+              `}
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">🔒 Tareas Bloqueadas (${tareasBloqueadas.length})</div>
+              </div>
+              ${tareasBloqueadas.length === 0 ? `<p style="color:var(--accent);">✅ Ninguna tarea bloqueada en este momento.</p>` : `
+                <div style="max-height:250px; overflow-y:auto;">
+                  ${tareasBloqueadas.map(t => `
+                    <div class="task-item blocked" onclick="App.openTaskModal('${t.id}')">
+                      <div style="display:flex; justify-content:space-between;">
+                        <span class="task-id">${t.id}</span>
+                        <span style="color:var(--danger); font-size:12px; font-weight:700;">
+                          Faltan: ${Logic.getBlockingIds(t).join(', ')}
+                        </span>
+                      </div>
+                      <div style="font-weight:600;">${this.escapeHtml(t.titulo)}</div>
+                    </div>
+                  `).join("")}
+                </div>
+              `}
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">🔍 Elementos [A VERIFICAR] Pendientes (${verPendientes.length})</div>
+              </div>
+              <div style="max-height:250px; overflow-y:auto;">
+                ${verPendientes.map(v => `
+                  <div style="padding:7px 0; border-bottom:1px solid var(--border); display:flex; align-items:flex-start; gap:8px;">
+                    <input type="checkbox" onchange="App.toggleVerificacion('${v.id}')" title="Marcar verificado" />
+                    <div style="flex:1;">
+                      <span class="badge tag-VERIFICAR">${this.escapeHtml(v.origen)}</span>
+                      <span style="font-size:12.5px;">${this.escapeHtml(v.texto)}</span>
+                    </div>
+                  </div>
+                `).join("")}
+              </div>
+            </div>
+          </div>
+        `;
+      },
+
+      cambiarSemanaActiva(delta) {
+        let s = Number(DataStore.state.config.semana_actual_p1 || 1) + delta;
+        if (s < 1) s = 1;
+        if (s > 9) s = 9;
+        DataStore.state.config.semana_actual_p1 = s;
+        DataStore.save();
+        this.render();
+      },
+
+      toggleVerificacion(id) {
+        const v = DataStore.state.verificaciones_pendientes.find(x => x.id === id);
+        if (v) {
+          v.cerrado = !v.cerrado;
+          DataStore.save();
+          this.render();
+        }
+      },
+
+      /* 2. VISTA ÁRBOL */
+      renderVistaArbol() {
+        const tareas = DataStore.state.tareas;
+        const p1 = tareas.filter(t => t.parte === 1);
+        const p2 = tareas.filter(t => t.parte === 2);
+        const progP1 = Logic.getWeightedProgress(p1);
+        const progP2 = Logic.getWeightedProgress(p2);
+
+        const renderFase = (parteNum, faseNombre) => {
+          const tFase = tareas.filter(t => t.parte === parteNum && t.fase === faseNombre);
+          const progFase = Logic.getWeightedProgress(tFase);
+          const fKey = `fase_${parteNum}_${faseNombre}`;
+          const colap = this.treeCollapsed[fKey];
+
+          return `
+            <div class="tree-node">
+              <div class="tree-header" onclick="App.toggleTree('${fKey}')">
+                <div style="font-weight:700;">${colap ? '▶' : '▼'} Fase: ${this.escapeHtml(faseNombre)} (${tFase.length} tareas)</div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span style="font-size:12px; font-weight:700;">${progFase}%</span>
+                  <div class="progress-wrap" style="width:70px;"><div class="progress-bar" style="width:${progFase}%"></div></div>
+                </div>
+              </div>
+              ${colap ? '' : `
+                <div style="margin-top:6px;">
+                  ${tFase.map(t => {
+                    const tKey = `task_${t.id}`;
+                    const tColap = this.treeCollapsed[tKey];
+                    const pProg = Logic.getTaskProgress(t);
+                    return `
+                      <div class="tree-node">
+                        <div class="tree-header" style="background:var(--bg-panel);" onclick="event.stopPropagation(); App.openTaskModal('${t.id}')">
+                          <div>
+                            <span class="task-id">${t.id}</span>
+                            <span style="font-weight:600; margin-left:6px;">${this.escapeHtml(t.titulo)}</span>
+                            <span style="font-size:12px; color:var(--text-muted); margin-left:6px;">• ${this.escapeHtml(t.rol_responsable)}</span>
+                          </div>
+                          <div style="display:flex; align-items:center; gap:8px;">
+                            ${this.renderStatusBadge(t)}
+                            <span style="font-size:12px;">${pProg}%</span>
+                            <button class="btn btn-sm" onclick="event.stopPropagation(); App.toggleTree('${tKey}')" title="Ver pasos">${tColap ? '▼ Pasos' : '▲ Pasos'}</button>
+                          </div>
+                        </div>
+                        ${tColap ? `
+                          <div style="margin-left:22px; padding:6px 0;">
+                            ${t.pasos.map(p => `
+                              <div style="display:flex; align-items:center; gap:8px; padding:3px 0; font-size:12.5px;">
+                                <input type="checkbox" ${p.hecho ? 'checked' : ''} onchange="App.togglePasoTree('${t.id}', '${p.id}', this.checked)" />
+                                <span style="${p.hecho ? 'text-decoration:line-through; color:var(--text-muted);' : ''}">${this.escapeHtml(p.texto)}</span>
+                              </div>
+                            `).join("")}
+                          </div>
+                        ` : ''}
+                      </div>
+                    `;
+                  }).join("")}
+                </div>
+              `}
+            </div>
+          `;
+        };
+
+        const fasesP1 = [...new Set(p1.map(t => t.fase))];
+        const fasesP2 = [...new Set(p2.map(t => t.fase))];
+
+        return `
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🌿 Árbol Jerárquico del Proyecto</div>
+              <div style="display:flex; gap:6px;">
+                <button class="btn btn-sm" onclick="App.expandAllTree()">Expandir todo</button>
+                <button class="btn btn-sm" onclick="App.collapseAllTree()">Colapsar todo</button>
+              </div>
+            </div>
+
+            <!-- NODO RAÍZ -->
+            <div class="tree-header" style="background:var(--bg-hover); font-size:15px; font-weight:800;">
+              <div>🌱 Cámara de Germinación Inteligente para Semilleros (Grupo 1)</div>
+              <div>${Logic.getWeightedProgress(tareas)}% Avance Total</div>
+            </div>
+
+            <!-- PARTE 1 -->
+            <div class="tree-node">
+              <div class="tree-header" onclick="App.toggleTree('parte_1')">
+                <div style="font-weight:700; color:var(--info);">
+                  ${this.treeCollapsed['parte_1'] ? '▶' : '▼'} PARTE 1: Prototipado en Protoboard y Lote Piloto (1er Bimestre)
+                </div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span style="font-weight:700;">${progP1}%</span>
+                  <div class="progress-wrap" style="width:90px;"><div class="progress-bar" style="width:${progP1}%; background:var(--info);"></div></div>
+                </div>
+              </div>
+              ${this.treeCollapsed['parte_1'] ? '' : fasesP1.map(f => renderFase(1, f)).join("")}
+            </div>
+
+            <!-- PARTE 2 -->
+            <div class="tree-node">
+              <div class="tree-header" onclick="App.toggleTree('parte_2')">
+                <div style="font-weight:700; color:var(--purple);">
+                  ${this.treeCollapsed['parte_2'] ? '▶' : '▼'} PARTE 2: Prototipo Final en PCB, Estructura Acrílica y Visión (2do Bimestre)
+                </div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span style="font-weight:700;">${progP2}%</span>
+                  <div class="progress-wrap" style="width:90px;"><div class="progress-bar" style="width:${progP2}%; background:var(--purple);"></div></div>
+                </div>
+              </div>
+              ${this.treeCollapsed['parte_2'] ? '' : fasesP2.map(f => renderFase(2, f)).join("")}
+            </div>
+          </div>
+        `;
+      },
+
+      toggleTree(key) {
+        this.treeCollapsed[key] = !this.treeCollapsed[key];
+        this.render();
+      },
+      expandAllTree() { this.treeCollapsed = {}; this.render(); },
+      collapseAllTree() {
+        this.treeCollapsed = { parte_1: true, parte_2: true };
+        this.render();
+      },
+      togglePasoTree(tId, pId, checked) {
+        const t = DataStore.state.tareas.find(x => x.id === tId);
+        if (!t) return;
+        const p = t.pasos.find(x => x.id === pId);
+        if (p) p.hecho = checked;
+        DataStore.save();
+        this.render();
+      },
+
+      /* 3. VISTA TABLERO (KANBAN) */
+      renderVistaTablero() {
+        const st = DataStore.state;
+        const f = this.kanbanFilters;
+        let lista = st.tareas.filter(t => {
+          if (f.parte !== "todas" && t.parte !== Number(f.parte)) return false;
+          if (f.responsable !== "todos" && !Logic.taskBelongsToUser(t, f.responsable)) return false;
+          if (f.etiqueta !== "todas" && !(t.etiquetas || []).includes(f.etiqueta)) return false;
+          if (f.busqueda) {
+            const q = f.busqueda.toLowerCase();
+            const txt = (t.id + " " + t.titulo + " " + t.descripcion).toLowerCase();
+            if (!txt.includes(q)) return false;
+          }
+          return true;
+        });
+
+        const estados = ["Pendiente", "En curso", "En revisión", "Hecha"];
+
+        return `
+          <div class="card" style="margin-bottom:14px;">
+            <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
+              <div style="flex:1; min-width:200px;">
+                <input type="text" placeholder="🔍 Buscar por ID, título o descripción..." value="${this.escapeHtml(f.busqueda)}" oninput="App.filtrarKanban('busqueda', this.value)" />
+              </div>
+              <div style="width:160px;">
+                <select onchange="App.filtrarKanban('parte', this.value)">
+                  <option value="todas" ${f.parte === 'todas' ? 'selected' : ''}>Todas las Partes</option>
+                  <option value="1" ${f.parte === '1' ? 'selected' : ''}>Parte 1 (T1)</option>
+                  <option value="2" ${f.parte === '2' ? 'selected' : ''}>Parte 2 (T2)</option>
+                </select>
+              </div>
+              <div style="width:180px;">
+                <select onchange="App.filtrarKanban('responsable', this.value)">
+                  <option value="todos" ${f.responsable === 'todos' ? 'selected' : ''}>Todos los responsables</option>
+                  <option value="Integrante 1" ${f.responsable === 'Integrante 1' ? 'selected' : ''}>${this.escapeHtml(Logic.formatMemberName('Integrante 1'))}</option>
+                  <option value="Integrante 2" ${f.responsable === 'Integrante 2' ? 'selected' : ''}>${this.escapeHtml(Logic.formatMemberName('Integrante 2'))}</option>
+                  <option value="Integrante 3" ${f.responsable === 'Integrante 3' ? 'selected' : ''}>${this.escapeHtml(Logic.formatMemberName('Integrante 3'))}</option>
+                </select>
+              </div>
+              <div style="width:160px;">
+                <select onchange="App.filtrarKanban('etiqueta', this.value)">
+                  <option value="todas">Todas las etiquetas</option>
+                  <option value="[PDF]" ${f.etiqueta === '[PDF]' ? 'selected' : ''}>[PDF]</option>
+                  <option value="[DISEÑO]" ${f.etiqueta === '[DISEÑO]' ? 'selected' : ''}>[DISEÑO]</option>
+                  <option value="[A VERIFICAR]" ${f.etiqueta === '[A VERIFICAR]' ? 'selected' : ''}>[A VERIFICAR]</option>
+                  <option value="[OPCIONAL]" ${f.etiqueta === '[OPCIONAL]' ? 'selected' : ''}>[OPCIONAL]</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="kanban-board">
+            ${estados.map(est => {
+              const items = lista.filter(t => t.estado === est);
+              return `
+                <div class="kanban-col">
+                  <div class="kanban-col-header">
+                    <span>${est}</span>
+                    <span class="badge status-${est.replace(/\s+/g, '-').replace('ó', 'o')}">${items.length}</span>
+                  </div>
+                  <div class="kanban-dropzone" ondragover="event.preventDefault(); this.classList.add('drag-over');" ondragleave="this.classList.remove('drag-over');" ondrop="App.handleKanbanDrop(event, '${est}')">
+                    ${items.map(t => {
+                      const bloq = Logic.isTaskBlocked(t) && t.estado !== "Hecha";
+                      return `
+                        <div class="task-item ${bloq ? 'blocked' : ''}" draggable="true" ondragstart="event.dataTransfer.setData('text/plain', '${t.id}')" onclick="App.openTaskModal('${t.id}')">
+                          <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span class="task-id">${t.id}</span>
+                            <span style="font-size:11px; color:var(--text-muted);">S${t.semana_inicio}-S${t.semana_fin}</span>
+                          </div>
+                          <div style="font-weight:600; margin:4px 0;">${this.escapeHtml(t.titulo)}</div>
+                          <div style="margin-bottom:6px;">${this.renderBadges(t.etiquetas)}</div>
+                          <div class="progress-wrap"><div class="progress-bar" style="width:${Logic.getTaskProgress(t)}%"></div></div>
+                          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px; font-size:11.5px; color:var(--text-muted);">
+                            <span>${this.escapeHtml(t.rol_responsable)}</span>
+                            ${bloq ? `<span style="color:var(--danger); font-weight:700;">🔒 Bloqueada</span>` : `<span>${t.pasos.filter(p => p.hecho).length}/${t.pasos.length}</span>`}
+                          </div>
+                          <div style="display:flex; gap:4px; margin-top:6px;" onclick="event.stopPropagation();">
+                            ${estados.filter(x => x !== est).map(dest => `
+                              <button class="btn btn-sm" style="flex:1; padding:2px;" onclick="App.moverEstadoRapido('${t.id}', '${dest}')" title="Mover a ${dest}">➔ ${dest.slice(0, 4)}</button>
+                            `).join("")}
+                          </div>
+                        </div>
+                      `;
+                    }).join("")}
+                  </div>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        `;
+      },
+
+      filtrarKanban(k, v) {
+        this.kanbanFilters[k] = v;
+        this.render();
+      },
+      handleKanbanDrop(e, nuevoEstado) {
+        e.preventDefault();
+        e.currentTarget.classList.remove("drag-over");
+        const id = e.dataTransfer.getData("text/plain");
+        if (id) {
+          Logic.changeTaskStatus(id, nuevoEstado);
+          this.render();
+        }
+      },
+      moverEstadoRapido(id, nuevoEstado) {
+        Logic.changeTaskStatus(id, nuevoEstado);
+        this.render();
+      },
+
+      /* 4. VISTA CRONOGRAMA (GANTT) */
+      renderVistaCronograma() {
+        const st = DataStore.state;
+        const tareas = st.tareas;
+        const hoy = new Date().toISOString().slice(0, 10);
+        const { criticos } = Logic.calcularRutaCritica();
+
+        return `
+          <div class="card" style="margin-bottom:14px;">
+            <div class="card-header">
+              <div class="card-title">📅 Cronograma Relativo (Gantt) y Fechas Reales</div>
+              <button class="btn btn-sm btn-primary no-print" onclick="window.print()">🖨️ Versión Imprimible</button>
+            </div>
+            <div class="grid-3" style="margin-bottom:12px;">
+              <div>
+                <label style="font-size:12px; font-weight:700;">Fecha Inicio Parte 1:</label>
+                <input type="date" value="${st.config.fecha_inicio_p1 || '2026-10-19'}" onchange="App.actualizarFechaInicio(1, this.value)" />
+              </div>
+              <div>
+                <label style="font-size:12px; font-weight:700;">Fecha Inicio Parte 2:</label>
+                <input type="date" value="${st.config.fecha_inicio_p2 || '2026-11-30'}" onchange="App.actualizarFechaInicio(2, this.value)" />
+              </div>
+              <div style="display:flex; align-items:flex-end;">
+                <button class="btn btn-sm" onclick="App.recalcularFechasBoton()">🔄 Recalcular Fechas de Tareas</button>
+              </div>
+            </div>
+            <div style="font-size:12px; color:var(--text-muted);">
+              Semanas relativas: Parte 1 (Semana 1 a 6) | Parte 2 (Semana 1 a 9). Hoy es ${hoy}. Tareas con borde dorado pertenecen a la Ruta Crítica.
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width:75px;">ID</th>
+                    <th style="min-width:180px;">Tarea</th>
+                    <th style="width:110px;">Responsable</th>
+                    <th style="width:70px;">Semana</th>
+                    <th style="width:90px;">Inicio</th>
+                    <th style="width:90px;">Fin</th>
+                    <th style="width:85px;">Estado</th>
+                    <th style="min-width:320px;">Barras por Semana (S1 a S9)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${tareas.map(t => {
+                    const esCritica = criticos.has(t.id);
+                    const maxS = t.parte === 1 ? 6 : 9;
+                    const leftPct = ((t.semana_inicio - 1) / maxS) * 100;
+                    const widthPct = Math.max(8, ((t.semana_fin - t.semana_inicio + 1) / maxS) * 100);
+                    const colorBar = t.estado === "Hecha" ? "var(--accent)" : (t.parte === 1 ? "var(--info)" : "var(--purple)");
+
+                    return `
+                      <tr style="cursor:pointer;" onclick="App.openTaskModal('${t.id}')">
+                        <td><span class="task-id">${t.id}</span></td>
+                        <td>
+                          <strong>${this.escapeHtml(t.titulo)}</strong>
+                          ${esCritica ? `<span class="badge tag-VERIFICAR" style="margin-left:4px;">Ruta Crítica</span>` : ""}
+                        </td>
+                        <td><span style="font-size:11.5px;">${this.escapeHtml(t.rol_responsable)}</span></td>
+                        <td>
+                          <span style="font-size:12px;">P${t.parte} S${t.semana_inicio}-${t.semana_fin}</span>
+                        </td>
+                        <td style="font-size:11.5px;">${t.fecha_inicio}</td>
+                        <td style="font-size:11.5px;">${t.fecha_fin}</td>
+                        <td>${this.renderStatusBadge(t)}</td>
+                        <td>
+                          <div style="position:relative; width:100%; height:22px; background:var(--bg-input); border-radius:5px; border:1px solid var(--border);">
+                            <div style="position:absolute; left:${leftPct}%; width:${widthPct}%; height:100%; background:${colorBar}; border-radius:4px; opacity:0.85; border:${esCritica ? '2px solid #fbbf24' : 'none'}; display:flex; align-items:center; justify-content:center; font-size:10.5px; font-weight:700; color:#fff;">
+                              ${Logic.getTaskProgress(t)}%
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    `;
+                  }).join("")}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      },
+
+      actualizarFechaInicio(parte, val) {
+        if (!val) return;
+        if (parte === 1) DataStore.state.config.fecha_inicio_p1 = val;
+        else DataStore.state.config.fecha_inicio_p2 = val;
+        Logic.recalcularFechas();
+        this.render();
+      },
+
+      recalcularFechasBoton() {
+        Logic.recalcularFechas();
+        this.render();
+        alert("Fechas recalculadas automáticamente.");
+      },
+
+      /* 5. VISTA SEMANA Y HOY */
+      renderVistaSemana() {
+        const st = DataStore.state;
+        const rut = st.rutinas_hoy || {};
+        const semana = Number(st.config.semana_actual_p1 || 1);
+        const parte = Number(st.config.parte_activa_semana || 1);
+        const tareasSem = st.tareas.filter(t => t.parte === parte && t.semana_inicio <= semana && t.semana_fin >= semana);
+
+        return `
+          <div class="grid-2" style="margin-bottom:16px;">
+            <!-- VISTA HOY -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">✅ Vista "Hoy" — Checklist Operativo Diario</div>
+                <span class="badge tag-PDF">Protocolo Piloto</span>
+              </div>
+              <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">
+                Rutinas recurrentes obligatorias del documento durante el lote piloto y el desarrollo:
+              </p>
+              <div style="display:flex; flex-direction:column; gap:8px;">
+                <label style="display:flex; align-items:center; gap:8px; padding:6px; background:var(--bg-card); border-radius:6px;">
+                  <input type="checkbox" ${rut.agua_piloto ? 'checked' : ''} onchange="App.toggleRutina('agua_piloto', this.checked)" />
+                  <span><strong>Revisar nivel de agua del lote piloto</strong> (el humidificador nunca debe operar en seco).</span>
+                </label>
+                <div style="padding:6px; background:var(--bg-card); border-radius:6px;">
+                  <div style="font-size:12px; font-weight:700; margin-bottom:4px;">📸 Captura de fotos (2 a 4 veces al día):</div>
+                  <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:6px;">
+                    <label style="display:flex; align-items:center; gap:4px; font-size:12px;">
+                      <input type="checkbox" ${rut.foto_00 ? 'checked' : ''} onchange="App.toggleRutina('foto_00', this.checked)" /> 00:00 h
+                    </label>
+                    <label style="display:flex; align-items:center; gap:4px; font-size:12px;">
+                      <input type="checkbox" ${rut.foto_06 ? 'checked' : ''} onchange="App.toggleRutina('foto_06', this.checked)" /> 06:00 h
+                    </label>
+                    <label style="display:flex; align-items:center; gap:4px; font-size:12px;">
+                      <input type="checkbox" ${rut.foto_12 ? 'checked' : ''} onchange="App.toggleRutina('foto_12', this.checked)" /> 12:00 h
+                    </label>
+                    <label style="display:flex; align-items:center; gap:4px; font-size:12px;">
+                      <input type="checkbox" ${rut.foto_18 ? 'checked' : ''} onchange="App.toggleRutina('foto_18', this.checked)" /> 18:00 h
+                    </label>
+                  </div>
+                </div>
+                <label style="display:flex; align-items:center; gap:8px; padding:6px; background:var(--bg-card); border-radius:6px;">
+                  <input type="checkbox" ${rut.receptor_activo ? 'checked' : ''} onchange="App.toggleRutina('receptor_activo', this.checked)" />
+                  <span><strong>Receptor y Mosquitto encendidos</strong> (laptop sin suspensión guardando telemetría).</span>
+                </label>
+                <label style="display:flex; align-items:center; gap:8px; padding:6px; background:var(--bg-card); border-radius:6px;">
+                  <input type="checkbox" ${rut.conteo_radiculas ? 'checked' : ''} onchange="App.toggleRutina('conteo_radiculas', this.checked)" />
+                  <span><strong>Conteo de radículas en fotos y bitácora</strong> (Integrante 3 cruza con Firebase).</span>
+                </label>
+                <label style="display:flex; align-items:center; gap:8px; padding:6px; background:var(--bg-card); border-radius:6px;">
+                  <input type="checkbox" ${rut.reunion_equipo ? 'checked' : ''} onchange="App.toggleRutina('reunion_equipo', this.checked)" />
+                  <span><strong>Reunión corta del equipo (15-20 min)</strong> (dos veces por semana).</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- CUADRÍCULA SEMANAL POR INTEGRANTE -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">🗓️ Horario Semanal — Parte ${parte}, Semana ${semana}</div>
+                <div style="display:flex; gap:6px;">
+                  <select style="width:auto;" onchange="App.cambiarParteSemana(this.value)">
+                    <option value="1" ${parte === 1 ? 'selected' : ''}>Parte 1</option>
+                    <option value="2" ${parte === 2 ? 'selected' : ''}>Parte 2</option>
+                  </select>
+                  <select style="width:auto;" onchange="App.cambiarNumeroSemana(this.value)">
+                    ${[1,2,3,4,5,6,7,8,9].map(num => `
+                      <option value="${num}" ${semana === num ? 'selected' : ''}>Semana ${num}</option>
+                    `).join("")}
+                  </select>
+                </div>
+              </div>
+
+              ${["Integrante 1", "Integrante 2", "Integrante 3"].map(rol => {
+                const tareasRol = tareasSem.filter(t => Logic.taskBelongsToUser(t, rol));
+                return `
+                  <div style="margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--border);">
+                    <div style="font-weight:700; color:var(--accent);">${this.escapeHtml(Logic.formatMemberName(rol))}</div>
+                    <div style="font-size:11.5px; color:var(--text-muted); margin-bottom:4px;">
+                      ${this.escapeHtml(st.config.integrantes[rol].especialidad)}
+                    </div>
+                    ${tareasRol.length === 0 ? `<p style="font-size:12px; color:var(--text-muted);">Sin tareas programadas para esta semana.</p>` : `
+                      <div style="display:flex; flex-direction:column; gap:4px;">
+                        ${tareasRol.map(t => `
+                          <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-card); padding:5px 8px; border-radius:5px; cursor:pointer;" onclick="App.openTaskModal('${t.id}')">
+                            <span style="font-size:12.5px;"><strong>${t.id}:</strong> ${this.escapeHtml(t.titulo)}</span>
+                            ${this.renderStatusBadge(t)}
+                          </div>
+                        `).join("")}
+                      </div>
+                    `}
+                  </div>
+                `;
+              }).join("")}
+            </div>
+          </div>
+        `;
+      },
+
+      toggleRutina(k, checked) {
+        if (!DataStore.state.rutinas_hoy) DataStore.state.rutinas_hoy = {};
+        DataStore.state.rutinas_hoy[k] = checked;
+        DataStore.save();
+        this.render();
+      },
+      cambiarParteSemana(p) {
+        DataStore.state.config.parte_activa_semana = Number(p);
+        DataStore.save();
+        this.render();
+      },
+      cambiarNumeroSemana(s) {
+        DataStore.state.config.semana_actual_p1 = Number(s);
+        DataStore.save();
+        this.render();
+      },
+
+      /* 6. VISTA DEPENDENCIAS Y RUTA CRÍTICA */
+      renderVistaDependencias() {
+        const tareas = DataStore.state.tareas;
+        const { criticos, nodes } = Logic.calcularRutaCritica();
+
+        return `
+          <div class="card" style="margin-bottom:14px;">
+            <div class="card-header">
+              <div class="card-title">🕸️ Grafo de Dependencias y Ruta Crítica (CPM)</div>
+              <span class="badge tag-VERIFICAR">${criticos.size} Tareas Críticas</span>
+            </div>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">
+              Una tarea está <strong>bloqueada</strong> si alguna de sus predecesoras no está Hecha. Las tareas con borde dorado forman la <strong>Ruta Crítica</strong> del proyecto (holgura cero).
+            </p>
+
+            <div class="grid-3" style="max-height:600px; overflow-y:auto;">
+              ${tareas.map(t => {
+                const esCrit = criticos.has(t.id);
+                const bloq = Logic.isTaskBlocked(t) && t.estado !== "Hecha";
+                const deps = t.depende_de || [];
+                const succ = tareas.filter(s => (s.depende_de || []).includes(t.id)).map(s => s.id);
+
+                return `
+                  <div class="card" style="border-left:5px solid ${esCrit ? '#fbbf24' : (bloq ? 'var(--danger)' : (t.estado === 'Hecha' ? 'var(--accent)' : 'var(--border)'))};" onclick="App.openTaskModal('${t.id}')">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                      <span class="task-id">${t.id}</span>
+                      ${this.renderStatusBadge(t)}
+                    </div>
+                    <div style="font-weight:700; margin:6px 0;">${this.escapeHtml(t.titulo)}</div>
+                    <div style="font-size:12px; color:var(--text-muted); margin-bottom:6px;">
+                      ${this.escapeHtml(t.rol_responsable)} • P${t.parte} (S${t.semana_inicio}-S${t.semana_fin})
+                    </div>
+                    <div style="font-size:11.5px; margin-top:4px;">
+                      <strong>⬅ Predecesoras:</strong> ${deps.length ? deps.map(d => `<span class="badge ${criticos.has(d) ? 'tag-VERIFICAR' : 'status-Pendiente'}" style="cursor:pointer;" onclick="event.stopPropagation(); App.openTaskModal('${d}')">${d}</span>`).join(" ") : '<span style="color:var(--text-muted);">Ninguna</span>'}
+                    </div>
+                    <div style="font-size:11.5px; margin-top:4px;">
+                      <strong>➔ Sucesoras:</strong> ${succ.length ? succ.map(s => `<span class="badge ${criticos.has(s) ? 'tag-VERIFICAR' : 'status-Pendiente'}" style="cursor:pointer;" onclick="event.stopPropagation(); App.openTaskModal('${s}')">${s}</span>`).join(" ") : '<span style="color:var(--text-muted);">Ninguna</span>'}
+                    </div>
+                  </div>
+                `;
+              }).join("")}
+            </div>
+          </div>
+        `;
+      },
+
+      /* 7. MODAL DETALLE DE TAREA */
+      openTaskModal(taskId) {
+        this.activeModalTaskId = taskId;
+        this.activeModalSubtab = "pasos";
+        const m = document.getElementById("task-modal");
+        const panel = document.getElementById("task-modal-content");
+        if (m && panel) {
+          panel.innerHTML = this.renderTaskModalContent(taskId);
+          m.classList.add("open");
+        }
+      },
+
+      closeTaskModal() {
+        this.activeModalTaskId = null;
+        const m = document.getElementById("task-modal");
+        if (m) m.classList.remove("open");
+        this.render();
+      },
+
+      renderTaskModalContent(taskId) {
+        const t = DataStore.state.tareas.find(x => x.id === taskId);
+        if (!t) return `<div class="modal-body">Tarea no encontrada</div>`;
+
+        const prog = Logic.getTaskProgress(t);
+        const bloq = Logic.isTaskBlocked(t) && t.estado !== "Hecha";
+        const sub = this.activeModalSubtab;
+
+        return `
+          <div class="modal-header">
+            <div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span class="task-id" style="font-size:16px;">${t.id}</span>
+                <span class="badge tag-PDF">Parte ${t.parte}</span>
+                <span class="badge tag-DISENO">${this.escapeHtml(t.fase)}</span>
+                ${this.renderBadges(t.etiquetas)}
+              </div>
+              <h2 id="modal-task-title" style="font-size:18px; margin-top:4px;">${this.escapeHtml(t.titulo)}</h2>
+            </div>
+            <button class="btn btn-sm" onclick="App.closeTaskModal()" style="font-size:16px;" aria-label="Cerrar modal">✕</button>
+          </div>
+
+          <div class="modal-body">
+            <!-- BANNER DE CRITERIO DE ACEPTACIÓN -->
+            <div class="acceptance-banner">
+              <div>
+                <div style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--accent);">CRITERIO DE ACEPTACIÓN [OBLIGATORIO]</div>
+                <div style="font-size:13px; font-weight:600; margin-top:2px;">${this.escapeHtml(t.criterio_aceptacion)}</div>
+              </div>
+              <label style="display:flex; align-items:center; gap:6px; font-weight:700; white-space:nowrap; cursor:pointer;">
+                <input type="checkbox" ${t.criterio_aprobado ? 'checked' : ''} onchange="App.toggleCriterioModal('${t.id}', this.checked)" />
+                <span>Aprobado</span>
+              </label>
+            </div>
+
+            <!-- FILA DE ESTADO Y METADATOS -->
+            <div class="grid-4" style="margin-bottom:14px; background:var(--bg-card); padding:10px; border-radius:8px;">
+              <div>
+                <label style="font-size:11.5px; color:var(--text-muted);">Estado:</label>
+                <select onchange="App.cambiarEstadoModal('${t.id}', this.value)">
+                  ${["Pendiente", "En curso", "En revisión", "Hecha"].map(est => `
+                    <option value="${est}" ${t.estado === est ? 'selected' : ''}>${est}</option>
+                  `).join("")}
+                </select>
+              </div>
+              <div>
+                <label style="font-size:11.5px; color:var(--text-muted);">Responsable:</label>
+                <select onchange="App.actualizarCampoTarea('${t.id}', 'rol_responsable', this.value)">
+                  <option value="Todos" ${t.rol_responsable === 'Todos' ? 'selected' : ''}>Todos</option>
+                  <option value="Integrante 1" ${t.rol_responsable === 'Integrante 1' ? 'selected' : ''}>${this.escapeHtml(Logic.formatMemberName('Integrante 1'))}</option>
+                  <option value="Integrante 2" ${t.rol_responsable === 'Integrante 2' ? 'selected' : ''}>${this.escapeHtml(Logic.formatMemberName('Integrante 2'))}</option>
+                  <option value="Integrante 3" ${t.rol_responsable === 'Integrante 3' ? 'selected' : ''}>${this.escapeHtml(Logic.formatMemberName('Integrante 3'))}</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:11.5px; color:var(--text-muted);">Revisión cruzada:</label>
+                <div style="font-size:12px; font-weight:600; padding:6px 0;">${this.escapeHtml(t.revisor)}</div>
+              </div>
+              <div>
+                <label style="font-size:11.5px; color:var(--text-muted);">Avance de pasos:</label>
+                <div style="font-size:14px; font-weight:700; color:var(--accent);">${prog}%</div>
+                <div class="progress-wrap"><div class="progress-bar" style="width:${prog}%"></div></div>
+              </div>
+            </div>
+
+            ${bloq ? `
+              <div style="background:var(--danger-soft); border:1px solid var(--danger); border-radius:8px; padding:8px 12px; margin-bottom:12px; font-size:12.5px; color:var(--danger);">
+                ⚠️ <strong>Esta tarea está bloqueada</strong> porque depende de: [${Logic.getBlockingIds(t).join(', ')}] que no están Hechas.
+              </div>
+            ` : ''}
+
+            <!-- PESTAÑAS INTERNAS -->
+            <div class="subtabs">
+              <button class="btn btn-sm ${sub === 'pasos' ? 'btn-primary' : ''}" onclick="App.cambiarSubtabModal('pasos')">✓ Cómo hacerlo (${t.pasos.length} pasos)</button>
+              <button class="btn btn-sm ${sub === 'info' ? 'btn-primary' : ''}" onclick="App.cambiarSubtabModal('info')">ℹ️ Metadatos y Dependencias</button>
+              <button class="btn btn-sm ${sub === 'notas' ? 'btn-primary' : ''}" onclick="App.cambiarSubtabModal('notas')">📝 Notas y Enlaces</button>
+              <button class="btn btn-sm ${sub === 'historial' ? 'btn-primary' : ''}" onclick="App.cambiarSubtabModal('historial')">📜 Historial (${(t.historial || []).length})</button>
+            </div>
+
+            <!-- CONTENIDO DE PESTAÑAS -->
+            ${sub === 'pasos' ? `
+              <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                  <span style="font-size:12px; color:var(--text-muted);">Marca cada paso para reflejar el avance real:</span>
+                  <button class="btn btn-sm" onclick="App.agregarPasoModal('${t.id}')">+ Añadir paso</button>
+                </div>
+                ${t.pasos.map((p, idx) => `
+                  <div style="display:flex; align-items:flex-start; gap:8px; padding:6px; background:var(--bg-card); border-radius:6px; margin-bottom:6px;">
+                    <input type="checkbox" ${p.hecho ? 'checked' : ''} onchange="App.togglePasoModal('${t.id}', '${p.id}', this.checked)" />
+                    <div style="flex:1; font-size:13px; ${p.hecho ? 'text-decoration:line-through; color:var(--text-muted);' : ''}">
+                      ${this.escapeHtml(p.texto)}
+                    </div>
+                    <button class="btn btn-sm btn-danger" onclick="App.eliminarPasoModal('${t.id}', '${p.id}')" title="Eliminar paso">✕</button>
+                  </div>
+                `).join("")}
+              </div>
+            ` : ''}
+
+            ${sub === 'info' ? `
+              <div style="display:flex; flex-direction:column; gap:10px;">
+                <div>
+                  <label style="font-size:12px; font-weight:700;">Descripción detallada:</label>
+                  <textarea rows="3" onchange="App.actualizarCampoTarea('${t.id}', 'descripcion', this.value)">${this.escapeHtml(t.descripcion)}</textarea>
+                </div>
+                <div class="grid-2">
+                  <div>
+                    <label style="font-size:12px; font-weight:700;">Semanas relativas:</label>
+                    <div style="display:flex; gap:6px;">
+                      <input type="number" min="1" max="9" value="${t.semana_inicio}" onchange="App.actualizarSemanaTarea('${t.id}', 'semana_inicio', this.value)" />
+                      <input type="number" min="1" max="9" value="${t.semana_fin}" onchange="App.actualizarSemanaTarea('${t.id}', 'semana_fin', this.value)" />
+                    </div>
+                  </div>
+                  <div>
+                    <label style="font-size:12px; font-weight:700;">Depende de (enlaces clicables):</label>
+                    <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:4px;">
+                      ${(t.depende_de || []).length === 0 ? '<span style="color:var(--text-muted); font-size:12px;">Sin dependencias</span>' : t.depende_de.map(dep => `
+                        <button class="btn btn-sm btn-warn" onclick="App.openTaskModal('${dep}')">➔ ${dep}</button>
+                      `).join("")}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ` : ''}
+
+            ${sub === 'notas' ? `
+              <div>
+                <label style="font-size:12px; font-weight:700;">Notas de laboratorio y observaciones:</label>
+                <textarea rows="5" placeholder="Escribe notas técnicas..." onchange="App.actualizarCampoTarea('${t.id}', 'notas', this.value)">${this.escapeHtml(t.notas || '')}</textarea>
+              </div>
+            ` : ''}
+
+            ${sub === 'historial' ? `
+              <div style="max-height:280px; overflow-y:auto;">
+                ${(t.historial || []).map(h => `
+                  <div style="padding:6px 0; border-bottom:1px solid var(--border); font-size:12px;">
+                    <span style="color:var(--text-muted);">${h.fecha.slice(0, 16).replace('T', ' ')}</span> —
+                    <strong>${this.escapeHtml(h.autor)}:</strong> ${this.escapeHtml(h.cambio)}
+                  </div>
+                `).join("")}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      },
+
+      cambiarSubtabModal(sub) {
+        this.activeModalSubtab = sub;
+        const panel = document.getElementById("task-modal-content");
+        if (panel && this.activeModalTaskId) {
+          panel.innerHTML = this.renderTaskModalContent(this.activeModalTaskId);
+        }
+      },
+
+      toggleCriterioModal(tId, checked) {
+        const t = DataStore.state.tareas.find(x => x.id === tId);
+        if (t) {
+          t.criterio_aprobado = checked;
+          t.historial.unshift({ fecha: new Date().toISOString(), autor: DataStore.state.config.usuario_actual || "Equipo", cambio: `Criterio de aceptación ${checked ? 'APROBADO' : 'desmarcado'}` });
+          DataStore.save();
+          this.cambiarSubtabModal(this.activeModalSubtab);
+        }
+      },
+
+      cambiarEstadoModal(tId, nuevoEstado) {
+        Logic.changeTaskStatus(tId, nuevoEstado);
+        this.cambiarSubtabModal(this.activeModalSubtab);
+      },
+
+      togglePasoModal(tId, pId, checked) {
+        const t = DataStore.state.tareas.find(x => x.id === tId);
+        if (t) {
+          const p = t.pasos.find(x => x.id === pId);
+          if (p) p.hecho = checked;
+          DataStore.save();
+          this.cambiarSubtabModal(this.activeModalSubtab);
+        }
+      },
+
+      agregarPasoModal(tId) {
+        const texto = prompt("Nuevo paso a ejecutar:");
+        if (!texto) return;
+        const t = DataStore.state.tareas.find(x => x.id === tId);
+        if (t) {
+          t.pasos.push({ id: `${t.id}-P${t.pasos.length + 1}`, texto, hecho: false });
+          DataStore.save();
+          this.cambiarSubtabModal(this.activeModalSubtab);
+        }
+      },
+
+      eliminarPasoModal(tId, pId) {
+        const t = DataStore.state.tareas.find(x => x.id === tId);
+        if (t) {
+          t.pasos = t.pasos.filter(x => x.id !== pId);
+          DataStore.save();
+          this.cambiarSubtabModal(this.activeModalSubtab);
+        }
+      },
+
+      actualizarCampoTarea(tId, campo, valor) {
+        const t = DataStore.state.tareas.find(x => x.id === tId);
+        if (t) {
+          t[campo] = valor;
+          t.actualizada = new Date().toISOString();
+          DataStore.save();
+        }
+      },
+
+      actualizarSemanaTarea(tId, campo, valor) {
+        const t = DataStore.state.tareas.find(x => x.id === tId);
+        if (t) {
+          t[campo] = Number(valor);
+          Logic.recalcularFechas();
+          this.cambiarSubtabModal(this.activeModalSubtab);
+        }
+      },
+
+      /* 8. VISTA BITÁCORA Y PLANTILLAS */
+      renderVistaBitacora() {
+        const st = DataStore.state;
+        const sub = this.bitacoraSubtab;
+        const cal = st.calibracion || {};
+
+        return `
+          <div class="card" style="margin-bottom:14px;">
+            <div class="card-header">
+              <div class="card-title">📓 Bitácora de Laboratorio y Calculadoras</div>
+              <div style="display:flex; gap:6px;">
+                <button class="btn btn-sm ${sub === 'listado' ? 'btn-primary' : ''}" onclick="App.cambiarBitacoraSubtab('listado')">Historial de Entradas</button>
+                <button class="btn btn-sm ${sub === 'calibracion' ? 'btn-primary' : ''}" onclick="App.cambiarBitacoraSubtab('calibracion')">19.1 Calibración Sensores</button>
+                <button class="btn btn-sm ${sub === 'piloto' ? 'btn-primary' : ''}" onclick="App.cambiarBitacoraSubtab('piloto')">19.2 Lote Piloto (% Germ)</button>
+                <button class="btn btn-sm ${sub === 'raspberry' ? 'btn-primary' : ''}" onclick="App.cambiarBitacoraSubtab('raspberry')">19.3 Sesión Raspberry Pi</button>
+                <button class="btn btn-sm ${sub === 'nueva' ? 'btn-primary' : ''}" onclick="App.cambiarBitacoraSubtab('nueva')">+ Nueva Entrada</button>
+              </div>
+            </div>
+          </div>
+
+          ${sub === 'calibracion' ? this.renderPlantillaCalibracion() : ''}
+          ${sub === 'piloto' ? this.renderPlantillaPiloto() : ''}
+          ${sub === 'raspberry' ? this.renderPlantillaRaspberry() : ''}
+          ${sub === 'nueva' ? this.renderFormularioNuevaEntrada() : ''}
+          ${sub === 'listado' ? this.renderListadoBitacora() : ''}
+        `;
+      },
+
+      cambiarBitacoraSubtab(s) {
+        this.bitacoraSubtab = s;
+        this.render();
+      },
+
+      renderPlantillaCalibracion() {
+        const cal = DataStore.state.calibracion;
+        const pCap1 = Logic.calcularMapADC(cal.cap1_adc_prueba, cal.cap1_aire, cal.cap1_agua);
+        const pCap2 = Logic.calcularMapADC(cal.cap2_adc_prueba, cal.cap2_aire, cal.cap2_agua);
+        const ratioMQ = (cal.mq135_r0_adc > 0) ? (cal.mq135_rs_adc / cal.mq135_r0_adc).toFixed(2) : "0.00";
+
+        return `
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">🌱 Sensor Capacitivo de Sustrato v1.2 (#1 y #2)</div>
+                <span class="badge tag-PDF">Fórmula map() C++</span>
+              </div>
+              <div style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">
+                Mapeo: <code>map(adc, ADC_aire, ADC_agua, 0, 100)</code> limitado a 0–100%.
+              </div>
+
+              <div style="background:var(--bg-card); padding:10px; border-radius:8px; margin-bottom:10px;">
+                <strong>Sensor #1 (Principal)</strong>
+                <div class="grid-3" style="margin-top:6px;">
+                  <div><label style="font-size:11px;">Aire Seco (0%):</label><input type="number" value="${cal.cap1_aire}" onchange="App.actualizarCalib('cap1_aire', this.value)" /></div>
+                  <div><label style="font-size:11px;">Agua Línea (100%):</label><input type="number" value="${cal.cap1_agua}" onchange="App.actualizarCalib('cap1_agua', this.value)" /></div>
+                  <div><label style="font-size:11px;">ADC Prueba:</label><input type="number" value="${cal.cap1_adc_prueba}" oninput="App.actualizarCalib('cap1_adc_prueba', this.value)" /></div>
+                </div>
+                <div style="margin-top:8px; font-weight:700; color:var(--accent);">
+                  ➔ Porcentaje Calculado: ${pCap1}%
+                </div>
+              </div>
+
+              <div style="background:var(--bg-card); padding:10px; border-radius:8px;">
+                <strong>Sensor #2 (Respaldo)</strong>
+                <div class="grid-3" style="margin-top:6px;">
+                  <div><label style="font-size:11px;">Aire Seco (0%):</label><input type="number" value="${cal.cap2_aire}" onchange="App.actualizarCalib('cap2_aire', this.value)" /></div>
+                  <div><label style="font-size:11px;">Agua Línea (100%):</label><input type="number" value="${cal.cap2_agua}" onchange="App.actualizarCalib('cap2_agua', this.value)" /></div>
+                  <div><label style="font-size:11px;">ADC Prueba:</label><input type="number" value="${cal.cap2_adc_prueba}" oninput="App.actualizarCalib('cap2_adc_prueba', this.value)" /></div>
+                </div>
+                <div style="margin-top:8px; font-weight:700; color:var(--accent);">
+                  ➔ Porcentaje Calculado: ${pCap2}%
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">💧 Nivel de Agua y 🫁 Sensor MQ-135</div>
+              </div>
+              <div style="background:var(--bg-card); padding:10px; border-radius:8px; margin-bottom:10px;">
+                <strong>Sensor de Nivel de Agua</strong>
+                <div class="grid-3" style="margin-top:6px;">
+                  <div><label style="font-size:11px;">Depósito Vacío:</label><input type="number" value="${cal.nivel_vacio}" onchange="App.actualizarCalib('nivel_vacio', this.value)" /></div>
+                  <div><label style="font-size:11px;">Depósito Lleno:</label><input type="number" value="${cal.nivel_lleno}" onchange="App.actualizarCalib('nivel_lleno', this.value)" /></div>
+                  <div><label style="font-size:11px;">Umbral Alerta:</label><input type="number" value="${cal.nivel_umbral}" onchange="App.actualizarCalib('nivel_umbral', this.value)" /></div>
+                </div>
+              </div>
+
+              <div style="background:var(--bg-card); padding:10px; border-radius:8px;">
+                <strong>MQ-135 (Divisor 10 kΩ / 15 kΩ)</strong>
+                <div class="grid-2" style="margin-top:6px;">
+                  <div><label style="font-size:11px;">Aire limpio precalentado (R0):</label><input type="number" value="${cal.mq135_r0_adc}" onchange="App.actualizarCalib('mq135_r0_adc', this.value)" /></div>
+                  <div><label style="font-size:11px;">Con semillas germinando (Rs):</label><input type="number" value="${cal.mq135_rs_adc}" onchange="App.actualizarCalib('mq135_rs_adc', this.value)" /></div>
+                </div>
+                <div style="margin-top:8px; font-weight:700; color:var(--purple);">
+                  ➔ Índice Relativo Rs/R0 = ${ratioMQ}
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      },
+
+      actualizarCalib(campo, val) {
+        DataStore.state.calibracion[campo] = Number(val);
+        DataStore.save();
+        this.render();
+      },
+
+      renderPlantillaPiloto() {
+        const st = DataStore.state;
+        const cfg = st.config.piloto_config;
+        const visitas = st.piloto_visitas || [];
+
+        // Generar puntos SVG para curva de % germinación
+        const w = 600, h = 180, pad = 30;
+        let points = "";
+        if (visitas.length > 1) {
+          points = visitas.map((v, i) => {
+            const x = pad + (i / (visitas.length - 1)) * (w - 2 * pad);
+            const y = h - pad - (v.porcentaje_germ / 100) * (h - 2 * pad);
+            return `${x},${y}`;
+          }).join(" ");
+        }
+
+        return `
+          <div class="card" style="margin-bottom:14px;">
+            <div class="card-header">
+              <div class="card-title">📈 Curva de % Germinación en Tiempo Real</div>
+              <button class="btn btn-sm btn-primary" onclick="App.agregarVisitaPilotoPrompt()">+ Registrar Visita</button>
+            </div>
+            <div style="width:100%; overflow-x:auto;">
+              <svg viewBox="0 0 ${w} ${h}" style="width:100%; max-height:220px; background:var(--bg-input); border-radius:8px;">
+                <line x1="${pad}" y1="${h - pad}" x2="${w - pad}" y2="${h - pad}" stroke="var(--border)" stroke-width="2" />
+                <line x1="${pad}" y1="${pad}" x2="${pad}" y2="${h - pad}" stroke="var(--border)" stroke-width="2" />
+                <!-- Línea umbral 80% -->
+                <line x1="${pad}" y1="${h - pad - 0.8 * (h - 2 * pad)}" x2="${w - pad}" y2="${h - pad - 0.8 * (h - 2 * pad)}" stroke="var(--accent)" stroke-dasharray="4" />
+                <text x="${w - pad - 60}" y="${h - pad - 0.8 * (h - 2 * pad) - 4}" fill="var(--accent)" font-size="10">Meta 80%</text>
+                ${points ? `<polyline points="${points}" fill="none" stroke="var(--info)" stroke-width="3" />` : ''}
+                ${visitas.map((v, i) => {
+                  const x = pad + (i / Math.max(1, visitas.length - 1)) * (w - 2 * pad);
+                  const y = h - pad - (v.porcentaje_germ / 100) * (h - 2 * pad);
+                  return `
+                    <circle cx="${x}" cy="${y}" r="4" fill="var(--accent)" />
+                    <text x="${x - 10}" y="${y - 8}" fill="var(--text-main)" font-size="10">${v.porcentaje_germ}%</text>
+                  `;
+                }).join("")}
+              </svg>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🌱 Cuadrícula de Visitas del Lote Piloto (N = ${cfg.n_semillas} semillas)</div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Fecha / Hora</th>
+                    <th>Temp (°C)</th>
+                    <th>Hum Aire (%)</th>
+                    <th>Hum Sust (%)</th>
+                    <th>GDDh</th>
+                    <th>Radículas (n)</th>
+                    <th>% Germinación</th>
+                    <th>Agua</th>
+                    <th>Foto</th>
+                    <th>Observaciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${visitas.map(v => `
+                    <tr>
+                      <td style="font-size:11.5px;">${v.fecha_hora.replace('T', ' ')}</td>
+                      <td>${v.temp_c}°</td>
+                      <td>${v.hum_aire}%</td>
+                      <td>${v.hum_sustrato}%</td>
+                      <td>${v.gddh_acum}</td>
+                      <td><strong>${v.radiculas_n}</strong> / ${cfg.n_semillas}</td>
+                      <td><span class="badge ${v.porcentaje_germ >= 80 ? 'status-Hecha' : 'status-En-curso'}">${v.porcentaje_germ}%</span></td>
+                      <td>${v.agua_estado}</td>
+                      <td style="font-family:monospace; font-size:11px;">${this.escapeHtml(v.archivo_foto)}</td>
+                      <td style="font-size:12px;">${this.escapeHtml(v.observaciones)}</td>
+                    </tr>
+                  `).join("")}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      },
+
+      agregarVisitaPilotoPrompt() {
+        const N = DataStore.state.config.piloto_config.n_semillas || 25;
+        const nStr = prompt(`Semillas con radícula emergida (>= 2 mm) sobre N = ${N}:`, "0");
+        if (nStr === null) return;
+        const n = Math.min(N, Math.max(0, Number(nStr) || 0));
+        const pct = Math.round((n / N) * 100);
+        const temp = Number(prompt("Temperatura actual (°C):", "20.5") || 20);
+        const humA = Number(prompt("Humedad relativa del aire (%):", "85") || 85);
+        const humS = Number(prompt("Humedad de sustrato (%):", "76") || 76);
+        const obs = prompt("Observaciones (condensación, hongos, etc.):", "Normal");
+
+        const id = `VIS-${String(DataStore.state.piloto_visitas.length + 1).padStart(2, '0')}`;
+        DataStore.state.piloto_visitas.push({
+          id,
+          dia: DataStore.state.piloto_visitas.length + 1,
+          hora_bloque: "12:00",
+          fecha_hora: new Date().toISOString().slice(0, 16),
+          temp_c: temp,
+          hum_aire: humA,
+          hum_sustrato: humS,
+          gddh_acum: Math.round(temp * 12),
+          radiculas_n: n,
+          porcentaje_germ: pct,
+          agua_estado: "Sí",
+          archivo_foto: `piloto_${id}.jpg`,
+          observaciones: obs || ""
+        });
+        DataStore.save();
+        this.render();
+      },
+
+      renderPlantillaRaspberry() {
+        const chk = DataStore.state.checks_raspberry || {};
+        return `
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🍓 Lista de Verificación: Sesión con la Raspberry Pi (Sección 8.6)</div>
+            </div>
+            <div class="grid-3">
+              <div style="background:var(--bg-card); padding:10px; border-radius:8px;">
+                <strong>Antes (en casa)</strong>
+                <div style="display:flex; flex-direction:column; gap:6px; margin-top:6px; font-size:12.5px;">
+                  <label><input type="checkbox" ${chk.antes_sd ? 'checked' : ''} onchange="App.toggleRaspCheck('antes_sd', this.checked)"> MicroSD propia con OS, SSH y Mosquitto</label>
+                  <label><input type="checkbox" ${chk.antes_systemd ? 'checked' : ''} onchange="App.toggleRaspCheck('antes_systemd', this.checked)"> Servicios en systemd o docker-compose</label>
+                  <label><input type="checkbox" ${chk.antes_script ? 'checked' : ''} onchange="App.toggleRaspCheck('antes_script', this.checked)"> Script de instalación rápida preparado</label>
+                  <label><input type="checkbox" ${chk.antes_env ? 'checked' : ''} onchange="App.toggleRaspCheck('antes_env', this.checked)"> Archivo .env configurado fuera de Git</label>
+                </div>
+              </div>
+              <div style="background:var(--bg-card); padding:10px; border-radius:8px;">
+                <strong>Durante (laboratorio)</strong>
+                <div style="display:flex; flex-direction:column; gap:6px; margin-top:6px; font-size:12.5px;">
+                  <label><input type="checkbox" ${chk.durante_wifi ? 'checked' : ''} onchange="App.toggleRaspCheck('durante_wifi', this.checked)"> ESP32 conecta a Wi-Fi y publica MQTT</label>
+                  <label><input type="checkbox" ${chk.durante_telemetria ? 'checked' : ''} onchange="App.toggleRaspCheck('durante_telemetria', this.checked)"> Telemetría llega a BD y al panel</label>
+                  <label><input type="checkbox" ${chk.durante_post ? 'checked' : ''} onchange="App.toggleRaspCheck('durante_post', this.checked)"> Envío POST de foto y análisis OpenCV</label>
+                  <label><input type="checkbox" ${chk.durante_modofoto ? 'checked' : ''} onchange="App.toggleRaspCheck('durante_modofoto', this.checked)"> Modo foto completo (ESP32 + CAM)</label>
+                  <label><input type="checkbox" ${chk.durante_reboot ? 'checked' : ''} onchange="App.toggleRaspCheck('durante_reboot', this.checked)"> Reinicio y comprobación de auto-arranque</label>
+                </div>
+              </div>
+              <div style="background:var(--bg-card); padding:10px; border-radius:8px;">
+                <strong>Después (cierre)</strong>
+                <div style="display:flex; flex-direction:column; gap:6px; margin-top:6px; font-size:12.5px;">
+                  <label><input type="checkbox" ${chk.despues_bitacora ? 'checked' : ''} onchange="App.toggleRaspCheck('despues_bitacora', this.checked)"> Registrar pruebas y fallas en bitácora</label>
+                  <label><input type="checkbox" ${chk.despues_git ? 'checked' : ''} onchange="App.toggleRaspCheck('despues_git', this.checked)"> Copiar datos y código al repositorio</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      },
+
+      toggleRaspCheck(k, c) {
+        DataStore.state.checks_raspberry[k] = c;
+        DataStore.save();
+        this.render();
+      },
+
+      renderFormularioNuevaEntrada() {
+        return `
+          <div class="card" style="max-width:700px; margin:0 auto;">
+            <div class="card-header"><div class="card-title">📝 Registrar Entrada de Bitácora</div></div>
+            <form onsubmit="App.guardarEntradaBitacora(event)" style="display:flex; flex-direction:column; gap:10px;">
+              <div class="grid-2">
+                <div>
+                  <label style="font-size:12px; font-weight:700;">Tipo de Registro:</label>
+                  <select id="bit-tipo" required>
+                    <option value="decisión">Decisión de ingeniería</option>
+                    <option value="medición">Medición o calibración</option>
+                    <option value="prueba">Prueba de hardware/software</option>
+                    <option value="problema">Problema o falla detectada</option>
+                    <option value="aprendizaje">Aprendizaje técnico</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="font-size:12px; font-weight:700;">Tarea vinculada:</label>
+                  <select id="bit-tarea">
+                    <option value="">(Ninguna)</option>
+                    ${DataStore.state.tareas.map(t => `<option value="${t.id}">${t.id}: ${this.escapeHtml(t.titulo)}</option>`).join("")}
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label style="font-size:12px; font-weight:700;">Título del registro:</label>
+                <input type="text" id="bit-titulo" placeholder="Ej. Medición de R0 en aire limpio" required />
+              </div>
+              <div>
+                <label style="font-size:12px; font-weight:700;">Descripción detallada:</label>
+                <textarea id="bit-texto" rows="4" placeholder="Valores obtenidos, decisiones tomadas, errores..." required></textarea>
+              </div>
+              <div style="display:flex; justify-content:flex-end; gap:8px;">
+                <button type="button" class="btn" onclick="App.cambiarBitacoraSubtab('listado')">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Guardar en Bitácora</button>
+              </div>
+            </form>
+          </div>
+        `;
+      },
+
+      guardarEntradaBitacora(e) {
+        e.preventDefault();
+        const tipo = document.getElementById("bit-tipo").value;
+        const tarea = document.getElementById("bit-tarea").value;
+        const titulo = document.getElementById("bit-titulo").value;
+        const texto = document.getElementById("bit-texto").value;
+        const autor = DataStore.state.config.usuario_actual || "Equipo";
+
+        const nueva = {
+          id: `BIT-${String(DataStore.state.bitacora.length + 1).padStart(3, '0')}`,
+          fecha_hora: new Date().toISOString().slice(0, 16),
+          autor,
+          tipo,
+          plantilla: "general",
+          tarea_id: tarea,
+          titulo,
+          texto,
+          datos_plantilla: {},
+          foto_base64: ""
+        };
+
+        DataStore.state.bitacora.unshift(nueva);
+        DataStore.save();
+        this.cambiarBitacoraSubtab("listado");
+      },
+
+      renderListadoBitacora() {
+        const b = DataStore.state.bitacora || [];
+        return `
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">📖 Historial Cronológico de Bitácora (${b.length} registros)</div>
+              <button class="btn btn-sm" onclick="App.exportarBitacoraCSV()">📥 Exportar Bitácora CSV</button>
+            </div>
+            ${b.length === 0 ? `<p style="color:var(--text-muted);">Sin entradas aún.</p>` : `
+              <div style="display:flex; flex-direction:column; gap:10px;">
+                ${b.map(e => `
+                  <div style="background:var(--bg-card); padding:12px; border-radius:8px; border:1px solid var(--border);">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                      <div>
+                        <span class="badge tag-PDF">${this.escapeHtml(e.tipo)}</span>
+                        ${e.tarea_id ? `<span class="badge tag-DISENO">Tarea: ${this.escapeHtml(e.tarea_id)}</span>` : ''}
+                        <strong style="margin-left:6px; font-size:14px;">${this.escapeHtml(e.titulo)}</strong>
+                      </div>
+                      <span style="font-size:12px; color:var(--text-muted);">${e.fecha_hora.replace('T', ' ')} • ${this.escapeHtml(e.autor)}</span>
+                    </div>
+                    <p style="margin-top:6px; font-size:13px; white-space:pre-wrap;">${this.escapeHtml(e.texto)}</p>
+                  </div>
+                `).join("")}
+              </div>
+            `}
+          </div>
+        `;
+      },
+
+      exportarBitacoraCSV() {
+        const b = DataStore.state.bitacora;
+        let csv = "ID,Fecha,Autor,Tipo,Tarea,Titulo,Texto\n";
+        b.forEach(e => {
+          csv += `"${e.id}","${e.fecha_hora}","${e.autor}","${e.tipo}","${e.tarea_id || ''}","${(e.titulo || '').replace(/"/g, '""')}","${(e.texto || '').replace(/"/g, '""')}"\n`;
+        });
+        this.descargarArchivo(csv, "bitacora_grupo1.csv", "text/csv");
+      },
+
+      /* 9. VISTA COMPRAS Y TIENDA */
+      renderVistaCompras() {
+        const st = DataStore.state;
+        const compras = st.compras.filter(c => {
+          if (this.comprasFiltroParte === "1") return c.parte === 1;
+          if (this.comprasFiltroParte === "2") return c.parte === 2;
+          return true;
+        });
+        const checks = st.checks_tienda || [];
+
+        return `
+          <div class="card" style="margin-bottom:14px;">
+            <div class="card-header">
+              <div class="card-title">🏬 Lista de Verificación en la Tienda (Sección 18)</div>
+              <span class="badge tag-VERIFICAR">Checks para celular en mostrador</span>
+            </div>
+            <div class="grid-2">
+              ${checks.map(c => `
+                <label style="display:flex; align-items:flex-start; gap:8px; padding:6px; background:var(--bg-card); border-radius:6px; font-size:12.5px;">
+                  <input type="checkbox" ${c.hecho ? 'checked' : ''} onchange="App.toggleCheckTienda('${c.id}', this.checked)" />
+                  <span style="${c.hecho ? 'text-decoration:line-through; color:var(--text-muted);' : ''}">${this.escapeHtml(c.texto)}</span>
+                </label>
+              `).join("")}
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🛒 Materiales de Ingeniería (Secciones 6.1, 6.2 y 6.3)</div>
+              <div style="display:flex; gap:6px;">
+                <select style="width:auto;" onchange="App.filtrarComprasParte(this.value)">
+                  <option value="todas">Todos los materiales</option>
+                  <option value="1">Parte 1 (6.1 Comprar ya)</option>
+                  <option value="2">Parte 2 (6.2 Comprar en P2)</option>
+                </select>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Subgrupo</th>
+                    <th>Ítem / Material</th>
+                    <th>Cant.</th>
+                    <th>Estado</th>
+                    <th>Precio ($)</th>
+                    <th>Etiquetas</th>
+                    <th>Notas</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${compras.map(c => `
+                    <tr>
+                      <td style="font-size:11.5px; color:var(--text-muted);">${this.escapeHtml(c.subgrupo)}</td>
+                      <td><strong>${this.escapeHtml(c.item)}</strong></td>
+                      <td>${this.escapeHtml(c.cantidad)}</td>
+                      <td>
+                        <select onchange="App.actualizarEstadoCompra('${c.id}', this.value)" style="font-size:12px; padding:3px;">
+                          ${["por comprar", "comprado", "probado", "falla"].map(est => `
+                            <option value="${est}" ${c.estado === est ? 'selected' : ''}>${est}</option>
+                          `).join("")}
+                        </select>
+                      </td>
+                      <td>
+                        <input type="text" placeholder="0.00" value="${this.escapeHtml(c.precio || '')}" onchange="App.actualizarPrecioCompra('${c.id}', this.value)" style="width:70px; font-size:12px; padding:3px;" />
+                      </td>
+                      <td>${this.renderBadges(c.etiquetas)}</td>
+                      <td style="font-size:12px;">${this.escapeHtml(c.notes || c.notas || '')}</td>
+                    </tr>
+                  `).join("")}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      },
+
+      toggleCheckTienda(id, checked) {
+        const c = DataStore.state.checks_tienda.find(x => x.id === id);
+        if (c) c.hecho = checked;
+        DataStore.save();
+        this.render();
+      },
+      filtrarComprasParte(p) {
+        this.comprasFiltroParte = p;
+        this.render();
+      },
+      actualizarEstadoCompra(id, est) {
+        const c = DataStore.state.compras.find(x => x.id === id);
+        if (c) c.estado = est;
+        DataStore.save();
+      },
+      actualizarPrecioCompra(id, precio) {
+        const c = DataStore.state.compras.find(x => x.id === id);
+        if (c) c.precio = precio;
+        DataStore.save();
+      },
+
+      /* 10. VISTA LISTAS (DECISIONES, RIESGOS, PRUEBAS, PREGUNTAS) */
+      renderVistaListas() {
+        const sub = this.listasSubtab;
+        return `
+          <div class="card" style="margin-bottom:14px;">
+            <div class="card-header">
+              <div class="card-title">📑 Listas Técnicas y Registros del Proyecto</div>
+              <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                <button class="btn btn-sm ${sub === 'decisiones' ? 'btn-primary' : ''}" onclick="App.cambiarListasSubtab('decisiones')">19 Decisiones (D01–D19)</button>
+                <button class="btn btn-sm ${sub === 'riesgos' ? 'btn-primary' : ''}" onclick="App.cambiarListasSubtab('riesgos')">16 Riesgos (R01–R16)</button>
+                <button class="btn btn-sm ${sub === 'pruebas' ? 'btn-primary' : ''}" onclick="App.cambiarListasSubtab('pruebas')">14 Pruebas (P1–P14)</button>
+                <button class="btn btn-sm ${sub === 'preguntas' ? 'btn-primary' : ''}" onclick="App.cambiarListasSubtab('preguntas')">6 Preguntas Docente (Q1–Q6)</button>
+                <button class="btn btn-sm ${sub === 'pendientes' ? 'btn-primary' : ''}" onclick="App.cambiarListasSubtab('pendientes')">Pendientes Inmediatos</button>
+              </div>
+            </div>
+          </div>
+
+          ${sub === 'decisiones' ? this.renderDecisiones() : ''}
+          ${sub === 'riesgos' ? this.renderRiesgos() : ''}
+          ${sub === 'pruebas' ? this.renderPruebas() : ''}
+          ${sub === 'preguntas' ? this.renderPreguntas() : ''}
+          ${sub === 'pendientes' ? this.renderPendientesInmediatos() : ''}
+        `;
+      },
+
+      cambiarListasSubtab(s) {
+        this.listasSubtab = s;
+        this.render();
+      },
+
+      renderDecisiones() {
+        return `
+          <div class="grid-2">
+            ${DataStore.state.decisiones.map(d => `
+              <div class="card">
+                <div class="card-header">
+                  <div>
+                    <span class="task-id">${d.id}</span>
+                    <strong style="margin-left:6px;">${this.escapeHtml(d.titulo)}</strong>
+                  </div>
+                  <select onchange="App.actualizarEstadoDecision('${d.id}', this.value)" style="width:auto; font-size:11.5px; padding:2px;">
+                    <option value="propuesta" ${d.estado === 'propuesta' ? 'selected' : ''}>Propuesta</option>
+                    <option value="confirmada" ${d.estado === 'confirmada' ? 'selected' : ''}>Confirmada</option>
+                    <option value="descartada" ${d.estado === 'descartada' ? 'selected' : ''}>Descartada</option>
+                  </select>
+                </div>
+                <div style="font-size:12.5px; margin-bottom:4px;"><strong>Por qué:</strong> ${this.escapeHtml(d.por_que)}</div>
+                <div style="font-size:12px; color:var(--danger); margin-bottom:4px;"><strong>Riesgo:</strong> ${this.escapeHtml(d.riesgo)}</div>
+                <div style="font-size:12px; color:var(--accent);"><strong>Mitigación:</strong> ${this.escapeHtml(d.mitigacion)}</div>
+                ${d.notas ? `<div style="font-size:11.5px; color:var(--text-muted); margin-top:6px;">Nota: ${this.escapeHtml(d.notas)}</div>` : ''}
+              </div>
+            `).join("")}
+          </div>
+        `;
+      },
+
+      actualizarEstadoDecision(id, val) {
+        const d = DataStore.state.decisiones.find(x => x.id === id);
+        if (d) d.estado = val;
+        DataStore.save();
+      },
+
+      renderRiesgos() {
+        return `
+          <div class="grid-2">
+            ${DataStore.state.riesgos.map(r => `
+              <div class="card">
+                <div class="card-header">
+                  <div>
+                    <span class="task-id" style="color:var(--danger);">${r.id}</span>
+                    <strong style="margin-left:6px;">${this.escapeHtml(r.titulo)}</strong>
+                  </div>
+                  <select onchange="App.actualizarEstadoRiesgo('${r.id}', this.value)" style="width:auto; font-size:11.5px; padding:2px;">
+                    <option value="activo" ${r.estado === 'activo' ? 'selected' : ''}>Activo</option>
+                    <option value="mitigado" ${r.estado === 'mitigado' ? 'selected' : ''}>Mitigado</option>
+                  </select>
+                </div>
+                <div style="font-size:12.5px; color:var(--accent);">
+                  <strong>Mitigación:</strong> ${this.escapeHtml(r.mitigacion)}
+                </div>
+              </div>
+            `).join("")}
+          </div>
+        `;
+      },
+
+      actualizarEstadoRiesgo(id, val) {
+        const r = DataStore.state.riesgos.find(x => x.id === id);
+        if (r) r.estado = val;
+        DataStore.save();
+      },
+
+      renderPruebas() {
+        return `
+          <div class="card">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Categoría</th>
+                    <th>Descripción de la Prueba</th>
+                    <th>Estado</th>
+                    <th>Resultado / Observaciones</th>
+                    <th>Fecha</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${DataStore.state.pruebas.map(p => `
+                    <tr>
+                      <td><span class="task-id">${p.id}</span></td>
+                      <td><span class="badge tag-PDF">${p.categoria}</span></td>
+                      <td><strong>${this.escapeHtml(p.titulo)}</strong></td>
+                      <td>
+                        <select onchange="App.actualizarEstadoPrueba('${p.id}', this.value)" style="font-size:12px; padding:3px;">
+                          <option value="pendiente" ${p.estado === 'pendiente' ? 'selected' : ''}>Pendiente</option>
+                          <option value="exitosa" ${p.estado === 'exitosa' ? 'selected' : ''}>Exitosa</option>
+                          <option value="fallida" ${p.estado === 'fallida' ? 'selected' : ''}>Fallida</option>
+                        </select>
+                      </td>
+                      <td>
+                        <input type="text" placeholder="Anotar resultado..." value="${this.escapeHtml(p.resultado || '')}" onchange="App.actualizarResultadoPrueba('${p.id}', this.value)" style="font-size:12px; padding:3px;" />
+                      </td>
+                      <td>
+                        <input type="date" value="${p.fecha || ''}" onchange="App.actualizarFechaPrueba('${p.id}', this.value)" style="font-size:12px; padding:3px;" />
+                      </td>
+                    </tr>
+                  `).join("")}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      },
+
+      actualizarEstadoPrueba(id, val) {
+        const p = DataStore.state.pruebas.find(x => x.id === id);
+        if (p) p.estado = val;
+        DataStore.save();
+      },
+      actualizarResultadoPrueba(id, val) {
+        const p = DataStore.state.pruebas.find(x => x.id === id);
+        if (p) p.resultado = val;
+        DataStore.save();
+      },
+      actualizarFechaPrueba(id, val) {
+        const p = DataStore.state.pruebas.find(x => x.id === id);
+        if (p) p.fecha = val;
+        DataStore.save();
+      },
+
+      renderPreguntas() {
+        return `
+          <div class="card">
+            <div class="card-header"><div class="card-title">❓ Preguntas para la Ing. Sinche (Sección 17)</div></div>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+              ${DataStore.state.preguntas.map(q => `
+                <div style="background:var(--bg-card); padding:12px; border-radius:8px; border:1px solid var(--border);">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span class="task-id" style="font-size:14px;">${q.id}</span>
+                    <select onchange="App.actualizarEstadoPregunta('${q.id}', this.value)" style="width:auto; font-size:11.5px; padding:2px;">
+                      <option value="pendiente" ${q.estado === 'pendiente' ? 'selected' : ''}>Pendiente</option>
+                      <option value="respondida" ${q.estado === 'respondida' ? 'selected' : ''}>Respondida</option>
+                    </select>
+                  </div>
+                  <div style="font-weight:700; margin:6px 0; font-size:13.5px;">${this.escapeHtml(q.pregunta)}</div>
+                  <div style="margin-top:6px;">
+                    <label style="font-size:11px; font-weight:700; color:var(--accent);">Respuesta oficial de la docente:</label>
+                    <textarea rows="2" placeholder="Escribir respuesta..." onchange="App.actualizarRespuestaPregunta('${q.id}', this.value)">${this.escapeHtml(q.respuesta || '')}</textarea>
+                  </div>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        `;
+      },
+
+      actualizarEstadoPregunta(id, val) {
+        const q = DataStore.state.preguntas.find(x => x.id === id);
+        if (q) q.estado = val;
+        DataStore.save();
+      },
+      actualizarRespuestaPregunta(id, val) {
+        const q = DataStore.state.preguntas.find(x => x.id === id);
+        if (q) q.respuesta = val;
+        DataStore.save();
+      },
+
+      renderPendientesInmediatos() {
+        return `
+          <div class="card">
+            <div class="card-header"><div class="card-title">⚡ Pendientes Inmediatos (Sección 20)</div></div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              ${DataStore.state.pendientes_inmediatos.map(p => `
+                <label style="display:flex; align-items:center; gap:8px; padding:8px; background:var(--bg-card); border-radius:6px; font-size:13px;">
+                  <input type="checkbox" ${p.hecho ? 'checked' : ''} onchange="App.togglePendienteInmediato('${p.id}', this.checked)" />
+                  <span style="font-weight:700; color:var(--accent); min-width:24px;">#${p.orden}</span>
+                  <span style="${p.hecho ? 'text-decoration:line-through; color:var(--text-muted);' : ''}">${this.escapeHtml(p.texto)}</span>
+                </label>
+              `).join("")}
+            </div>
+          </div>
+        `;
+      },
+
+      togglePendienteInmediato(id, checked) {
+        const p = DataStore.state.pendientes_inmediatos.find(x => x.id === id);
+        if (p) p.hecho = checked;
+        DataStore.save();
+        this.render();
+      },
+
+      /* VISTA DE CONSULTA DEL DOCUMENTO ÍNTEGRO */
+      renderVistaReferencia() {
+        return `
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">📖 Plan Maestro v2.0 — Texto Íntegro de Referencia</div>
+            </div>
+            <pre style="background:var(--bg-input); padding:14px; border-radius:8px; font-family:monospace; font-size:12px; white-space:pre-wrap; line-height:1.45; max-height:75vh; overflow-y:auto; border:1px solid var(--border);">${this.escapeHtml(PLAN_MAESTRO_TEXTO_INTEGRO)}</pre>
+          </div>
+        `;
+      },
+
+      /* 11. VISTA CONFIGURACIÓN Y SINCRONIZACIÓN */
+      renderVistaConfig() {
+        const st = DataStore.state;
+        const cfg = st.config;
+        const fb = cfg.firebase || {};
+
+        return `
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header"><div class="card-title">👥 Configuración del Equipo (Grupo 1)</div></div>
+              <div style="display:flex; flex-direction:column; gap:10px;">
+                <div style="background:var(--bg-card); padding:8px; border-radius:6px; font-size:12px;">
+                  <strong>Nombres en Ficha Oficial:</strong> ${cfg.integrantes_ficha}
+                  <button class="btn btn-sm btn-primary" style="margin-top:4px;" onclick="App.asignarNombresFicha()">Asignar automáticamente Xavier, Angelo y Fernando</button>
+                </div>
+                ${["Integrante 1", "Integrante 2", "Integrante 3"].map(rol => `
+                  <div>
+                    <label style="font-size:12px; font-weight:700;">Nombre para ${rol}:</label>
+                    <input type="text" value="${this.escapeHtml(cfg.integrantes[rol].nombre)}" onchange="App.actualizarNombreIntegrante('${rol}', this.value)" />
+                    <span style="font-size:11.5px; color:var(--text-muted);">${cfg.integrantes[rol].especialidad}</span>
+                  </div>
+                `).join("")}
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="card-title">☁️ Sincronización Opcional con Firebase Realtime Database</div></div>
+              <div style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">
+                Permite a los 3 integrantes sincronizar tareas y bitácora en vivo desde el celular sin necesidad de servidor propio.
+              </div>
+              <div style="display:flex; flex-direction:column; gap:8px;">
+                <label style="display:flex; align-items:center; gap:6px; font-weight:700;">
+                  <input type="checkbox" ${fb.activo ? 'checked' : ''} onchange="App.actualizarFirebase('activo', this.checked)" />
+                  <span>Habilitar sincronización con Firebase</span>
+                </label>
+                <div>
+                  <label style="font-size:11.5px;">URL de Firebase Realtime Database:</label>
+                  <input type="text" placeholder="https://tu-proyecto-default-rtdb.firebaseio.com" value="${this.escapeHtml(fb.databaseURL || '')}" onchange="App.actualizarFirebase('databaseURL', this.value)" />
+                </div>
+                <div>
+                  <label style="font-size:11.5px;">Nombre del nodo compartido:</label>
+                  <input type="text" value="${this.escapeHtml(fb.rutaNodo || 'epn_iot_grupo1_camara')}" onchange="App.actualizarFirebase('rutaNodo', this.value)" />
+                </div>
+                <div>
+                  <label style="font-size:11.5px;">Token / Secret Auth (opcional para reglas privadas):</label>
+                  <input type="password" placeholder="Clave de base de datos o token" value="${this.escapeHtml(fb.secretToken || '')}" onchange="App.actualizarFirebase('secretToken', this.value)" />
+                </div>
+                <div style="display:flex; gap:6px; margin-top:6px;">
+                  <button class="btn btn-sm btn-primary" onclick="DataStore.pushToFirebase(); alert('Datos enviados a Firebase.')">☁️ Subir a Firebase</button>
+                  <button class="btn btn-sm" onclick="DataStore.pullFromFirebase()">⬇️ Descargar de Firebase</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:16px;">
+            <div class="card-header"><div class="card-title">📦 Copia de Seguridad, Exportación y Restablecimiento</div></div>
+            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+              <button class="btn btn-primary" onclick="App.exportarJSON()">💾 Exportar Todo en JSON</button>
+              <label class="btn" style="cursor:pointer;">
+                📂 Importar JSON <input type="file" accept=".json" style="display:none;" onchange="App.importarJSON(event)" />
+              </label>
+              <button class="btn" onclick="App.exportarTareasCSV()">📊 Exportar Tareas a CSV</button>
+              <button class="btn btn-danger" onclick="DataStore.reset()">⚠️ Restablecer Datos de Fábrica</button>
+            </div>
+          </div>
+        `;
+      },
+
+      asignarNombresFicha() {
+        DataStore.state.config.integrantes["Integrante 1"].nombre = "Xavier Anatoa";
+        DataStore.state.config.integrantes["Integrante 2"].nombre = "Angelo Conterón";
+        DataStore.state.config.integrantes["Integrante 3"].nombre = "Fernando Guarderas";
+        DataStore.save();
+        this.render();
+        alert("Nombres oficiales asignados a los 3 roles.");
+      },
+
+      actualizarNombreIntegrante(rol, nombre) {
+        DataStore.state.config.integrantes[rol].nombre = nombre;
+        DataStore.save();
+        this.render();
+      },
+
+      actualizarFirebase(campo, val) {
+        if (!DataStore.state.config.firebase) DataStore.state.config.firebase = {};
+        DataStore.state.config.firebase[campo] = val;
+        DataStore.save();
+      },
+
+      exportarJSON() {
+        const json = JSON.stringify(DataStore.state, null, 2);
+        this.descargarArchivo(json, `plan_maestro_grupo1_${new Date().toISOString().slice(0, 10)}.json`, "application/json");
+      },
+
+      importarJSON(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = evt => {
+          try {
+            const data = JSON.parse(evt.target.result);
+            if (data && data.tareas && data.decisiones) {
+              DataStore.state = data;
+              DataStore.save();
+              this.render();
+              alert("Datos importados con éxito.");
+            } else {
+              alert("El archivo no parece ser un JSON válido de la aplicación.");
+            }
+          } catch (err) {
+            alert("Error al leer el archivo JSON: " + err.message);
+          }
+        };
+        reader.readAsText(file);
+      },
+
+      exportarTareasCSV() {
+        let csv = "ID,Parte,Fase,Titulo,Responsable,Revisor,Estado,Progreso,SemanaInicio,SemanaFin,FechaInicio,FechaFin,CriterioAprobado\n";
+        DataStore.state.tareas.forEach(t => {
+          csv += `"${t.id}","${t.parte}","${t.fase}","${t.titulo.replace(/"/g, '""')}","${t.rol_responsable}","${t.revisor}","${t.estado}","${Logic.getTaskProgress(t)}%","${t.semana_inicio}","${t.semana_fin}","${t.fecha_inicio}","${t.fecha_fin}","${t.criterio_aprobado ? 'SI' : 'NO'}"\n`;
+        });
+        this.descargarArchivo(csv, "tareas_camara_iot.csv", "text/csv");
+      },
+
+      descargarArchivo(contenido, nombre, tipo) {
+        const blob = new Blob([contenido], { type: tipo });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = nombre;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+    };
+
+    // Inicializar aplicación al cargar
+    document.addEventListener("DOMContentLoaded", () => App.init());
+
+    // Registro de Service Worker para PWA (solo cuando se sirve por http/https)
+    if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('PWA ServiceWorker activo:', reg.scope))
+          .catch(err => console.log('PWA ServiceWorker error:', err));
+      });
+    }
+  </script>
+</body>
+</html>
