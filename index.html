@@ -735,41 +735,1093 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
       const ahora = "2026-10-18T19:00:00.000Z";
       const tareasRaw = [
         // PARTE 1
-        { id: "T1.01", titulo: "Reunión de arranque", parte: 1, fase: "Planificación y Arranque", rol_responsable: "Todos", revisor: "Todos (revisión grupal)", depende_de: [], etiquetas: ["[DISEÑO]"], semana_inicio: 1, semana_fin: 1, descripcion: "Reunión inicial del equipo para asignar roles, confirmar Plan A y definir el lote piloto.", pasos: ["Asignar nombres a Integrante 1, 2 y 3.", "Confirmar el Plan A con revisión cruzada.", "Crear el repositorio Git y el grupo de WhatsApp.", "Decidir en la casa de quién vive el piloto.", "Decidir la variedad de fréjol."], criterio_aceptacion: "Roles con nombres, repositorio creado, dueño del piloto definido." },
-        { id: "T1.02", titulo: "Consultar a la Ing. Sinche", parte: 1, fase: "Planificación y Arranque", rol_responsable: "Todos", revisor: "Integrante 1", depende_de: ["T1.01"], etiquetas: ["[A VERIFICAR]"], semana_inicio: 1, semana_fin: 1, descripcion: "Consultar Q1 a Q6 de la Sección 17 a la docente PhD. Soraya Sinche.", pasos: ["Hacer las preguntas de la Sección 17 (Q1 a Q6) a la Ing. Sinche.", "Anotar las respuestas y las fechas oficiales de entrega de Parte 1 y Parte 2."], criterio_aceptacion: "Respuestas anotadas en la bitácora, con fechas de entrega." },
-        { id: "T1.03", titulo: "Compras de la Parte 1 con pruebas en tienda", parte: 1, fase: "Hardware y Prototipado", rol_responsable: "Integrante 1", revisor: "Integrante 2", depende_de: ["T1.01"], etiquetas: ["[PDF]", "[A VERIFICAR]"], semana_inicio: 1, semana_fin: 1, descripcion: "Adquirir materiales 6.1 verificando en el mostrador los puntos críticos de Sección 18.", pasos: ["Usar la lista de materiales 6.1 (Electrónica, Lote piloto y Servidor local).", "Aplicar la lista de verificación en la tienda de la Sección 18.", "Pedir en la tienda que conecten el humidificador ultrasónico a 5 V directos y comprobar que lanza niebla sin pulsar nada.", "Comprobar que el módulo relé de 2 canales tenga optoacoplador y jumper JD-VCC."], criterio_aceptacion: "Humidificador probado a 5 V directos, relé con jumper JD-VCC, todos los módulos comprados." },
-        { id: "T1.04", titulo: "Entorno de desarrollo en la laptop gemela", parte: 1, fase: "Servidor y Comunicaciones", rol_responsable: "Integrante 3", revisor: "Integrante 2", depende_de: ["T1.01"], etiquetas: ["[DISEÑO]"], semana_inicio: 1, semana_fin: 1, descripcion: "Configurar laptop gemela de la Raspberry Pi y programar script simulador.", pasos: ["Instalar Docker o WSL, broker Mosquitto, entorno de Python y estructurar el repositorio Git.", "Crear el script simulador en Python que publique telemetría falsa en epn/iot/grupo1/sensores y responda a comandos."], criterio_aceptacion: "El simulador publica telemetría y el receptor la recibe." },
-        { id: "T1.05", titulo: "Simulación del firmware en Wokwi", parte: 1, fase: "Firmware y Control", rol_responsable: "Integrante 2", revisor: "Integrante 1", depende_de: ["T1.01"], etiquetas: ["[DISEÑO]", "[A VERIFICAR]"], semana_inicio: 1, semana_fin: 1, descripcion: "Simular firmware del ESP32 antes de armar para detectar errores de código y pines.", pasos: ["Simular lectura de ADC1 (con potenciómetro), DHT22 y pantalla OLED SSD1306 en Wokwi.", "Simular control de relé con histéresis y arranque seguro (escribir HIGH antes de pinMode OUTPUT).", "Verificar formato del JSON de telemetría por puerto serie."], criterio_aceptacion: "El proyecto compila y muestra el JSON de prueba." },
-        { id: "T1.06", titulo: "Impermeabilización y pruebas de mesa", parte: 1, fase: "Hardware y Prototipado", rol_responsable: "Integrante 1", revisor: "Integrante 2", depende_de: ["T1.03"], etiquetas: ["[PDF]", "[DISEÑO]"], semana_inicio: 2, semana_fin: 2, descripcion: "Sellar sensores capacitivos y probar etapa de potencia aislada.", pasos: ["Sellar los dos sensores capacitivos v1.2 con esmalte de uñas transparente o silicona en la electrónica superior (sin cubrir zona de medición).", "Probar humidificador y módulo relé de forma aislada con la fuente externa de 5 V / 3 A."], criterio_aceptacion: "Esmalte seco sin tapar la zona de medición, y relé y humidificador funcionando." },
-        { id: "T1.07", titulo: "Diagrama técnico de pines y alimentación", parte: 1, fase: "Hardware y Prototipado", rol_responsable: "Integrante 1", revisor: "Integrante 2 (compara diagrama vs código)", depende_de: ["T1.03"], etiquetas: ["[PDF]", "[DISEÑO]"], semana_inicio: 2, semana_fin: 2, descripcion: "Esquema Fritzing/KiCad con pines oficiales 6.4 y reglas 6.5.", pasos: ["Dibujar esquema con Fritzing/KiCad usando tabla 6.4 (sensores analógicos en ADC1) y reglas 6.5.", "Dibujar todos los componentes aunque no estén en protoboard.", "Revisión cruzada: Integrante 2 compara el diagrama contra el código."], criterio_aceptacion: "Imagen de alta resolución con tierras unidas y VIN libre." },
-        { id: "T1.08", titulo: "Armado en protoboard", parte: 1, fase: "Hardware y Prototipado", rol_responsable: "Integrante 1", revisor: "Integrante 2", depende_de: ["T1.06", "T1.07"], etiquetas: ["[PDF]"], semana_inicio: 2, semana_fin: 2, descripcion: "Montar circuito prototipo con alimentación separada.", pasos: ["Conectar ESP32 alimentado solo por USB con sensor capacitivo (GPIO 34), DHT22 (GPIO 4) y pantalla OLED I2C (GPIO 21/22).", "Cablear etapa de potencia (relé sin jumper JD-VCC, humidificador y condensador de 220-470 µF) con fuente de 5 V / 3 A y GND común."], criterio_aceptacion: "El ESP32 enciende y apaga el humidificador sin reiniciarse." },
-        { id: "T1.09", titulo: "Firmware: calibración, control y pantalla", parte: 1, fase: "Firmware y Control", rol_responsable: "Integrante 2", revisor: "Integrante 1 (prueba en hardware real)", depende_de: ["T1.05", "T1.08"], etiquetas: ["[PDF]", "[DISEÑO]", "[A VERIFICAR]"], semana_inicio: 3, semana_fin: 3, descripcion: "Firmware C++ con calibración aire/agua, DHT22, lazo con tiempos y OLED.", pasos: ["Calibración aire seco (0%) / agua (100%) promediando 16 a 32 lecturas.", "Implementar lectura del DHT22 y visualización en OLED.", "Programar control con histéresis, t_min_on (30 s), t_min_off (60 s) y t_max_on (10 min)."], criterio_aceptacion: "Tabla de ADC registrada, porcentaje de 0 a 100 en la pantalla y relé funcionando con histéresis." },
-        { id: "T1.10", titulo: "Broker, receptor y Firebase", parte: 1, fase: "Servidor y Comunicaciones", rol_responsable: "Integrante 3", revisor: "Integrante 2", depende_de: ["T1.04"], etiquetas: ["[PDF]", "[DISEÑO]"], semana_inicio: 3, semana_fin: 3, descripcion: "Mosquitto con usuario/contraseña, receptor Python, respaldo CSV y Firebase.", pasos: ["Configurar broker Mosquitto con usuario y contraseña en puerto 1883.", "Programar script receptor en Python con validación y registro local CSV/SQLite.", "Configurar envío a Firebase Realtime Database por HTTPS con variables en .env."], criterio_aceptacion: "El simulador guarda datos de prueba en Firebase y en el CSV." },
-        { id: "T1.11", titulo: "Telemetría MQTT real", parte: 1, fase: "Servidor y Comunicaciones", rol_responsable: "Integrante 2", revisor: "Integrante 3", depende_de: ["T1.09", "T1.10"], etiquetas: ["[PDF]"], semana_inicio: 4, semana_fin: 4, descripcion: "Publicación real del ESP32 hacia el broker y Firebase.", pasos: ["Conectar ESP32 a Wi-Fi y publicar en epn/iot/grupo1/sensores cada 10-30 s con reconexión automática.", "Confirmar que receptor guarda en local y en Firebase."], criterio_aceptacion: "Lecturas reales del sensor y del DHT22 visibles en Firebase." },
-        { id: "T1.12", titulo: "Montaje y siembra del lote piloto", parte: 1, fase: "Lote Piloto", rol_responsable: "Integrante 1", revisor: "Integrante 3", depende_de: ["T1.09"], etiquetas: ["[DISEÑO]", "[A VERIFICAR]"], semana_inicio: 3, semana_fin: 4, descripcion: "Montar tupper con paño cuadriculado y sembrar 20-25 semillas de fréjol según Sección 10.", pasos: ["Preparar tupper con orificio de cables, paño con cuadrícula 4x5 o 5x5 e hilo, y depósito con marca.", "Instalar sensor capacitivo en sustrato y DHT22 en parte alta lejos de la niebla.", "Sembrar 20 a 25 semillas de fréjol (una por celda) y tomar primera foto con fecha y hora."], criterio_aceptacion: "Piloto sembrado, humedad estable y primera foto con fecha y hora." },
-        { id: "T1.13", titulo: "Monitoreo del piloto (4 a 5 días)", parte: 1, fase: "Lote Piloto", rol_responsable: "Integrante 1", revisor: "Integrante 3 (datos y conteo)", depende_de: ["T1.11", "T1.12"], etiquetas: ["[DISEÑO]", "[A VERIFICAR]"], semana_inicio: 4, semana_fin: 5, descripcion: "Revisar agua a diario, fotos 2 a 4 veces al día y mantener receptor encendido.", pasos: ["Revisar agua todos los días (humidificador nunca sin agua).", "Tomar fotos desde arriba 2 a 4 veces al día (ej. piloto_d1_08h.jpg).", "Receptor encendido sin suspensión; contar semillas con radícula (>= 2 mm) y cruzar con Firebase."], criterio_aceptacion: "Bitácora completa, fotos diarias y serie de temperatura y humedad sin huecos." },
-        { id: "T1.14", titulo: "Redacción de secciones del informe", parte: 1, fase: "Documentación y Entrega", rol_responsable: "Todos", revisor: "Integrante 3 (al 1), 1 (al 2), 2 (al 3)", depende_de: ["T1.07", "T1.09", "T1.10"], etiquetas: ["[PDF]"], semana_inicio: 5, semana_fin: 5, descripcion: "Redactar secciones individuales del informe técnico 1 según Sección 16.", pasos: ["Integrante 1: redactar hardware, esquemas, consumo y montaje piloto.", "Integrante 2: redactar firmware y curvas de calibración.", "Integrante 3: redactar comunicaciones, receptor, estructura de datos y bitácora piloto.", "Revisión cruzada entre integrantes."], criterio_aceptacion: "Tres secciones listas y revisadas por otro integrante." },
-        { id: "T1.15", titulo: "Consolidación del informe y paquete de código", parte: 1, fase: "Documentación y Entrega", rol_responsable: "Integrante 2", revisor: "Integrante 3", depende_de: ["T1.13", "T1.14"], etiquetas: ["[PDF]"], semana_inicio: 6, semana_fin: 6, descripcion: "Unificar informe en PDF y dejar repo limpio con README.", pasos: ["Unir secciones, resultados del piloto y limitaciones en un solo documento.", "Dejar repositorio limpio, con README y sin credenciales (.env y secrets.h fuera)."], criterio_aceptacion: "PDF del informe, código C++ y script receptor listos." },
-        { id: "T1.16", titulo: "Ensayo de entrega", parte: 1, fase: "Documentación y Entrega", rol_responsable: "Todos", revisor: "Todos", depende_de: ["T1.15"], etiquetas: ["[PDF]"], semana_inicio: 6, semana_fin: 6, descripcion: "Prueba integral de arranque en frío de la Parte 1.", pasos: ["Apagar y encender todo desde cero.", "Comprobar que prototipo funciona y ensayar la demostración."], criterio_aceptacion: "Demostración completa sin intervención manual." },
+        {
+          id: "T1.01",
+          titulo: "Reunión de arranque y acuerdos de equipo",
+          parte: 1,
+          fase: "Planificación y Arranque",
+          rol_responsable: "Todos",
+          revisor: "Todos (revisión grupal)",
+          depende_de: [],
+          etiquetas: ["[DISEÑO]"],
+          semana_inicio: 1,
+          semana_fin: 1,
+          descripcion: "Reunión inicial de los 3 integrantes para asignar roles oficiales, confirmar Plan A y fijar la logística del lote piloto.",
+          pasos: [
+            {
+              texto: "Asignar nombres y especialidades a los 3 integrantes del equipo",
+              detalle: "Ficha oficial EPN: Xavier Anatoa (Hardware y Montaje), Angelo Conterón (Firmware, Control y Visión), Fernando Guarderas (Servidor, BD y Firebase).",
+              subpasos: [
+                { texto: "Integrante 1: Xavier Anatoa — Hardware, PCB, sensores y montaje físico", hecho: true },
+                { texto: "Integrante 2: Angelo Conterón — Firmware ESP32/ESP32-CAM, control y visión", hecho: true },
+                { texto: "Integrante 3: Fernando Guarderas — Servidor Python/Flask, Mosquitto, Firebase y datos", hecho: true }
+              ]
+            },
+            {
+              texto: "Confirmar el Plan A de arquitectura IoT con revisión cruzada",
+              detalle: "Plan A: ESP32 DevKit V1 como nodo autónomo de control por histéresis + Raspberry Pi 4 (o laptop gemela en Parte 1) como broker y servidor."
+            },
+            {
+              texto: "Crear el repositorio Git oficial y el canal de WhatsApp",
+              detalle: "Repositorio creado: https://github.com/Anghel01/-camara-germinacion-iot.git para versionar firmware, servidor y documentación."
+            },
+            {
+              texto: "Decidir en qué domicilio se instalará el lote piloto",
+              detalle: "El lugar debe disponer de Wi-Fi ininterrumpido 2.4 GHz, toma eléctrica continua sin riesgo de apagones y temperatura controlada."
+            },
+            {
+              texto: "Seleccionar y comprar la variedad comercial de semillas de fréjol",
+              detalle: "Elegir fréjol comercial (negro o canario) de tamaño homogéneo, sin daño mecánico en el tegumento para asegurar imbibición pareja."
+            }
+          ],
+          criterio_aceptacion: "Roles con nombres, repositorio creado, dueño del piloto definido y variedad de fréjol seleccionada."
+        },
+
+        {
+          id: "T1.02",
+          titulo: "Consultar a la Ing. Sinche (Preguntas Q1 a Q6 y Fechas)",
+          parte: 1,
+          fase: "Planificación y Arranque",
+          rol_responsable: "Todos",
+          revisor: "Integrante 1",
+          depende_de: ["T1.01"],
+          etiquetas: ["[A VERIFICAR]"],
+          semana_inicio: 1,
+          semana_fin: 1,
+          descripcion: "Consultar de forma presencial o por correo las 6 preguntas críticas (Q1 a Q6) a la docente PhD. Soraya Sinche para destrabar compras y cronograma.",
+          pasos: [
+            {
+              texto: "Formular las 6 preguntas técnicas oficiales a la docente PhD. Soraya Sinche",
+              detalle: "Preguntas oficiales que deben responderse para autorizar componentes de hardware y fijar los plazos del proyecto:",
+              subpasos: [
+                {
+                  ref_id: "Q1",
+                  tipo: "pregunta",
+                  texto: "Q1 — ¿Podemos implementar la cámara como nodo propio con una ESP32-CAM por HTTP a la Pi en lugar de cámara conectada directamente a la Pi?",
+                  detalle: "Por qué se pregunta: En el PDF la cámara aparece en la capa de dispositivos. Una ESP32-CAM permite independizar la visión y colocarla en el techo del acrílico sin cables planos (ribbon) frágiles hacia la Raspberry. Define la compra de M2.01 y decisión D01.",
+                  hecho: false,
+                  respuesta: ""
+                },
+                {
+                  ref_id: "Q2",
+                  tipo: "pregunta",
+                  texto: "Q2 — Para la alerta de depósito sin agua, ¿podemos añadir un sensor de nivel de agua al listado o se estima por software?",
+                  detalle: "Por qué se pregunta: La alerta es obligatoria en el PDF. Un sensor de nivel físico (M1.13 / M2.04) es mucho más confiable que estimar evaporación por software y previene que el humidificador trabaje en seco y se queme. Define D03.",
+                  hecho: false,
+                  respuesta: ""
+                },
+                {
+                  ref_id: "Q3",
+                  tipo: "pregunta",
+                  texto: "Q3 — ¿Cuáles son las fechas de entrega oficiales de Parte 1 y Parte 2, y hay un formato o plantilla obligatoria para informes?",
+                  detalle: "Por qué se pregunta: Indispensable para fijar las fechas de entrega definitivas en el Cronograma Gantt y cumplir con las normas de entrega institucional.",
+                  hecho: false,
+                  respuesta: ""
+                },
+                {
+                  ref_id: "Q4",
+                  tipo: "pregunta",
+                  texto: "Q4 — Sobre la Raspberry Pi 4: ¿podemos usarla varios días seguidos para pruebas finales, con microSD propia y red propia?",
+                  detalle: "Por qué se pregunta: En las semanas 7-8 de la Parte 2 se requieren 5-6 días seguidos para el lote autónomo (T2.14). Necesitamos confirmar si habrá préstamo continuo o si se mantendrá la laptop gemela.",
+                  hecho: false,
+                  respuesta: ""
+                },
+                {
+                  ref_id: "Q5",
+                  tipo: "pregunta",
+                  texto: "Q5 — En Parte 1, ¿es aceptable que el servidor del piloto sea una laptop gemela con el mismo código Python?",
+                  detalle: "Por qué se pregunta: El lote piloto dura 4 a 5 días continuos. Si la Pi solo se presta una vez a la semana en clase, la laptop gemela correrá Mosquitto, receptor y Firebase (D06 y D14).",
+                  hecho: false,
+                  respuesta: ""
+                },
+                {
+                  ref_id: "Q6",
+                  tipo: "pregunta",
+                  texto: "Q6 — ¿Podemos usar piezas impresas en 3D (PETG/ASA) como parte de la estructura, además del acrílico?",
+                  detalle: "Por qué se pregunta: Para diseñar y fabricar soportes herméticos de cámara, ventilación y boquilla de niebla con filamento técnico (D17 y Sección 14).",
+                  hecho: false,
+                  respuesta: ""
+                }
+              ]
+            },
+            {
+              texto: "Anotar las respuestas recibidas y las fechas oficiales de entrega de Parte 1 y Parte 2",
+              detalle: "Registrar las fechas oficiales para alimentar el cronograma de la aplicación y la bitácora técnica:",
+              subpasos: [
+                { texto: "Fecha oficial de entrega Parte 1 anotada y confirmada con la docente", hecho: false },
+                { texto: "Fecha oficial de entrega Parte 2 anotada y confirmada con la docente", hecho: false },
+                { texto: "Estructura y formato de informe técnico confirmados con la cátedra", hecho: false }
+              ]
+            }
+          ],
+          criterio_aceptacion: "Las 6 preguntas Q1 a Q6 respondidas por la docente, respuestas registradas en bitácora y fechas oficiales de entrega anotadas."
+        },
+
+        {
+          id: "T1.03",
+          titulo: "Compras de la Parte 1 con pruebas en tienda",
+          parte: 1,
+          fase: "Hardware y Prototipado",
+          rol_responsable: "Integrante 1",
+          revisor: "Integrante 2",
+          depende_de: ["T1.01"],
+          etiquetas: ["[PDF]", "[A VERIFICAR]"],
+          semana_inicio: 1,
+          semana_fin: 1,
+          descripcion: "Adquirir la lista de materiales 6.1 aplicando en mostrador las pruebas de tienda críticas de la Sección 18.",
+          pasos: [
+            {
+              texto: "Revisar lista de materiales 6.1 (Electrónica, Lote piloto y Servidor local)",
+              detalle: "Verificar ítems: ESP32 DevKit V1 (30 pines), 2 sensores capacitivos v1.2, DHT22, humidificador ultrasónico 5V, relé 2 canales, OLED I2C 0.96 pulg (SSD1306), fuente 5V/3A, condensadores 220-470 µF, resistencias (10k, 15k, 4.7k), tupper, paño e hilo."
+            },
+            {
+              texto: "PRUEBA EN TIENDA: Humidificador ultrasónico a 5 V directos",
+              detalle: "Conectar en el mostrador a 5 V directos. Debe emitir microniebla de inmediato sin pulsar nada. Si trae pulsador, adquirir transistor 2N2222 o PC817 para puenteo.",
+              subpasos: [
+                { texto: "Verificar arranque inmediato al recibir 5 V en el módulo", hecho: false },
+                { texto: "Comprobar que la membrana cerámica no requiera pulsar ningún botón manual", hecho: false }
+              ]
+            },
+            {
+              texto: "PRUEBA EN TIENDA: Módulo relé de 2 canales con optoacoplador y jumper JD-VCC",
+              detalle: "Inspeccionar físicamente que tenga optoacopladores y que incluya el jumper removible JD-VCC para desacoplar las bobinas de 5 V de la lógica de 3.3 V del ESP32.",
+              subpasos: [
+                { texto: "Optoacopladores visibles en el PCB del módulo relé", hecho: false },
+                { texto: "Jumper JD-VCC presente y retirable", hecho: false }
+              ]
+            },
+            {
+              texto: "Verificar sensores capacitivos de humedad de suelo v1.2",
+              detalle: "Comprobar que lleven regulador de voltaje soldado en el PCB. Rechazar sensores resistivos con pistas desnudas porque se corroen por electrólisis."
+            },
+            {
+              texto: "Comprar tupper hermético con tapa, paño oscuro, hilo y esmalte de uñas transparente",
+              detalle: "Tupper rectangular transparente amplio, paño de algodón oscuro (para contrastar con la radícula blanca) y esmalte para sellado impermeable."
+            }
+          ],
+          criterio_aceptacion: "Humidificador probado a 5 V directos emitiendo niebla, relé con jumper JD-VCC verificado y todos los componentes de la lista 6.1 adquiridos."
+        },
+
+        {
+          id: "T1.04",
+          titulo: "Entorno de desarrollo en la laptop gemela",
+          parte: 1,
+          fase: "Servidor y Comunicaciones",
+          rol_responsable: "Integrante 3",
+          revisor: "Integrante 2",
+          depende_de: ["T1.01"],
+          etiquetas: ["[DISEÑO]"],
+          semana_inicio: 1,
+          semana_fin: 1,
+          descripcion: "Configurar laptop gemela para que actúe como servidor idéntico a la Raspberry Pi 4 durante la Parte 1.",
+          pasos: [
+            {
+              texto: "Instalar Docker o WSL2, Python 3.10+ y estructurar el repositorio Git",
+              detalle: "Crear carpetas: /firmware, /servidor, /simulador, /datos, /docs. Configurar .gitignore para excluir .env y secrets.h."
+            },
+            {
+              texto: "Instalar y configurar Broker Mosquitto local en el puerto 1883",
+              detalle: "Configurar mosquitto.conf con usuario y contraseña (sin acceso anónimo) y habilitar listeners para red local."
+            },
+            {
+              texto: "Crear script simulador en Python para generar telemetría MQTT sintética",
+              detalle: "Script simulador.py que publique cada 10-30 s en epn/iot/grupo1/sensores el JSON oficial: {hum_sustrato_rel, temp_amb_c, hum_amb_rel, mq135_ratio, agua_ok, rele_hum, rele_led}."
+            },
+            {
+              texto: "Verificar que el receptor capture telemetría y registre datos en CSV local",
+              detalle: "Comprobar que los mensajes lleguen al tópico y se guarden en archivo telemetria.csv sin duplicados."
+            }
+          ],
+          criterio_aceptacion: "El broker Mosquitto procesa mensajes en el puerto 1883, el simulador emite telemetría válida y el receptor la guarda localmente."
+        },
+
+        {
+          id: "T1.05",
+          titulo: "Simulación del firmware en Wokwi",
+          parte: 1,
+          fase: "Firmware y Control",
+          rol_responsable: "Integrante 2",
+          revisor: "Integrante 1",
+          depende_de: ["T1.01"],
+          etiquetas: ["[DISEÑO]", "[A VERIFICAR]"],
+          semana_inicio: 1,
+          semana_fin: 1,
+          descripcion: "Validar firmware C++ del ESP32 en simulación Wokwi antes del montaje en físico para evitar errores de pines.",
+          pasos: [
+            {
+              texto: "Montar circuito virtual en Wokwi con ESP32, potenciómetro, DHT22 y OLED SSD1306",
+              detalle: "Conexiones Wokwi: Potenciómetro en ADC1 GPIO 34, DHT22 en GPIO 4, pantalla OLED SSD1306 en bus I2C (GPIO 21 SDA, GPIO 22 SCL)."
+            },
+            {
+              texto: "Programar arranque seguro del relé",
+              detalle: "Escribir digitalWrite(PIN_RELE, HIGH) ANTES de pinMode(PIN_RELE, OUTPUT) para garantizar que el relé no se active en falso al energizar."
+            },
+            {
+              texto: "Simular control con histéresis y temporizadores de protección",
+              detalle: "Encender humidificador si humedad < H_on, apagar si >= H_off. Respetar t_min_on (30 s) y t_min_off (60 s)."
+            },
+            {
+              texto: "Verificar generación del JSON de telemetría por puerto serie",
+              detalle: "Comprobar formato exacto de variables y valores numéricos en la consola serial."
+            }
+          ],
+          criterio_aceptacion: "El firmware compila en Wokwi, muestra valores coherentes en pantalla OLED y emite el JSON esperado por consola."
+        },
+
+        {
+          id: "T1.06",
+          titulo: "Impermeabilización y pruebas de mesa",
+          parte: 1,
+          fase: "Hardware y Prototipado",
+          rol_responsable: "Integrante 1",
+          revisor: "Integrante 2",
+          depende_de: ["T1.03"],
+          etiquetas: ["[PDF]", "[DISEÑO]"],
+          semana_inicio: 2,
+          semana_fin: 2,
+          descripcion: "Sellar la electrónica expuesta de los sensores capacitivos y probar la etapa de potencia de 5 V de forma aislada.",
+          pasos: [
+            {
+              texto: "Impermeabilizar la parte superior de los 2 sensores capacitivos v1.2",
+              detalle: "Aplicar 2 capas de esmalte de uñas transparente o silicona neutra sobre el integrado, resistencias y conector de la placa superior. NO pintar la zona de medición del PCB. Dejar secar 3 horas.",
+              subpasos: [
+                { texto: "Sensor #1 sellado con 2 capas sin tocar pistas de medición", hecho: false },
+                { texto: "Sensor #2 (respaldo) sellado con 2 capas sin tocar pistas de medición", hecho: false }
+              ]
+            },
+            {
+              texto: "Probar etapa de potencia de forma aislada con fuente externa 5 V / 3 A",
+              detalle: "Alimentar humidificador y relé directamente desde la fuente externa. Verificar que no haya caídas de tensión por debajo de 4.8 V al conmutar."
+            },
+            {
+              texto: "Medir consumo de corriente en reposo y con humidificador encendido",
+              detalle: "Verificar con multímetro que la corriente esté dentro de los 300-600 mA previstos y no sobrecaliente la fuente."
+            }
+          ],
+          criterio_aceptacion: "Esmalte totalmente seco sin cubrir pistas de medición, y relé conmutando el humidificador de forma aislada y estable."
+        },
+
+        {
+          id: "T1.07",
+          titulo: "Diagrama técnico de pines y alimentación",
+          parte: 1,
+          fase: "Hardware y Prototipado",
+          rol_responsable: "Integrante 1",
+          revisor: "Integrante 2 (compara diagrama vs código)",
+          depende_de: ["T1.03"],
+          etiquetas: ["[PDF]", "[DISEÑO]"],
+          semana_inicio: 2,
+          semana_fin: 2,
+          descripcion: "Elaborar diagrama esquemático formal en KiCad o Fritzing respetando la tabla oficial de pines (Sección 6.4) y reglas de alimentación.",
+          pasos: [
+            {
+              texto: "Dibujar conexiones oficiales de sensores y actuadores (Sección 6.4)",
+              detalle: "Pines oficiales:\n• Sensor sustrato v1.2: AOUT -> GPIO 34 (ADC1), VCC -> 3V3 ESP32, GND -> GND común.\n• DHT22: DATA -> GPIO 4, VCC -> 3V3 ESP32, GND -> GND.\n• OLED 0.96 pulg I2C: SDA -> GPIO 21, SCL -> GPIO 22, VCC -> 3V3, GND -> GND.\n• Relé 2 canales: IN1 -> GPIO 26, IN2 -> GPIO 27, VCC -> 3V3 ESP32, JD-VCC -> 5 V ext, GND -> GND común.\n• REGLA CRÍTICA: Prohibido usar ADC2 con Wi-Fi."
+            },
+            {
+              texto: "Representar desacoplo de alimentación con condensador y tierras unidas",
+              detalle: "Mostrar la fuente externa de 5 V alimentando el humidificador y JD-VCC, el ESP32 alimentado por USB, masas unidas (GND común) y condensador 220-470 µF."
+            },
+            {
+              texto: "Revisión cruzada obligatoria: Integrante 2 coteja esquema frente a código",
+              detalle: "Comprobar pin a pin que los números de GPIO definidos en el código C++ coincidan exactamente con el esquema KiCad."
+            }
+          ],
+          criterio_aceptacion: "Diagrama esquemático en alta resolución con tierras unidas, VIN sin conectar a fuente externa, y pines del código idénticos al esquema."
+        },
+
+        {
+          id: "T1.08",
+          titulo: "Armado en protoboard del circuito prototipo",
+          parte: 1,
+          fase: "Hardware y Prototipado",
+          rol_responsable: "Integrante 1",
+          revisor: "Integrante 2",
+          depende_de: ["T1.06", "T1.07"],
+          etiquetas: ["[PDF]"],
+          semana_inicio: 2,
+          semana_fin: 2,
+          descripcion: "Cablear en protoboard el microcontrolador ESP32, sensores en 3.3 V y etapa de potencia con separación de alimentación.",
+          pasos: [
+            {
+              texto: "Insertar ESP32 DevKit V1 alimentado por USB y montar sensores",
+              detalle: "Conectar riel de 3.3 V del ESP32 a sensor capacitivo (GPIO 34), DHT22 (GPIO 4) y pantalla OLED (GPIO 21/22)."
+            },
+            {
+              texto: "Cablear etapa de potencia desacoplada con fuente externa 5 V / 3 A",
+              detalle: "Quitar jumper JD-VCC. Conectar pin JD-VCC a 5 V de la fuente externa, VCC a 3.3 V del ESP32, e interconectar GND de la fuente con GND del ESP32."
+            },
+            {
+              texto: "Añadir condensador de desacoplo de 220-470 µF",
+              detalle: "Colocar condensador en paralelo con la entrada de 5 V del humidificador para absorber picos transitorios de conmutación."
+            },
+            {
+              texto: "Verificar conmutaciones repetidas sin reinicios del ESP32",
+              detalle: "Hacer conmutar el relé 10 veces consecutivas y verificar por puerto serie que el ESP32 no sufra reset por brownout ni ruido inductivo."
+            }
+          ],
+          criterio_aceptacion: "El ESP32 enciende y apaga el humidificador repetidamente mediante el relé sin reiniciarse ni emitir lecturas corruptas."
+        },
+
+        {
+          id: "T1.09",
+          titulo: "Firmware: calibración, control y pantalla OLED",
+          parte: 1,
+          fase: "Firmware y Control",
+          rol_responsable: "Integrante 2",
+          revisor: "Integrante 1 (prueba en hardware real)",
+          depende_de: ["T1.05", "T1.08"],
+          etiquetas: ["[PDF]", "[DISEÑO]", "[A VERIFICAR]"],
+          semana_inicio: 3,
+          semana_fin: 3,
+          descripcion: "Desarrollar firmware C++ con curva de calibración aire/agua, lectura DHT22, lazo con histéresis y refresco en pantalla OLED.",
+          pasos: [
+            {
+              texto: "Calibración del sensor capacitivo en aire seco (0%) y agua destilada (100%)",
+              detalle: "Medir valor ADC en aire seco (ADC_aire, ~3200-3500) y sumergido en agua destilada (ADC_agua, ~1400-1600), promediando 16-32 lecturas.",
+              subpasos: [
+                { texto: "Registrar valor ADC_aire seco promediando 32 muestras", hecho: false },
+                { texto: "Registrar valor ADC_agua promediando 32 muestras", hecho: false }
+              ]
+            },
+            {
+              texto: "Implementar conversión lineal con límites",
+              detalle: "Fórmula: humedad = map(adc_actual, ADC_aire, ADC_agua, 0, 100); humedad = constrain(humedad, 0, 100);"
+            },
+            {
+              texto: "Implementar lectura del DHT22 y visualización gráfica en OLED SSD1306",
+              detalle: "Mostrar pantalla con 4 líneas: 1) Humedad sustrato %, 2) Temp ambiental °C, 3) Humedad ambiental %, 4) Estado relé (ON/OFF)."
+            },
+            {
+              texto: "Programar lazo con histéresis y temporizadores de seguridad",
+              detalle: "Activar si humedad < H_on, desactivar si >= H_off. Parámetros de protección: t_min_on = 30 s, t_min_off = 60 s, t_max_on = 10 min."
+            }
+          ],
+          criterio_aceptacion: "Tabla de calibración registrada en bitácora, visualización fluida en OLED y control de humidificador con histéresis validado."
+        },
+
+        {
+          id: "T1.10",
+          titulo: "Broker Mosquitto, receptor Python y Firebase",
+          parte: 1,
+          fase: "Servidor y Comunicaciones",
+          rol_responsable: "Integrante 3",
+          revisor: "Integrante 2",
+          depende_de: ["T1.04"],
+          etiquetas: ["[PDF]", "[DISEÑO]"],
+          semana_inicio: 3,
+          semana_fin: 3,
+          descripcion: "Implementar pipeline completo de comunicaciones: broker local con autenticación, script receptor en Python y sincronización con Firebase.",
+          pasos: [
+            {
+              texto: "Configurar broker Mosquitto en la laptop gemela / Raspberry con contraseña",
+              detalle: "Habilitar archivo mosquitto_passwd en puerto 1883 para restringir el acceso a clientes autorizados."
+            },
+            {
+              texto: "Programar script receptor.py con cliente paho-mqtt y respaldo local",
+              detalle: "Suscribirse a epn/iot/grupo1/sensores, validar tipos de datos del JSON y registrar cada lectura con timestamp en CSV y SQLite."
+            },
+            {
+              texto: "Configurar sincronización con Firebase Realtime Database mediante .env",
+              detalle: "Enviar datos vía REST HTTPS a Firebase. Mantener credenciales y tokens fuera del repositorio Git mediante archivo .env."
+            }
+          ],
+          criterio_aceptacion: "El simulador o ESP32 transmite datos, el receptor los almacena en telemetria.csv local y los refleja en Firebase en tiempo real."
+        },
+
+        {
+          id: "T1.11",
+          titulo: "Telemetría MQTT real en hardware",
+          parte: 1,
+          fase: "Servidor y Comunicaciones",
+          rol_responsable: "Integrante 2",
+          revisor: "Integrante 3",
+          depende_de: ["T1.09", "T1.10"],
+          etiquetas: ["[PDF]"],
+          semana_inicio: 4,
+          semana_fin: 4,
+          descripcion: "Vincular el ESP32 real a la red Wi-Fi y transmitir telemetría periódica al broker Mosquitto y Firebase.",
+          pasos: [
+            {
+              texto: "Compilar y cargar firmware en ESP32 con reconexión automática a Wi-Fi y MQTT",
+              detalle: "Implementar bucle de reconexión no bloqueante si se pierde la señal Wi-Fi o cae el broker."
+            },
+            {
+              texto: "Publicar lecturas reales cada 10 a 30 segundos en epn/iot/grupo1/sensores",
+              detalle: "Transmitir la trama JSON real con lecturas de sustrato, DHT22 y estado del relé."
+            },
+            {
+              texto: "Verificar recepción ininterrumpida y persistencia de datos durante 2 horas",
+              detalle: "Comprobar que no haya pérdida de paquetes ni bloqueos en el hilo principal del ESP32."
+            }
+          ],
+          criterio_aceptacion: "Lecturas de sensores reales y actuadores visibles en la consola del receptor y actualizándose en Firebase cada 10-30 s."
+        },
+
+        {
+          id: "T1.12",
+          titulo: "Montaje y siembra del lote piloto (Sección 10)",
+          parte: 1,
+          fase: "Lote Piloto",
+          rol_responsable: "Integrante 1",
+          revisor: "Integrante 3",
+          depende_de: ["T1.09"],
+          etiquetas: ["[DISEÑO]", "[A VERIFICAR]"],
+          semana_inicio: 3,
+          semana_fin: 4,
+          descripcion: "Acondicionar el tupper piloto con paño cuadriculado, instalar sensores y sembrar 20 a 25 semillas de fréjol según Sección 10.",
+          pasos: [
+            {
+              texto: "Preparar contenedor tupper con paño cuadriculado 5x5 e hilo",
+              detalle: "Crear orificio sellado con silicona para cables. Colocar paño oscuro en el fondo con cuadrícula 5x5 (25 celdas) bordada con hilo para separar cada semilla."
+            },
+            {
+              texto: "Instalar sensor capacitivo en el sustrato y DHT22 en la parte superior",
+              detalle: "Ubicar sensor capacitivo en una celda central. Ubicar DHT22 en la parte alta de la tapa, lejos de la salida directa del humidificador."
+            },
+            {
+              texto: "Llenar depósito con > 500 mL de agua y verificar marca de nivel mínimo",
+              detalle: "Asegurar que el humidificador quede sumergido correctamente y que nunca trabaje en seco."
+            },
+            {
+              texto: "Sembrar entre 20 y 25 semillas de fréjol (1 semilla por celda)",
+              detalle: "Sembrar semillas homogéneas seleccionadas previamente. Tomar primera fotografía cenital de inicio piloto_d0_inicio.jpg."
+            }
+          ],
+          criterio_aceptacion: "Contenedor montado, semillas sembradas individualmente en la cuadrícula, humedad estable y primera foto de inicio registrada."
+        },
+
+        {
+          id: "T1.13",
+          titulo: "Monitoreo del piloto (4 a 5 días de corrida)",
+          parte: 1,
+          fase: "Lote Piloto",
+          rol_responsable: "Integrante 1",
+          revisor: "Integrante 3 (datos y conteo)",
+          depende_de: ["T1.11", "T1.12"],
+          etiquetas: ["[DISEÑO]", "[A VERIFICAR]"],
+          semana_inicio: 4,
+          semana_fin: 5,
+          descripcion: "Supervisar lote piloto 24/7 durante 4 a 5 días: rutina diaria de agua, fotografías periódicas y conteo de germinación.",
+          pasos: [
+            {
+              texto: "RUTINA DIARIA 1: Revisar y rellenar nivel de agua del depósito cada mañana",
+              detalle: "El humidificador ultrasónico NUNCA debe operar en seco. Verificar nivel antes de que descienda de la marca mínima."
+            },
+            {
+              texto: "RUTINA DIARIA 2: Tomar fotos cenitales 2 a 4 veces al día (00h, 06h, 12h, 18h)",
+              detalle: "Capturar fotografías desde la misma altura y ángulo, guardándolas con el formato piloto_d[dia]_[hora]h.jpg."
+            },
+            {
+              texto: "RUTINA DIARIA 3: Conteo de semillas germinadas (radícula visible >= 2 mm)",
+              detalle: "Contar cuántas semillas tienen radícula >= 2 mm. Calcular % germinación = (germinadas / total) * 100 y anotarlo en la bitácora."
+            },
+            {
+              texto: "RUTINA DIARIA 4: Mantener laptop gemela encendida permanentemente",
+              detalle: "Desactivar suspensión y ahorro de energía en la laptop para asegurar registro continuo de telemetría sin huecos."
+            }
+          ],
+          criterio_aceptacion: "Bitácora completa con 4-5 días de datos continuos, registro fotográfico diario y serie temporal de temperatura/humedad sin interrupciones."
+        },
+
+        {
+          id: "T1.14",
+          titulo: "Redacción de secciones del informe técnico de Parte 1",
+          parte: 1,
+          fase: "Documentación y Entrega",
+          rol_responsable: "Todos",
+          revisor: "Integrante 3 (al 1), 1 (al 2), 2 (al 3)",
+          depende_de: ["T1.07", "T1.09", "T1.10"],
+          etiquetas: ["[PDF]"],
+          semana_inicio: 5,
+          semana_fin: 5,
+          descripcion: "Redactar secciones individuales del primer informe técnico con revisión cruzada obligatoria entre compañeros.",
+          pasos: [
+            {
+              texto: "Integrante 1 (Xavier): Redactar sección de Hardware y Lote Piloto",
+              detalle: "Detallar esquemas electrónicos KiCad, balance de potencia, aislamiento JD-VCC, sellado de sensores y montaje físico del piloto."
+            },
+            {
+              texto: "Integrante 2 (Angelo): Redactar sección de Firmware y Calibración",
+              detalle: "Detallar máquina de estados del ESP32, curvas de calibración aire/agua, lazo de control con histéresis y refresco en pantalla OLED."
+            },
+            {
+              texto: "Integrante 3 (Fernando): Redactar sección de Servidor y Datos",
+              detalle: "Detallar broker Mosquitto, tópicos MQTT, script receptor Python, integración con Firebase y curvas experimentales del piloto."
+            },
+            {
+              texto: "Revisión cruzada obligatoria de secciones",
+              detalle: "Xavier revisa a Angelo, Angelo a Fernando, y Fernando a Xavier para asegurar coherencia técnica antes de consolidar."
+            }
+          ],
+          criterio_aceptacion: "Tres secciones individuales redactadas con rigor técnico y revisadas por los compañeros según la matriz de revisión cruzada."
+        },
+
+        {
+          id: "T1.15",
+          titulo: "Consolidación del informe y paquete de código",
+          parte: 1,
+          fase: "Documentación y Entrega",
+          rol_responsable: "Integrante 2",
+          revisor: "Integrante 3",
+          depende_de: ["T1.13", "T1.14"],
+          etiquetas: ["[PDF]"],
+          semana_inicio: 6,
+          semana_fin: 6,
+          descripcion: "Unificar secciones en documento PDF final y limpiar el repositorio de código fuente para entrega.",
+          pasos: [
+            {
+              texto: "Unificar informe técnico en un solo documento PDF formal",
+              detalle: "Incluir carátula oficial EPN, introducción, objetivos, metodología, esquemas, gráficas de telemetría, resultados del piloto y lecciones aprendidas."
+            },
+            {
+              texto: "Limpieza y auditoría de seguridad del repositorio Git",
+              detalle: "Verificar que ningún archivo contenga contraseñas ni tokens (.env y secrets.h excluidos). Escribir README.md detallado con guía de arranque."
+            }
+          ],
+          criterio_aceptacion: "PDF del informe consolidado listo para entrega y repositorio Git con código limpio, documentado y sin credenciales expuestas."
+        },
+
+        {
+          id: "T1.16",
+          titulo: "Ensayo de entrega y arranque en frío",
+          parte: 1,
+          fase: "Documentación y Entrega",
+          rol_responsable: "Todos",
+          revisor: "Todos",
+          depende_de: ["T1.15"],
+          etiquetas: ["[PDF]"],
+          semana_inicio: 6,
+          semana_fin: 6,
+          descripcion: "Prueba integral de recuperación tras corte de energía y ensayo general de demostración de la Parte 1.",
+          pasos: [
+            {
+              texto: "Prueba de arranque en frío total (apagado forzado)",
+              detalle: "Desconectar totalmente la alimentación de la pared, reconectar y verificar que el ESP32 restablezca control autónomo y reconecte la telemetría sin intervención humana."
+            },
+            {
+              texto: "Ensayo de exposición grupal de 15 minutos",
+              detalle: "Ensayar explicación técnica de cada integrante ante posibles preguntas de la docente."
+            }
+          ],
+          criterio_aceptacion: "El prototipo arranca y se estabiliza de forma 100% autónoma tras encendido en frío, y el equipo aprueba el ensayo de exposición."
+        },
 
         // PARTE 2
-        { id: "T2.01", titulo: "Revisión posterior a la Parte 1", parte: 2, fase: "Planificación y Compras P2", rol_responsable: "Todos", revisor: "Todos", depende_de: ["T1.13"], etiquetas: ["[DISEÑO]", "[A VERIFICAR]"], semana_inicio: 1, semana_fin: 1, descripcion: "Ajustar umbrales y lecciones aprendidas tras el piloto.", pasos: ["Revisar lecciones del piloto.", "Fijar valores definitivos de H_on, H_off, RH_on, RH_off y tiempos.", "Fijar variedad de fréjol y criterio de germinación (radícula >= 2 mm)."], criterio_aceptacion: "Lista de ajustes y valores definitivos de H_on, H_off, RH_on, RH_off y tiempos." },
-        { id: "T2.02", titulo: "Compras de la Parte 2", parte: 2, fase: "Planificación y Compras P2", rol_responsable: "Integrante 1", revisor: "Integrante 2", depende_de: ["T1.02", "T2.01"], etiquetas: ["[PDF]", "[DISEÑO]", "[A VERIFICAR]"], semana_inicio: 1, semana_fin: 1, descripcion: "Comprar lista 6.2 tras respuesta de docente sobre cámara y nivel.", pasos: ["Verificar respuestas Q1 y Q2.", "Comprar lista 6.2 (ESP32-CAM, MQ-135, tira LED, nivel de agua, acrílico, filamento PETG/ASA, conectores)."], criterio_aceptacion: "Componentes de la lista 6.2 comprados, con la respuesta de la docente sobre ESP32-CAM y sensor de nivel." },
-        { id: "T2.03", titulo: "Pruebas individuales en protoboard", parte: 2, fase: "Hardware, PCB y Estructura", rol_responsable: "Integrante 1", revisor: "Integrante 2 (cámara y firmware)", depende_de: ["T2.02"], etiquetas: ["[PDF]", "[DISEÑO]", "[A VERIFICAR]"], semana_inicio: 2, semana_fin: 2, descripcion: "Probar MQ-135 con divisor 10k/15k, tira LED, sensor de nivel y ESP32-CAM.", pasos: ["MQ-135 con divisor: nunca > 3.0 V en GPIO 35.", "Tira LED 5 V controlada por segundo relé (GPIO 27).", "Sensor de nivel de agua en depósito vacío y lleno.", "ESP32-CAM (enfoque a 15-25 cm, captura y POST HTTP) y medir consumo."], criterio_aceptacion: "Cada componente funciona por separado y se anota su consumo." },
-        { id: "T2.04", titulo: "Diseño de la PCB", parte: 2, fase: "Hardware, PCB y Estructura", rol_responsable: "Integrante 1", revisor: "Integrante 2 (revisión cruzada)", depende_de: ["T2.03"], etiquetas: ["[PDF]"], semana_inicio: 2, semana_fin: 4, descripcion: "Diseño en KiCad/EasyEDA con borneras para sensores y actuadores.", pasos: ["Diseñar esquemático y layout con borneras y hembras para ESP32.", "Revisión cruzada del esquema antes de exportar Gerbers.", "Enviar PCB a fabricar (S4)."], criterio_aceptacion: "Archivos de fabricación listos y revisados." },
-        { id: "T2.05", titulo: "Firmware completo del ESP32 principal", parte: 2, fase: "Firmware y Visión", rol_responsable: "Integrante 2", revisor: "Integrante 1 (hardware real)", depende_de: ["T2.03"], etiquetas: ["[PDF]", "[DISEÑO]"], semana_inicio: 2, semana_fin: 3, descripcion: "Fotoperíodo, MQ-135 (Rs/R0), nivel de agua y modo foto con temporizador 6 min.", pasos: ["Integrar fotoperíodo, MQ-135 y nivel de agua.", "Máquina de estados modo foto (apagar humidificador, encender LED, esperar 3-4 min y foto_listo).", "Temporizador de seguridad de 6 min y restauración de LED tras fin_foto."], criterio_aceptacion: "El ESP32 responde a preparar_foto, se recupera solo a los 6 minutos y mantiene el control autónomo." },
-        { id: "T2.06", titulo: "Firmware de la ESP32-CAM", parte: 2, fase: "Firmware y Visión", rol_responsable: "Integrante 2", revisor: "Integrante 3", depende_de: ["T2.03"], etiquetas: ["[PDF]", "[DISEÑO]"], semana_inicio: 2, semana_fin: 3, descripcion: "Nodo de visión independiente sincronizado por MQTT y POST HTTP.", pasos: ["Configurar brownout, PSRAM y suscripción a epn/iot/grupo1/estado.", "Tomar 2-3 fotos al recibir foto_listo y conservar la última.", "Enviar foto por POST HTTP a /upload con reintento."], criterio_aceptacion: "Una imagen nítida llega a la Raspberry cada vez que se pide." },
-        { id: "T2.07", titulo: "Servidor Flask", parte: 2, fase: "Servidor, Modelo y Servicios", rol_responsable: "Integrante 3", revisor: "Integrante 2", depende_de: ["T1.10"], etiquetas: ["[DISEÑO]"], semana_inicio: 2, semana_fin: 3, descripcion: "Servidor HTTP en Raspberry para recibir, guardar y servir fotos.", pasos: ["Rutas /upload (con token), /fotos/<f> y /salud.", "Guardar fotos con timestamp, encolar OpenCV y publicar fin_foto por MQTT."], criterio_aceptacion: "El servidor recibe una foto y la deja disponible para el panel." },
-        { id: "T2.08", titulo: "Script OpenCV", parte: 2, fase: "Firmware y Visión", rol_responsable: "Integrante 2", revisor: "Integrante 3", depende_de: ["T2.07", "T1.13"], etiquetas: ["[PDF]", "[DISEÑO]", "[A VERIFICAR]"], semana_inicio: 3, semana_fin: 3, descripcion: "Detección de radícula como brote alargado (evitar confundir con hinchazón).", pasos: ["Recorte de celdas, umbralización y apertura morfológica con fotos del piloto.", "Detectar brote alargado (relación largo/ancho > 2 y longitud >= 2 mm).", "Recalibrar umbral con foto real en caja acrílica y documentar error vs manual."], criterio_aceptacion: "Error de conteo documentado frente al conteo manual." },
-        { id: "T2.09", titulo: "Modelo de tiempo óptimo", parte: 2, fase: "Servidor, Modelo y Servicios", rol_responsable: "Integrante 3", revisor: "Integrante 2", depende_de: ["T1.13"], etiquetas: ["[PDF]", "[DISEÑO]", "[A VERIFICAR]"], semana_inicio: 3, semana_fin: 3, descripcion: "Script Python de grados-hora hidrotermales acumulados.", pasos: ["Calcular GDDh = max(0, T - T_base) acumulando solo si H_sustrato >= H_umbral.", "Ajustar curva logística con datos del piloto.", "Estimar horas restantes para llegar al 80% y publicar en Firebase."], criterio_aceptacion: "El script estima horas restantes para el 80% y se presenta como modelo preliminar." },
-        { id: "T2.10", titulo: "Panel y alertas", parte: 2, fase: "Servidor, Modelo y Servicios", rol_responsable: "Integrante 3", revisor: "Integrante 2", depende_de: ["T2.07", "T1.10"], etiquetas: ["[PDF]", "[DISEÑO]"], semana_inicio: 4, semana_fin: 4, descripcion: "Panel web conectado a Firebase y alertas Telegram/email.", pasos: ["Panel web (sustrato, luz, temp/hum aire, MQ-135, curva germinación, fotos, predicción).", "Alertas Telegram y SMTP para depósito sin agua, sustrato seco y nodo caído (con cooldown 30 min y resuelto)."], criterio_aceptacion: "El panel muestra datos en vivo y llega un aviso al vaciar el depósito." },
-        { id: "T2.11", titulo: "Diseño 3D y estructura acrílica", parte: 2, fase: "Hardware, PCB y Estructura", rol_responsable: "Integrante 1", revisor: "Todos (coordinación medidas)", depende_de: ["T2.03", "T2.04"], etiquetas: ["[PDF]", "[DISEÑO]", "[A VERIFICAR]"], semana_inicio: 4, semana_fin: 5, descripcion: "Cámara acrílica con zona húmeda y zona seca separadas y piezas en PETG/ASA.", pasos: ["Definir tamaño PCB y modelar en CAD soportes (cámara, humidificador, sensor, OLED, LED).", "Imprimir piezas en PETG o ASA (no PLA).", "Cortar y armar estructura acrílica con zona seca y húmeda separadas."], criterio_aceptacion: "Estructura armada con zona húmeda y zona seca." },
-        { id: "T2.12", titulo: "Fabricación y soldadura de la PCB", parte: 2, fase: "Hardware, PCB y Estructura", rol_responsable: "Integrante 1", revisor: "Integrante 2", depende_de: ["T2.04"], etiquetas: ["[PDF]"], semana_inicio: 5, semana_fin: 5, descripcion: "Soldar componentes en PCB y verificar continuidades y cortos.", pasos: ["Soldar borneras, conectores y zócalos en la PCB fabricada.", "Verificar continuidad y ausencia de cortos antes de alimentar.", "Conectar módulos y comprobar funcionamiento."], criterio_aceptacion: "La PCB enciende y todos los módulos responden." },
-        { id: "T2.13", titulo: "Integración total y prueba en seco", parte: 2, fase: "Integración y Pruebas Reales", rol_responsable: "Todos", revisor: "Todos", depende_de: ["T2.05", "T2.06", "T2.08", "T2.11", "T2.12"], etiquetas: ["[PDF]", "[DISEÑO]"], semana_inicio: 6, semana_fin: 6, descripcion: "Ensamblar en caja acrílica y test continuo de 24 h sin semillas.", pasos: ["Montar PCB, sensores, humidificador, LED y ESP32-CAM en caja acrílica.", "Correr 24 horas continuas con niebla, luz y fotos cada 6 h."], criterio_aceptacion: "24 horas sin reinicios ni fallas y con fotos recibidas." },
-        { id: "T2.14", titulo: "Pruebas reales de germinación", parte: 2, fase: "Integración y Pruebas Reales", rol_responsable: "Integrante 1", revisor: "Integrante 3 (datos)", depende_de: ["T2.13"], etiquetas: ["[PDF]", "[A VERIFICAR]"], semana_inicio: 7, semana_fin: 8, descripcion: "Dos lotes reales de fréjol (5-6 días cada uno) 100% autónomos con fotos cada 6 h.", pasos: ["Asegurar préstamo largo de la Pi o servidor alterno sin suspensión.", "Correr Lote 1 de fréjol (5 a 6 días) en modo 100% autónomo.", "Correr Lote 2 de fréjol (5 a 6 días) en modo 100% autónomo."], criterio_aceptacion: "Base de datos completa con fotos cada 6 horas." },
-        { id: "T2.15", titulo: "Curvas reales y ajuste del modelo", parte: 2, fase: "Servidor, Modelo y Servicios", rol_responsable: "Integrante 3", revisor: "Integrante 2", depende_de: ["T2.14", "T2.09"], etiquetas: ["[PDF]", "[DISEÑO]"], semana_inicio: 7, semana_fin: 8, descripcion: "Generar curvas reales de germinación y reajustar modelo GDDh.", pasos: ["Generar curvas reales (% vs tiempo y vs GDDh).", "Ajustar modelo y documentar limitaciones estadísticas."], criterio_aceptacion: "Curvas de germinación reales y modelo ajustado con sus limitaciones." },
-        { id: "T2.16", titulo: "Manual de uso e informe final", parte: 2, fase: "Documentación y Defensa Final", rol_responsable: "Integrante 3", revisor: "Integrante 1 (manual) e Integrante 2", depende_de: ["T2.15"], etiquetas: ["[PDF]"], semana_inicio: 9, semana_fin: 9, descripcion: "Redactar Manual de Uso (Integrante 1) y consolidar Informe Final (Integrante 3).", pasos: ["Integrante 1: Manual de uso completo (encendido, siembra, agua, pantallas, fallas, seguridad).", "Integrante 3: Informe final completo con PCB, estructura, modo foto, visión y curvas reales."], criterio_aceptacion: "Informe final y manual entregados." },
-        { id: "T2.17", titulo: "Ensayo de defensa", parte: 2, fase: "Documentación y Defensa Final", rol_responsable: "Todos", revisor: "Todos", depende_de: ["T2.16"], etiquetas: ["[PDF]"], semana_inicio: 9, semana_fin: 9, descripcion: "Ensayo general de exposición y demostración en vivo.", pasos: ["Ensayar demo en vivo de cámara y Raspberry Pi.", "Verificar que cada integrante pueda explicar cualquier parte del sistema."], criterio_aceptacion: "Cada integrante puede explicar cualquier parte del sistema." }
+        {
+          id: "T2.01",
+          titulo: "Revisión posterior al piloto y ajuste de umbrales",
+          parte: 2,
+          fase: "Planificación y Compras P2",
+          rol_responsable: "Todos",
+          revisor: "Todos",
+          depende_de: ["T1.13"],
+          etiquetas: ["[DISEÑO]", "[A VERIFICAR]"],
+          semana_inicio: 1,
+          semana_fin: 1,
+          descripcion: "Evaluar resultados experimentales del lote piloto y definir los umbrales de humedad, fotoperíodo y temporizadores para Parte 2.",
+          pasos: [
+            {
+              texto: "Analizar curvas de germinación y consumo de agua del lote piloto",
+              detalle: "Revisar tiempos de respuesta del humidificador y estabilidad de humedad en el sustrato durante los 5 días de corrida."
+            },
+            {
+              texto: "Fijar umbrales definitivos de control: H_on, H_off, RH_on y RH_off",
+              detalle: "Ajustar valores óptimos para fréjol (ej. H_on=70%, H_off=85%, RH_on=80%, RH_off=90%) y tiempos de protección de actuadores."
+            },
+            {
+              texto: "Ratificar criterio morfológico de germinación (radícula >= 2 mm)",
+              detalle: "Confirmar longitud mínima de radícula para el conteo automático de visión por computador."
+            }
+          ],
+          criterio_aceptacion: "Documento de lecciones del piloto registrado con los umbrales numéricos definitivos para el firmware de Parte 2."
+        },
+
+        {
+          id: "T2.02",
+          titulo: "Compras de la Parte 2",
+          parte: 2,
+          fase: "Planificación y Compras P2",
+          rol_responsable: "Integrante 1",
+          revisor: "Integrante 2",
+          depende_de: ["T1.02", "T2.01"],
+          etiquetas: ["[PDF]", "[DISEÑO]", "[A VERIFICAR]"],
+          semana_inicio: 1,
+          semana_fin: 1,
+          descripcion: "Adquirir componentes de la lista 6.2 tras validar las respuestas de la docente sobre cámara y sensor de nivel.",
+          pasos: [
+            {
+              texto: "Verificar respuestas de la docente a las preguntas Q1 y Q2",
+              detalle: "Confirmar que la docente haya aprobado el uso de ESP32-CAM y sensor de nivel de agua antes de realizar la compra."
+            },
+            {
+              texto: "Comprar componentes electrónicos de la lista 6.2",
+              detalle: "Adquirir: Módulo ESP32-CAM (AI-Thinker con OV2640 y base FTDI/USB), sensor MQ-135, tira LED 5 V blanca con difusor, sensor de nivel de agua, resistencias para divisor 10k/15k y borneras."
+            },
+            {
+              texto: "Comprar materiales de estructura acrílica y filamento 3D",
+              detalle: "Láminas de acrílico cristal 3 mm, tornillería M3, separadores hexagonales y 1 rollo de filamento PETG o ASA (prohibido PLA en zona húmeda)."
+            }
+          ],
+          criterio_aceptacion: "Todos los materiales de la lista 6.2 comprados con verificación de componentes en mano."
+        },
+
+        {
+          id: "T2.03",
+          titulo: "Pruebas individuales en protoboard (P7 a P10)",
+          parte: 2,
+          fase: "Hardware, PCB y Estructura",
+          rol_responsable: "Integrante 1",
+          revisor: "Integrante 2 (cámara y firmware)",
+          depende_de: ["T2.02"],
+          etiquetas: ["[PDF]", "[DISEÑO]", "[A VERIFICAR]"],
+          semana_inicio: 2,
+          semana_fin: 2,
+          descripcion: "Probar cada componente nuevo de forma individual en protoboard para validar voltajes, consumos y funcionamiento.",
+          pasos: [
+            {
+              texto: "Prueba P7: Sensor MQ-135 con divisor de tensión 10k/15k",
+              detalle: "Armar divisor de tensión en salida analógica para que el voltaje en GPIO 35 nunca supere los 3.0 V. Precalentar calefactor 24h y medir relación Rs/R0 en aire limpio.",
+              subpasos: [
+                { texto: "Verificar con multímetro que la tensión en GPIO 35 no supere 3.0 V", hecho: false },
+                { texto: "Precalentar el sensor durante 24 horas continuas", hecho: false }
+              ]
+            },
+            {
+              texto: "Prueba P8: Tira LED 5 V con difusor y segundo canal de relé",
+              detalle: "Conectar tira LED a 5 V a través del segundo contacto del relé (GPIO 27). Verificar disipación térmica y ausencia de parpadeo."
+            },
+            {
+              texto: "Prueba P9: Sensor de nivel de agua con activación pulsada",
+              detalle: "Lectura en GPIO 32 (ADC1). Alimentar VCC del sensor desde pin GPIO 33 solo durante 150 ms para evitar electrólisis prematura de las pistas."
+            },
+            {
+              texto: "Prueba P10: ESP32-CAM (enfoque, captura JPEG y POST HTTP)",
+              detalle: "Ajustar lente manualmente girándola para enfocar nítidamente a 15-25 cm de distancia. Tomar captura JPEG y enviarla por HTTP a servidor de prueba. Medir picos de corriente (300-500 mA)."
+            }
+          ],
+          criterio_aceptacion: "MQ-135 con divisor seguro < 3.0 V, tira LED operando en relé 2, sensor de nivel respondiendo y ESP32-CAM enviando fotos nítidas."
+        },
+
+        {
+          id: "T2.04",
+          titulo: "Diseño esquemático y layout de la PCB",
+          parte: 2,
+          fase: "Hardware, PCB y Estructura",
+          rol_responsable: "Integrante 1",
+          revisor: "Integrante 2 (revisión cruzada)",
+          depende_de: ["T2.03"],
+          etiquetas: ["[PDF]"],
+          semana_inicio: 2,
+          semana_fin: 4,
+          descripcion: "Diseñar la placa de circuito impreso (PCB) en KiCad o EasyEDA con borneras para sensores, zócalos y planos de potencia.",
+          pasos: [
+            {
+              texto: "Diseñar esquemático con zócalos para ESP32 DevKit V1 y borneras",
+              detalle: "Incorporar borneras de tornillo de 2 y 3 pines para todos los sensores y actuadores externos, condensadores electrolíticos y divisor para MQ-135."
+            },
+            {
+              texto: "Trazar pistas de potencia anchas y plano de masa sólido (GND)",
+              detalle: "Asegurar pistas de al menos 1 mm para la línea de 5 V y plano de tierra en capa inferior."
+            },
+            {
+              texto: "Revisión cruzada obligatoria del esquemático y huellas",
+              detalle: "Integrante 2 coteja pin por pin las conexiones de la PCB antes de exportar los archivos de fabricación Gerber."
+            },
+            {
+              texto: "Enviar archivos Gerber a fabricación en taller especializado",
+              detalle: "Enviar a fabricar en taller local o servicio express en la Semana 4 para recibir a tiempo."
+            }
+          ],
+          criterio_aceptacion: "Archivos Gerber revisados y aprobados sin errores DRC, y orden de fabricación enviada."
+        },
+
+        {
+          id: "T2.05",
+          titulo: "Firmware completo del ESP32 principal",
+          parte: 2,
+          fase: "Firmware y Visión",
+          rol_responsable: "Integrante 2",
+          revisor: "Integrante 1 (hardware real)",
+          depende_de: ["T2.03"],
+          etiquetas: ["[PDF]", "[DISEÑO]"],
+          semana_inicio: 2,
+          semana_fin: 3,
+          descripcion: "Integrar en el firmware principal fotoperíodo, MQ-135, nivel de agua y la máquina de estados del MODO FOTO con watchdog de 6 min.",
+          pasos: [
+            {
+              texto: "Integrar fotoperíodo, lectura de MQ-135 y sensor de nivel de agua",
+              detalle: "Controlar horario de tira LED, calcular ratio Rs/R0 del MQ-135 y lectura digitalizada del nivel de agua."
+            },
+            {
+              texto: "Implementar máquina de estados del MODO FOTO (Sección 7.4)",
+              detalle: "Secuencia:\n1. Recibir comando MQTT {cmd: preparar_foto}.\n2. Apagar humidificador y encender tira LED (guardando estado previo).\n3. Iniciar temporizador de seguridad de 6 minutos.\n4. Esperar 3-4 minutos para que la niebla se disipe.\n5. Publicar en epn/iot/grupo1/estado -> {estado: foto_listo}.\n6. Al recibir fin_foto, restaurar tira LED y reanudar humidificador.",
+              subpasos: [
+                { texto: "Apagado inmediato del humidificador y encendido de LED con respaldo de estado", hecho: false },
+                { texto: "Espera no bloqueante de 3 a 4 minutos para asentamiento de la niebla", hecho: false },
+                { texto: "Publicación de {estado: foto_listo} en epn/iot/grupo1/estado", hecho: false },
+                { texto: "Watchdog de recuperación autónoma a los 6 minutos si se corta la comunicación", hecho: false }
+              ]
+            }
+          ],
+          criterio_aceptacion: "El ESP32 ejecuta la secuencia de foto completa, responde a comandos MQTT y se recupera solo ante cortes sin bloquear el lazo ambiental."
+        },
+
+        {
+          id: "T2.06",
+          titulo: "Firmware de la ESP32-CAM",
+          parte: 2,
+          fase: "Firmware y Visión",
+          rol_responsable: "Integrante 2",
+          revisor: "Integrante 3",
+          depende_de: ["T2.03"],
+          etiquetas: ["[PDF]", "[DISEÑO]"],
+          semana_inicio: 2,
+          semana_fin: 3,
+          descripcion: "Desarrollar firmware para el nodo independiente de visión ESP32-CAM, sincronizado por MQTT y enviando fotos por POST HTTP.",
+          pasos: [
+            {
+              texto: "Configurar PSRAM, resolución UXGA/SVGA y desactivar detector brownout",
+              detalle: "Optimizar manejo de búferes en memoria externa para evitar fallas durante la codificación JPEG."
+            },
+            {
+              texto: "Suscribirse al tópico MQTT epn/iot/grupo1/estado",
+              detalle: "Al detectar el mensaje {estado: foto_listo}, activar la rutina de captura fotográfica."
+            },
+            {
+              texto: "Secuencia de captura y descarte de imágenes previas",
+              detalle: "Tomar 3 fotografías consecutivas, descartar las dos primeras (para permitir estabilización de exposición y balance de blancos) y conservar la 3ª imagen nítida."
+            },
+            {
+              texto: "Enviar imagen por HTTP POST multiparte a /upload en la Raspberry Pi",
+              detalle: "Transmitir la imagen con token de seguridad en la cabecera y reintentar hasta 3 veces si la red falla."
+            }
+          ],
+          criterio_aceptacion: "La ESP32-CAM toma y transfiere imágenes JPEG nítidas hacia el servidor cada vez que recibe la orden MQTT sin reiniciarse."
+        },
+
+        {
+          id: "T2.07",
+          titulo: "Servidor Flask en Raspberry Pi",
+          parte: 2,
+          fase: "Servidor, Modelo y Servicios",
+          rol_responsable: "Integrante 3",
+          revisor: "Integrante 2",
+          depende_de: ["T1.10"],
+          etiquetas: ["[DISEÑO]"],
+          semana_inicio: 2,
+          semana_fin: 3,
+          descripcion: "Programar servicio web en Flask para recibir, almacenar con timestamp y servir las fotos tomadas por la cámara.",
+          pasos: [
+            {
+              texto: "Crear endpoint POST /upload con validación de token de seguridad",
+              detalle: "Verificar cabecera Authorization antes de aceptar la subida de imágenes."
+            },
+            {
+              texto: "Almacenar imágenes en disco con nomenclatura estandarizada",
+              detalle: "Guardar en /home/pi/camara_fotos/foto_YYYYMMDD_HHMMSS.jpg y mantener registro en base de datos."
+            },
+            {
+              texto: "Publicar de inmediato el comando MQTT {cmd: fin_foto}",
+              detalle: "Avisar al ESP32 que la foto fue recibida correctamente para que reanude el control ambiental."
+            },
+            {
+              texto: "Crear endpoints GET /fotos/<f> y GET /salud",
+              detalle: "Servir las imágenes para el panel web y ofrecer ruta de comprobación de estado."
+            }
+          ],
+          criterio_aceptacion: "El servidor Flask recibe imágenes por HTTP POST, las almacena en disco y emite la confirmación MQTT fin_foto."
+        },
+
+        {
+          id: "T2.08",
+          titulo: "Script de visión por computador con OpenCV",
+          parte: 2,
+          fase: "Firmware y Visión",
+          rol_responsable: "Integrante 2",
+          revisor: "Integrante 3",
+          depende_de: ["T2.07", "T1.13"],
+          etiquetas: ["[PDF]", "[DISEÑO]", "[A VERIFICAR]"],
+          semana_inicio: 3,
+          semana_fin: 3,
+          descripcion: "Desarrollar algoritmo de visión artificial para segmentar celdas y detectar radícula visible evitando falsos positivos por hinchazón.",
+          pasos: [
+            {
+              texto: "Recorte automático de la ROI (Región de Interés) y división en celdas",
+              detalle: "Alinear imagen cenital y extraer individualmente cada celda de la cuadrícula de semillas."
+            },
+            {
+              texto: "Preprocesamiento morfológico (HSV, binarización y apertura)",
+              detalle: "Aplicar filtrado Gaussiano, umbralización y apertura morfológica con elemento elíptico para remover ruido y brillos."
+            },
+            {
+              texto: "Detección geométrica de brote alargado (radícula >= 2 mm)",
+              detalle: "Evaluar excentricidad y relación aspecto (largo/ancho > 2) para distinguir la elongación radicular de la simple dilatación de la semilla por hidratación."
+            },
+            {
+              texto: "Calibración con fotografías reales del lote piloto y margen de error",
+              detalle: "Comparar las detecciones automáticas frente al conteo manual de la bitácora y documentar la precisión."
+            }
+          ],
+          criterio_aceptacion: "El script procesa fotos de forma desatendida, cuenta semillas germinadas y documenta el porcentaje de acierto frente al conteo visual."
+        },
+
+        {
+          id: "T2.09",
+          titulo: "Modelo de tiempo térmico óptimo (GDDh)",
+          parte: 2,
+          fase: "Servidor, Modelo y Servicios",
+          rol_responsable: "Integrante 3",
+          revisor: "Integrante 2",
+          depende_de: ["T1.13"],
+          etiquetas: ["[PDF]", "[DISEÑO]", "[A VERIFICAR]"],
+          semana_inicio: 3,
+          semana_fin: 3,
+          descripcion: "Implementar modelo en Python de grados-hora hidrotermales acumulados para predecir el tiempo de germinación.",
+          pasos: [
+            {
+              texto: "Programar sumatoria hidrotermal: GDDh = sum(max(0, T - T_base))",
+              detalle: "Utilizar T_base = 10 °C para fréjol (respaldado con literatura agronómica), acumulando solo cuando H_sustrato >= H_umbral."
+            },
+            {
+              texto: "Ajustar curva sigmoidea logística con datos experimentales del piloto",
+              detalle: "Modelar la función de germinación acumulada en función de los grados-hora transcurridos."
+            },
+            {
+              texto: "Calcular estimación de horas restantes para alcanzar el 80% de germinación",
+              detalle: "Generar valor numérico de predicción y subirlo periódicamente a Firebase."
+            }
+          ],
+          criterio_aceptacion: "El modelo predice las horas estimadas para el 80% de germinación y se documenta formalmente su carácter preliminar."
+        },
+
+        {
+          id: "T2.10",
+          titulo: "Panel web interactivo y sistema de alertas",
+          parte: 2,
+          fase: "Servidor, Modelo y Servicios",
+          rol_responsable: "Integrante 3",
+          revisor: "Integrante 2",
+          depende_de: ["T2.07", "T1.10"],
+          etiquetas: ["[PDF]", "[DISEÑO]"],
+          semana_inicio: 4,
+          semana_fin: 4,
+          descripcion: "Desarrollar panel de monitoreo en tiempo real y bot de alertas Telegram/SMTP para eventos críticos.",
+          pasos: [
+            {
+              texto: "Diseñar panel web con métricas de sustrato, ambiente, luz, gas y fotos",
+              detalle: "Visualizar gráficos en vivo, estado de relés, ratio MQ-135, última imagen capturada y predicción de germinación."
+            },
+            {
+              texto: "Configurar alertas automáticas por bot de Telegram y correo electrónico",
+              detalle: "Disparar alertas inmediatas ante: 1) Depósito sin agua (crítica), 2) Sustrato seco persistente > 2h, 3) Nodo fuera de línea > 5 min."
+            },
+            {
+              texto: "Implementar cooldown de 30 minutos y notificación de evento resuelto",
+              detalle: "Evitar spam continuo repitiendo la alerta cada 30 min como máximo y enviar confirmación cuando la variable vuelva a la normalidad."
+            }
+          ],
+          criterio_aceptacion: "El panel web muestra telemetría en vivo y al vaciar el depósito de agua llega un mensaje de alerta a Telegram en < 30 segundos."
+        },
+
+        {
+          id: "T2.11",
+          titulo: "Diseño 3D de piezas y estructura acrílica",
+          parte: 2,
+          fase: "Hardware, PCB y Estructura",
+          rol_responsable: "Integrante 1",
+          revisor: "Todos (coordinación medidas)",
+          depende_de: ["T2.03", "T2.04"],
+          etiquetas: ["[PDF]", "[DISEÑO]", "[A VERIFICAR]"],
+          semana_inicio: 4,
+          semana_fin: 5,
+          descripcion: "Diseñar en CAD 3D los soportes en PETG/ASA y armar la cabina de acrílico separando zona seca y húmeda.",
+          pasos: [
+            {
+              texto: "Modelar en CAD 3D los soportes modulares (cámara, humidificador, LED, OLED)",
+              detalle: "Diseñar soporte cenital regulable para la ESP32-CAM a 20 cm de altura, soporte para boquilla de niebla y guías de tira LED."
+            },
+            {
+              texto: "Imprimir las piezas en filamento PETG o ASA",
+              detalle: "Imprimir con 40% de relleno y temperatura adecuada para garantizar resistencia hidrofóbica sin proliferación de hongos (no PLA)."
+            },
+            {
+              texto: "Cortar y armar caja de acrílico con división estricta zona seca / húmeda",
+              detalle: "Separar físicamente la electrónica de control y fuente (zona seca) del microclima de semillas y niebla (zona húmeda) con pasamuros sellados."
+            }
+          ],
+          criterio_aceptacion: "Estructura acrílica ensamblada con soportes 3D ajustados, división estricta entre zona seca y húmeda, y sin fugas de niebla."
+        },
+
+        {
+          id: "T2.12",
+          titulo: "Fabricación, soldadura y verificación de la PCB",
+          parte: 2,
+          fase: "Hardware, PCB y Estructura",
+          rol_responsable: "Integrante 1",
+          revisor: "Integrante 2",
+          depende_de: ["T2.04"],
+          etiquetas: ["[PDF]"],
+          semana_inicio: 5,
+          semana_fin: 5,
+          descripcion: "Soldar los componentes en la PCB fabricada y realizar pruebas de aislamiento y voltajes antes de conectar los módulos.",
+          pasos: [
+            {
+              texto: "Soldar componentes pasivos, borneras de tornillo y zócalos hembra",
+              detalle: "Soldar resistencias de 10k/15k para MQ-135, condensadores de desacoplo, borneras y zócalos para ESP32."
+            },
+            {
+              texto: "Prueba de aislamiento en frío con multímetro",
+              detalle: "Verificar en modo continuidad que NO exista ningún cortocircuito entre las líneas de 5 V, 3.3 V y GND antes de encender."
+            },
+            {
+              texto: "Energizar la PCB y medir voltajes en todos los pines de alimentación",
+              detalle: "Comprobar que el riel de 5 V y el riel de 3.3 V entreguen tensiones nominales limpias."
+            }
+          ],
+          criterio_aceptacion: "PCB soldada sin puentes de estaño, cortocircuitos descartados y voltajes de alimentación verificados."
+        },
+
+        {
+          id: "T2.13",
+          titulo: "Integración total del sistema y prueba en seco de 24 h",
+          parte: 2,
+          fase: "Integración y Pruebas Reales",
+          rol_responsable: "Todos",
+          revisor: "Todos",
+          depende_de: ["T2.05", "T2.06", "T2.08", "T2.11", "T2.12"],
+          etiquetas: ["[PDF]", "[DISEÑO]"],
+          semana_inicio: 6,
+          semana_fin: 6,
+          descripcion: "Instalar todos los subsistemas en la cámara definitiva y ejecutar un test continuo de 24 horas en seco con fotos programadas.",
+          pasos: [
+            {
+              texto: "Montar PCB, actuadores, humidificador, LED y ESP32-CAM en la cámara",
+              detalle: "Fijar arneses de cables, sellar pasamuros y montar el sensor de nivel en el depósito con agua."
+            },
+            {
+              texto: "Correr prueba continua de 24 horas en seco (sin semillas)",
+              detalle: "Ejecutar ciclos periódicos de niebla por histéresis y fotos programadas cada 6 horas (00:00, 06:00, 12:00, 18:00)."
+            },
+            {
+              texto: "Verificar recepción de 4 fotografías y ausencia total de bloqueos",
+              detalle: "Confirmar que las 4 fotos se reciban nítidas, OpenCV las procese y el sistema no presente reinicios."
+            }
+          ],
+          criterio_aceptacion: "24 horas ininterrumpidas de operación sin reinicios, 4 fotos procesadas con éxito y telemetría registrada."
+        },
+
+        {
+          id: "T2.14",
+          titulo: "Pruebas reales de germinación (Lote 1 y Lote 2)",
+          parte: 2,
+          fase: "Integración y Pruebas Reales",
+          rol_responsable: "Integrante 1",
+          revisor: "Integrante 3 (datos)",
+          depende_de: ["T2.13"],
+          etiquetas: ["[PDF]", "[A VERIFICAR]"],
+          semana_inicio: 7,
+          semana_fin: 8,
+          descripcion: "Ejecutar dos lotes experimentales reales de fréjol (5-6 días cada uno) en modo 100% autónomo con fotos cada 6 h.",
+          pasos: [
+            {
+              texto: "Garantizar disponibilidad de servidor local / Raspberry sin suspensión",
+              detalle: "Confirmar que el servidor permanezca energizado 24/7 sin entrar en reposo durante los días de prueba."
+            },
+            {
+              texto: "Correr Lote Real 1 de fréjol (5 a 6 días continuos)",
+              detalle: "Sembrar 20-25 semillas y dejar operar de forma 100% autónoma registrando telemetría y fotografías cada 6 horas."
+            },
+            {
+              texto: "Correr Lote Real 2 de fréjol (5 a 6 días continuos)",
+              detalle: "Sembrar réplica experimental idéntica para validar repetibilidad biológica bajo las mismas condiciones climáticas."
+            }
+          ],
+          criterio_aceptacion: "Dos lotes experimentales completos de 5-6 días cada uno con base de datos de fotos cada 6 horas y telemetría completa."
+        },
+
+        {
+          id: "T2.15",
+          titulo: "Generación de curvas reales y ajuste del modelo",
+          parte: 2,
+          fase: "Servidor, Modelo y Servicios",
+          rol_responsable: "Integrante 3",
+          revisor: "Integrante 2",
+          depende_de: ["T2.14", "T2.09"],
+          etiquetas: ["[PDF]", "[DISEÑO]"],
+          semana_inicio: 7,
+          semana_fin: 8,
+          descripcion: "Consolidar las curvas reales de porcentaje de germinación vs tiempo y vs GDDh, y reajustar los parámetros del modelo.",
+          pasos: [
+            {
+              texto: "Extraer series temporales reales de porcentaje de germinación",
+              detalle: "Graficar % de germinación vs tiempo transcurrido en horas y vs grados-hora hidrotermales acumulados (GDDh)."
+            },
+            {
+              texto: "Reajustar coeficientes del modelo logístico con datos de los dos lotes",
+              detalle: "Calcular métricas de bondad de ajuste (R² y error cuadrático medio RMSE)."
+            },
+            {
+              texto: "Documentar formalmente las limitaciones estadísticas del modelo",
+              detalle: "Explicar fuentes de dispersión (variabilidad biológica de la semilla y microclima local)."
+            }
+          ],
+          criterio_aceptacion: "Curvas de germinación reales generadas, modelo calibrado y reporte de limitaciones estadísticas documentado."
+        },
+
+        {
+          id: "T2.16",
+          titulo: "Manual de uso ilustrado e informe final consolidado",
+          parte: 2,
+          fase: "Documentación y Defensa Final",
+          rol_responsable: "Integrante 3",
+          revisor: "Integrante 1 (manual) e Integrante 2",
+          depende_de: ["T2.15"],
+          etiquetas: ["[PDF]"],
+          semana_inicio: 9,
+          semana_fin: 9,
+          descripcion: "Redactar el Manual de Usuario integral del sistema y consolidar el Informe Técnico Final del proyecto IoT.",
+          pasos: [
+            {
+              texto: "Integrante 1 (Xavier): Redactar Manual de Usuario ilustrado",
+              detalle: "Incluir procedimiento paso a paso para encendido, siembra, recarga de agua, interpretación de pantallas OLED, guía de fallas (troubleshooting) y seguridad."
+            },
+            {
+              texto: "Integrante 3 (Fernando): Redactar Informe Final del proyecto IoT",
+              detalle: "Documentar arquitectura completa, esquemas, PCB, estructura acrílica, visión por computador, modelo térmico y resultados de ambos lotes."
+            },
+            {
+              texto: "Integrante 2 (Angelo): Revisión técnica integral y limpieza del repositorio Git",
+              detalle: "Revisar precisión de fórmulas, esquemas y dejar el repositorio GitHub con releases etiquetadas (v1.0 y v2.0)."
+            }
+          ],
+          criterio_aceptacion: "Manual de usuario ilustrado e informe final consolidado en PDF, listos para entrega formal."
+        },
+
+        {
+          id: "T2.17",
+          titulo: "Ensayo general de defensa y demostración en vivo",
+          parte: 2,
+          fase: "Documentación y Defensa Final",
+          rol_responsable: "Todos",
+          revisor: "Todos",
+          depende_de: ["T2.16"],
+          etiquetas: ["[PDF]"],
+          semana_inicio: 9,
+          semana_fin: 9,
+          descripcion: "Ensayo completo de la presentación y demostración del sistema funcionando en vivo ante la cátedra.",
+          pasos: [
+            {
+              texto: "Montar demostración en vivo de la cámara, servidor y panel web",
+              detalle: "Preparar escenario para mostrar encendido, disparo de foto, análisis OpenCV y telemetría en vivo sin fallas."
+            },
+            {
+              texto: "Ensayo de preguntas técnicas entre los 3 integrantes",
+              detalle: "Asegurar que Xavier, Angelo y Fernando puedan explicar cualquier parte del sistema (hardware, firmware, red, visión o modelo biológico)."
+            }
+          ],
+          criterio_aceptacion: "Demostración en vivo ensayada con éxito y los 3 integrantes preparados para defender el proyecto."
+        }
       ];
 
       const fechaBaseP1 = "2026-10-19";
@@ -787,7 +1839,26 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
           rol_sugerido_pdf: t.rol_responsable,
           rol_responsable: "Sin asignar",
           finalizada_por: "",
-          pasos: t.pasos.map((texto, idx) => ({ id: `${t.id}-P${idx + 1}`, texto, hecho: false })),
+          pasos: t.pasos.map((p, idx) => {
+            if (typeof p === "string") {
+              return { id: `${t.id}-P${idx + 1}`, texto: p, hecho: false, detalle: "", subpasos: [] };
+            }
+            return {
+              id: `${t.id}-P${idx + 1}`,
+              texto: p.texto,
+              hecho: false,
+              detalle: p.detalle || "",
+              subpasos: (p.subpasos || []).map((sub, sIdx) => ({
+                id: sub.id || `${t.id}-P${idx + 1}-S${sIdx + 1}`,
+                ref_id: sub.ref_id || "",
+                tipo: sub.tipo || "tarea",
+                texto: sub.texto,
+                detalle: sub.detalle || "",
+                respuesta: sub.respuesta || "",
+                hecho: sub.hecho || false
+              }))
+            };
+          }),
           criterio_aprobado: false,
           estado: "Pendiente",
           fecha_inicio: sumarDias(base, (t.semana_inicio - 1) * 7),
@@ -1052,6 +2123,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
 
       init() {
         const raw = localStorage.getItem(STORAGE_KEY);
+        const initialData = crearDatosIniciales();
         if (raw) {
           try {
             this.state = JSON.parse(raw);
@@ -1061,13 +2133,51 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
                   t.rol_sugerido_pdf = t.rol_responsable;
                   t.rol_responsable = "Sin asignar";
                 }
+                // Enriquecer tareas existentes con los pasos completos, desplegables y sub-tareas
+                const initT = initialData.tareas.find(x => x.id === t.id);
+                if (initT && initT.pasos) {
+                  const needsEnrichment = !t.pasos || t.pasos.some(p => !p.detalle && (!p.subpasos || p.subpasos.length === 0));
+                  if (needsEnrichment) {
+                    const doneMap = {};
+                    (t.pasos || []).forEach(p => { doneMap[p.id] = p.hecho; });
+                    t.pasos = initT.pasos.map(p => {
+                      const wasDone = doneMap[p.id] !== undefined ? doneMap[p.id] : (t.estado === "Hecha");
+                      return {
+                        ...p,
+                        hecho: wasDone,
+                        subpasos: (p.subpasos || []).map(s => ({
+                          ...s,
+                          hecho: wasDone ? true : (s.hecho || false)
+                        }))
+                      };
+                    });
+                  }
+                }
               });
+
+              // Sincronizar respuestas ya existentes en preguntas oficiales con el paso T1.02
+              if (this.state.preguntas) {
+                const t02 = this.state.tareas.find(x => x.id === "T1.02");
+                if (t02 && t02.pasos) {
+                  t02.pasos.forEach(p => {
+                    (p.subpasos || []).forEach(sub => {
+                      if (sub.ref_id) {
+                        const q = this.state.preguntas.find(x => x.id === sub.ref_id);
+                        if (q && q.respuesta && !sub.respuesta) {
+                          sub.respuesta = q.respuesta;
+                          sub.hecho = true;
+                        }
+                      }
+                    });
+                  });
+                }
+              }
             }
           } catch (e) {
-            this.state = crearDatosIniciales();
+            this.state = initialData;
           }
         } else {
-          this.state = crearDatosIniciales();
+          this.state = initialData;
           this.save();
         }
         this.updateSyncBadge();
@@ -2420,19 +3530,64 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
             <!-- CONTENIDO DE PESTAÑAS -->
             ${sub === 'pasos' ? `
               <div>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                  <span style="font-size:12px; color:var(--text-muted);">Marca cada paso para reflejar el avance real:</span>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                  <span style="font-size:12.5px; color:var(--text-muted);">Completa cada paso y despliega las instrucciones técnicas para tener todo en un solo lugar:</span>
                   <button class="btn btn-sm" onclick="App.agregarPasoModal('${t.id}')">+ Añadir paso</button>
                 </div>
-                ${t.pasos.map((p, idx) => `
-                  <div style="display:flex; align-items:flex-start; gap:8px; padding:6px; background:var(--bg-card); border-radius:6px; margin-bottom:6px;">
-                    <input type="checkbox" ${p.hecho ? 'checked' : ''} onchange="App.togglePasoModal('${t.id}', '${p.id}', this.checked)" />
-                    <div style="flex:1; font-size:13px; ${p.hecho ? 'text-decoration:line-through; color:var(--text-muted);' : ''}">
-                      ${this.escapeHtml(p.texto)}
+                ${t.pasos.map((p, idx) => {
+                  const hasSub = p.subpasos && p.subpasos.length > 0;
+                  const completedSub = hasSub ? p.subpasos.filter(s => s.hecho).length : 0;
+                  return `
+                    <div class="step-card" style="padding:10px 12px; background:var(--bg-card); border-radius:8px; margin-bottom:8px; border:1px solid var(--border);">
+                      <div style="display:flex; align-items:flex-start; gap:10px;">
+                        <input type="checkbox" style="margin-top:2px; transform:scale(1.15); cursor:pointer;" ${p.hecho ? 'checked' : ''} onchange="App.togglePasoModal('${t.id}', '${p.id}', this.checked)" />
+                        <div style="flex:1;">
+                          <div style="font-size:13.5px; font-weight:700; line-height:1.4; ${p.hecho ? 'text-decoration:line-through; color:var(--text-muted);' : ''}">
+                            ${idx + 1}. ${this.escapeHtml(p.texto)}
+                          </div>
+                          
+                          ${p.detalle ? `
+                            <div style="font-size:12px; color:var(--text-muted); margin-top:4px; line-height:1.45; white-space:pre-line;">
+                              ${this.escapeHtml(p.detalle)}
+                            </div>
+                          ` : ''}
+
+                          ${hasSub ? `
+                            <details class="step-details-accordion" style="margin-top:8px; background:rgba(148, 163, 184, 0.06); border:1px solid var(--border); border-radius:6px; padding:8px 10px;" ${!p.hecho ? 'open' : ''}>
+                              <summary style="font-size:12px; font-weight:700; color:var(--accent); cursor:pointer; user-select:none; display:flex; align-items:center; gap:6px;">
+                                <span>Ver instrucciones detalladas y mini-tareas (${completedSub}/${p.subpasos.length} completadas)</span>
+                              </summary>
+                              <div style="margin-top:8px; display:flex; flex-direction:column; gap:8px;">
+                                ${p.subpasos.map((sub, sIdx) => `
+                                  <div style="background:var(--bg-panel); border:1px solid var(--border); border-radius:6px; padding:8px 10px; display:flex; flex-direction:column; gap:4px;">
+                                    <div style="display:flex; align-items:flex-start; gap:8px;">
+                                      <input type="checkbox" ${sub.hecho ? 'checked' : ''} onchange="App.toggleSubpasoModal('${t.id}', '${p.id}', ${sIdx}, this.checked)" style="margin-top:2px; cursor:pointer;" />
+                                      <div style="flex:1; font-size:12.5px; line-height:1.4; ${sub.hecho ? 'text-decoration:line-through; color:var(--text-muted);' : 'font-weight:600;'}">
+                                        ${this.escapeHtml(sub.texto)}
+                                      </div>
+                                    </div>
+                                    ${sub.detalle ? `
+                                      <div style="font-size:11.5px; color:var(--text-muted); margin-left:26px; line-height:1.4; white-space:pre-line;">
+                                        ${this.escapeHtml(sub.detalle)}
+                                      </div>
+                                    ` : ''}
+                                    ${sub.tipo === 'pregunta' ? `
+                                      <div style="margin-left:26px; margin-top:4px; background:var(--bg-card); padding:8px; border-radius:6px; border:1px dashed var(--border);">
+                                        <label style="font-size:11px; font-weight:800; color:var(--accent); display:block; margin-bottom:2px;">Respuesta de la Ing. Soraya Sinche:</label>
+                                        <input type="text" placeholder="Escribe aquí la respuesta obtenida de la docente..." value="${this.escapeHtml(sub.respuesta || '')}" onchange="App.actualizarRespuestaSubpaso('${t.id}', '${p.id}', ${sIdx}, '${sub.ref_id || ''}', this.value)" style="width:100%; font-size:12px; padding:5px 8px; border-radius:4px;" />
+                                      </div>
+                                    ` : ''}
+                                  </div>
+                                `).join("")}
+                              </div>
+                            </details>
+                          ` : ''}
+                        </div>
+                        <button class="btn btn-sm btn-danger" onclick="App.eliminarPasoModal('${t.id}', '${p.id}')" title="Eliminar paso" style="display:inline-flex; align-items:center; padding:4px;">${Icons.trash}</button>
+                      </div>
                     </div>
-                    <button class="btn btn-sm btn-danger" onclick="App.eliminarPasoModal('${t.id}', '${p.id}')" title="Eliminar paso" style="display:inline-flex; align-items:center; padding:4px;">${Icons.trash}</button>
-                  </div>
-                `).join("")}
+                  `;
+                }).join("")}
               </div>
             ` : ''}
 
@@ -2510,10 +3665,82 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
         const t = DataStore.state.tareas.find(x => x.id === tId);
         if (t) {
           const p = t.pasos.find(x => x.id === pId);
-          if (p) p.hecho = checked;
+          if (p) {
+            p.hecho = checked;
+            if (p.subpasos && p.subpasos.length > 0) {
+              p.subpasos.forEach(s => {
+                s.hecho = checked;
+                if (s.ref_id) {
+                  const q = DataStore.state.preguntas.find(x => x.id === s.ref_id);
+                  if (q && checked && !q.respuesta) {
+                    q.estado = 'respondida';
+                    q.fecha = new Date().toISOString().slice(0, 10);
+                  }
+                }
+              });
+            }
+          }
           DataStore.save();
           this.cambiarSubtabModal(this.activeModalSubtab);
         }
+      },
+
+      toggleSubpasoModal(tId, pId, subIndex, checked) {
+        const t = DataStore.state.tareas.find(x => x.id === tId);
+        if (t) {
+          const p = t.pasos.find(x => x.id === pId);
+          if (p && p.subpasos && p.subpasos[subIndex]) {
+            p.subpasos[subIndex].hecho = checked;
+            const refId = p.subpasos[subIndex].ref_id;
+            if (refId) {
+              const q = DataStore.state.preguntas.find(x => x.id === refId);
+              if (q) {
+                if (checked && !q.respuesta) {
+                  q.estado = 'respondida';
+                  q.fecha = new Date().toISOString().slice(0, 10);
+                } else if (!checked && !p.subpasos[subIndex].respuesta) {
+                  q.estado = 'pendiente';
+                }
+              }
+            }
+            // Auto marcar o desmarcar paso principal según sus subtareas
+            const todosHechos = p.subpasos.every(s => s.hecho);
+            if (todosHechos) {
+              p.hecho = true;
+            } else if (p.hecho && !checked) {
+              p.hecho = false;
+            }
+            DataStore.save();
+            this.cambiarSubtabModal(this.activeModalSubtab);
+          }
+        }
+      },
+
+      actualizarRespuestaSubpaso(tId, pId, subIndex, refId, respuesta) {
+        const t = DataStore.state.tareas.find(x => x.id === tId);
+        if (t) {
+          const p = t.pasos.find(x => x.id === pId);
+          if (p && p.subpasos && p.subpasos[subIndex]) {
+            p.subpasos[subIndex].respuesta = respuesta;
+            if (respuesta.trim() !== '') {
+              p.subpasos[subIndex].hecho = true;
+            }
+            const todosHechos = p.subpasos.every(s => s.hecho);
+            if (todosHechos) p.hecho = true;
+          }
+        }
+        if (refId) {
+          const q = DataStore.state.preguntas.find(x => x.id === refId);
+          if (q) {
+            q.respuesta = respuesta;
+            if (respuesta.trim() !== '') {
+              q.estado = 'respondida';
+              q.fecha = new Date().toISOString().slice(0, 10);
+            }
+          }
+        }
+        DataStore.save();
+        this.cambiarSubtabModal(this.activeModalSubtab);
       },
 
       agregarPasoModal(tId) {
@@ -3210,7 +4437,28 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
       },
       actualizarRespuestaPregunta(id, val) {
         const q = DataStore.state.preguntas.find(x => x.id === id);
-        if (q) q.respuesta = val;
+        if (q) {
+          q.respuesta = val;
+          if (val.trim() !== '') {
+            q.estado = 'respondida';
+            q.fecha = new Date().toISOString().slice(0, 10);
+          }
+        }
+        // Sincronizar en el paso de T1.02
+        const t02 = DataStore.state.tareas.find(x => x.id === 'T1.02');
+        if (t02 && t02.pasos) {
+          t02.pasos.forEach(p => {
+            (p.subpasos || []).forEach(sub => {
+              if (sub.ref_id === id) {
+                sub.respuesta = val;
+                if (val.trim() !== '') sub.hecho = true;
+              }
+            });
+            if (p.subpasos && p.subpasos.length > 0) {
+              p.hecho = p.subpasos.every(s => s.hecho);
+            }
+          });
+        }
         DataStore.save();
       },
 
