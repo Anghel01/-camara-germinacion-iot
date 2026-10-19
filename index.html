@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2310b981' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M11 20A7 7 0 0 1 4 13a7 7 0 0 1 7-7c4 0 9 3 9 7a7 7 0 0 1-7 7z'/%3E%3Cpath d='M11 20V10'/%3E%3Cpath d='M11 14h4'/%3E%3C/svg%3E" />
   <style>
     :root[data-theme="oscuro"] {
       --bg-main: #0b111e;
@@ -286,36 +286,159 @@
       border-radius: 8px;
     }
 
-    /* TREE */
-    .tree-node {
-      margin-left: 18px;
-      padding-left: 14px;
-      border-left: 2px solid var(--border);
-      position: relative;
-      margin-top: 6px;
-    }
-    .tree-node::before {
-      content: "";
-      position: absolute;
-      left: -2px;
-      top: 14px;
-      width: 14px;
-      height: 10px;
-      border-bottom: 2px solid var(--border);
-      border-bottom-left-radius: 8px;
-    }
-    .tree-header {
-      background: var(--bg-card);
+    /* HORIZONTAL CHECKOUT PIPELINE TREE (DE IZQUIERDA A DERECHA) */
+    .checkout-tree-container {
+      background: var(--bg-panel);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 8px 12px;
+      border-radius: 12px;
+      padding: 20px;
+      overflow-x: auto;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+      scrollbar-width: thin;
+    }
+    .checkout-root-node {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg-card);
+      border: 2px solid var(--accent);
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-weight: 800;
+      font-size: 14px;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.15);
+      flex-shrink: 0;
+    }
+    .checkout-branch {
+      position: relative;
+      padding-left: 24px;
+      margin-bottom: 28px;
+      border-left: 3px solid var(--info);
+    }
+    .checkout-branch.parte-2 {
+      border-left-color: var(--purple);
+    }
+    .checkout-branch-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
-      cursor: pointer;
+      gap: 12px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
     }
-    .tree-header:hover { border-color: var(--accent); }
+    .checkout-branch-title {
+      font-size: 15px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .checkout-phases-track {
+      display: flex;
+      gap: 18px;
+      overflow-x: auto;
+      padding-bottom: 12px;
+      scrollbar-width: thin;
+      align-items: flex-start;
+    }
+    .checkout-phase-col {
+      min-width: 290px;
+      max-width: 320px;
+      flex-shrink: 0;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .checkout-phase-header {
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid var(--border);
+      font-size: 12.5px;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .checkout-tasks-flow {
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* PASTEL CARDS */
+    .pastel-card {
+      border-radius: 9px;
+      padding: 11px 13px;
+      cursor: pointer;
+      transition: all 0.16s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      border: 1.5px solid transparent;
+      user-select: none;
+    }
+    .pastel-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Pastel Hecha / Completada (Verde suave completo) */
+    .pastel-hecha {
+      background: rgba(16, 185, 129, 0.13) !important;
+      border-color: #10b981 !important;
+      color: var(--text-main) !important;
+    }
+    :root[data-theme="claro"] .pastel-hecha {
+      background: #ecfdf5 !important;
+      border-color: #6ee7b7 !important;
+      color: #064e3b !important;
+    }
+
+    /* Pastel En curso (Celeste / Azul suave completo) */
+    .pastel-en-curso {
+      background: rgba(59, 130, 246, 0.13) !important;
+      border-color: #3b82f6 !important;
+      color: var(--text-main) !important;
+    }
+    :root[data-theme="claro"] .pastel-en-curso {
+      background: #eff6ff !important;
+      border-color: #93c5fd !important;
+      color: #1e3a8a !important;
+    }
+
+    /* Pastel En revisión (Púrpura / Lavanda suave completo) */
+    .pastel-en-revision {
+      background: rgba(168, 85, 247, 0.13) !important;
+      border-color: #a855f7 !important;
+      color: var(--text-main) !important;
+    }
+    :root[data-theme="claro"] .pastel-en-revision {
+      background: #faf5ff !important;
+      border-color: #d8b4fe !important;
+      color: #581c87 !important;
+    }
+
+    /* Pastel Pendiente (Pizarra / Gris neutro suave) */
+    .pastel-pendiente {
+      background: rgba(148, 163, 184, 0.08) !important;
+      border-color: var(--border) !important;
+      color: var(--text-main) !important;
+    }
+    :root[data-theme="claro"] .pastel-pendiente {
+      background: #f8fafc !important;
+      border-color: #cbd5e1 !important;
+      color: #334155 !important;
+    }
+
+    .pastel-blocked {
+      border-left: 4px solid var(--danger) !important;
+    }
 
     /* TABLES & WRAPPERS */
     .table-wrap { width: 100%; overflow-x: auto; }
@@ -405,13 +528,16 @@
   <!-- BARRA SUPERIOR -->
   <header class="topbar">
     <div class="brand">
-      <div class="brand-icon" title="Cámara de Germinación Inteligente">🌱</div>
+      <div class="brand-icon" title="Cámara de Germinación Inteligente">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);"><path d="M11 20A7 7 0 0 1 4 13a7 7 0 0 1 7-7c4 0 9 3 9 7a7 7 0 0 1-7 7z"/><path d="M11 20V10"/><path d="M11 14h4"/></svg>
+      </div>
       <div>
         <div class="brand-title">Cámara de Germinación Inteligente — Grupo 1 (EPN)</div>
         <div class="brand-sub" id="topbar-subtitle">Sistemas IoT 2026-B • PhD. Soraya Sinche • Plan Maestro v2.0</div>
       </div>
-      <a href="https://github.com/Anghel01" target="_blank" rel="noopener" class="badge tag-PDF" style="text-decoration:none; margin-left:6px;" title="Ver perfil GitHub de Angelo Conterón">
-        🐙 @Anghel01
+      <a href="https://github.com/Anghel01" target="_blank" rel="noopener" class="badge tag-PDF" style="text-decoration:none; margin-left:6px; display:inline-flex; align-items:center; gap:5px;" title="Ver perfil GitHub de Angelo Conterón">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+        <span>@Anghel01</span>
       </a>
     </div>
 
@@ -419,31 +545,73 @@
       <div style="display:flex; align-items:center; gap:6px;">
         <label for="user-selector" style="font-size:12px; color:var(--text-muted); white-space:nowrap;">Vista de:</label>
         <select id="user-selector" style="width:auto; min-width:180px;" onchange="App.setActiveUser(this.value)" aria-label="Seleccionar integrante activo">
-          <option value="Angelo Conterón" selected>⭐ Angelo Conterón (Tú)</option>
-          <option value="Xavier Anatoa">🔧 Xavier Anatoa (Hardware)</option>
-          <option value="Fernando Guarderas">☁️ Fernando Guarderas (Servidor)</option>
-          <option value="Todos">👥 Todos (Equipo Grupo 1)</option>
+          <option value="Angelo Conterón" selected>Angelo Conterón (Tú)</option>
+          <option value="Xavier Anatoa">Xavier Anatoa (Hardware)</option>
+          <option value="Fernando Guarderas">Fernando Guarderas (Servidor)</option>
+          <option value="Todos">Todos (Equipo Grupo 1)</option>
         </select>
       </div>
-      <span id="sync-indicator" class="badge status-Pendiente" title="Almacenamiento local activo">💾 LocalStorage</span>
-      <button class="btn btn-sm" onclick="App.toggleTheme()" title="Cambiar modo claro/oscuro">🌓 Tema</button>
-      <button class="btn btn-sm btn-primary" onclick="App.switchTab('bitacora')">+ Bitácora</button>
+      <span id="sync-indicator" class="badge status-Pendiente" style="display:inline-flex; align-items:center; gap:5px;" title="Almacenamiento local activo">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        <span>LocalStorage</span>
+      </span>
+      <button class="btn btn-sm" onclick="App.toggleTheme()" style="gap:5px;" title="Cambiar modo claro/oscuro">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <span>Tema</span>
+      </button>
+      <button class="btn btn-sm btn-primary" onclick="App.switchTab('bitacora')" style="gap:5px;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span>+ Bitácora</span>
+      </button>
     </div>
   </header>
 
   <!-- PESTAÑAS DE MÓDULOS -->
   <nav class="nav-tabs" aria-label="Módulos del sistema">
-    <button class="nav-btn active" data-tab="panel" onclick="App.switchTab('panel')">📊 1. Panel Principal</button>
-    <button class="nav-btn" data-tab="arbol" onclick="App.switchTab('arbol')">🌿 2. Vista Árbol</button>
-    <button class="nav-btn" data-tab="tablero" onclick="App.switchTab('tablero')">📋 3. Tablero Kanban</button>
-    <button class="nav-btn" data-tab="cronograma" onclick="App.switchTab('cronograma')">📅 4. Cronograma Gantt</button>
-    <button class="nav-btn" data-tab="semana" onclick="App.switchTab('semana')">🗓️ 5. Vista Semana y Hoy</button>
-    <button class="nav-btn" data-tab="dependencias" onclick="App.switchTab('dependencias')">🕸️ 6. Dependencias y Ruta Crítica</button>
-    <button class="nav-btn" data-tab="bitacora" onclick="App.switchTab('bitacora')">📓 8. Bitácora y Plantillas</button>
-    <button class="nav-btn" data-tab="compras" onclick="App.switchTab('compras')">🛒 9. Compras y Tienda</button>
-    <button class="nav-btn" data-tab="listas" onclick="App.switchTab('listas')">📑 10. Decisiones, Riesgos, Pruebas y Q&A</button>
-    <button class="nav-btn" data-tab="referencia" onclick="App.switchTab('referencia')">📖 Plan Maestro v2.0 (Íntegro)</button>
-    <button class="nav-btn" data-tab="config" onclick="App.switchTab('config')">⚙️ 11. Configuración y Sync</button>
+    <button class="nav-btn active" data-tab="arbol" onclick="App.switchTab('arbol')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
+      <span>Árbol de Ramas</span>
+    </button>
+    <button class="nav-btn" data-tab="panel" onclick="App.switchTab('panel')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Inicio (Hoy)</span>
+    </button>
+    <button class="nav-btn" data-tab="tablero" onclick="App.switchTab('tablero')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+      <span>Tablero</span>
+    </button>
+    <button class="nav-btn" data-tab="cronograma" onclick="App.switchTab('cronograma')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="13" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="16" y2="18"/></svg>
+      <span>Cronograma</span>
+    </button>
+    <button class="nav-btn" data-tab="semana" onclick="App.switchTab('semana')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span>Semana y Hoy</span>
+    </button>
+    <button class="nav-btn" data-tab="dependencias" onclick="App.switchTab('dependencias')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="12" cy="18" r="3"/><line x1="8.5" y1="7.5" x2="15.5" y2="7.5"/><line x1="7.5" y1="8.5" x2="10.5" y2="15.5"/><line x1="16.5" y1="8.5" x2="13.5" y2="15.5"/></svg>
+      <span>Dependencias</span>
+    </button>
+    <button class="nav-btn" data-tab="bitacora" onclick="App.switchTab('bitacora')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      <span>Bitácora</span>
+    </button>
+    <button class="nav-btn" data-tab="compras" onclick="App.switchTab('compras')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      <span>Compras</span>
+    </button>
+    <button class="nav-btn" data-tab="listas" onclick="App.switchTab('listas')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      <span>Decisiones & Pruebas</span>
+    </button>
+    <button class="nav-btn" data-tab="config" onclick="App.switchTab('config')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span>Configuración & Sync</span>
+    </button>
+    <button class="nav-btn" data-tab="referencia" onclick="App.switchTab('referencia')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      <span>Plan Maestro</span>
+    </button>
   </nav>
 
   <!-- CONTENEDOR DE VISTAS -->
@@ -455,6 +623,37 @@
   </div>
 
   <script>
+    /* ============================================================================
+       ICONOS VECTORIALES SVG (DISEÑO LIMPIO, SIN EMOJIS)
+       ============================================================================ */
+    const Icons = {
+      tree: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>`,
+      home: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
+      board: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>`,
+      gantt: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="13" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="16" y2="18"/></svg>`,
+      calendar: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
+      graph: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="12" cy="18" r="3"/><line x1="8.5" y1="7.5" x2="15.5" y2="7.5"/><line x1="7.5" y1="8.5" x2="10.5" y2="15.5"/><line x1="16.5" y1="8.5" x2="13.5" y2="15.5"/></svg>`,
+      book: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>`,
+      cart: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>`,
+      list: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>`,
+      docs: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`,
+      settings: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`,
+      check: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+      checkCircle: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+      lock: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
+      user: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+      clock: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+      leaf: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 4 13a7 7 0 0 1 7-7c4 0 9 3 9 7a7 7 0 0 1-7 7z"/><path d="M11 20V10"/><path d="M11 14h4"/></svg>`,
+      storage: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>`,
+      theme: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`,
+      plus: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
+      cloud: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>`,
+      upload: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>`,
+      download: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`,
+      alert: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
+      trash: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>`
+    };
+
     /* ============================================================================
        PLAN MAESTRO v2.0 — FUENTE DE VERDAD INICIAL
        ============================================================================ */
@@ -852,10 +1051,10 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
         const fb = this.state?.config?.firebase;
         if (fb && fb.activo && fb.databaseURL) {
           el.className = "badge status-Hecha";
-          el.textContent = "☁️ Firebase Activo";
+          el.innerHTML = `${Icons.cloud || ''} <span>Firebase Activo</span>`;
         } else {
           el.className = "badge status-Pendiente";
-          el.textContent = "💾 LocalStorage";
+          el.innerHTML = `${Icons.storage || ''} <span>LocalStorage</span>`;
         }
       },
 
@@ -974,13 +1173,13 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
         // Alerta de bloqueo
         if (nuevoEstado !== "Pendiente" && this.isTaskBlocked(t)) {
           const f = this.getBlockingIds(t).join(", ");
-          const ok = confirm(`⚠️ TAREA BLOQUEADA: ${t.id} depende de [${f}] no terminadas.\n\n¿Deseas avanzar el estado a "${nuevoEstado}" con confirmación?`);
+          const ok = confirm(`[TAREA BLOQUEADA] ${t.id} depende de [${f}] no terminadas.\n\n¿Deseas avanzar el estado a "${nuevoEstado}" con confirmación?`);
           if (!ok) return false;
         }
 
         // Criterio de aceptación
         if (nuevoEstado === "Hecha" && !t.criterio_aprobado) {
-          const ok = confirm(`⚠️ CRITERIO DE ACEPTACIÓN PENDIENTE:\n"${t.criterio_aceptacion}"\n\n¿Deseas aprobar el criterio y marcar la tarea como Hecha?`);
+          const ok = confirm(`[CRITERIO PENDIENTE]\n"${t.criterio_aceptacion}"\n\n¿Deseas aprobar el criterio y marcar la tarea como Hecha?`);
           if (!ok) return false;
           t.criterio_aprobado = true;
         }
@@ -989,7 +1188,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
         t.estado = nuevoEstado;
         t.actualizada = new Date().toISOString();
         const aut = DataStore.state.config.usuario_actual || "Equipo";
-        t.historial.unshift({ fecha: t.actualizada, autor: aut, cambio: `Estado: "${ant}" ➔ "${nuevoEstado}"` });
+        t.historial.unshift({ fecha: t.actualizada, autor: aut, cambio: `Estado: "${ant}" -> "${nuevoEstado}"` });
         DataStore.save();
         return true;
       },
@@ -1065,7 +1264,8 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
        INTERFAZ DE USUARIO (11 MÓDULOS)
        ============================================================================ */
     const App = {
-      currentTab: "panel",
+      currentTab: "arbol",
+      treeFilter: "todos",
       treeCollapsed: {},
       kanbanFilters: { parte: "todas", responsable: "todos", etiqueta: "todas", busqueda: "" },
       bitacoraSubtab: "listado",
@@ -1107,7 +1307,56 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
         const c = "status-" + t.estado.replace(/\s+/g, "-").replace("ó", "o");
         return `
           <span class="badge ${c}">${this.escapeHtml(t.estado)}</span>
-          ${bloq ? `<span class="badge status-Bloqueada" title="Bloqueada por: ${Logic.getBlockingIds(t).join(', ')}">🔒 Bloqueada</span>` : ""}
+          ${bloq ? `<span class="badge status-Bloqueada" title="Bloqueada por: ${Logic.getBlockingIds(t).join(', ')}" style="display:inline-flex; align-items:center; gap:4px;">${Icons.lock} Bloqueada</span>` : ""}
+        `;
+      },
+
+      /* Renderizador de tarjetas en color pastel completo (las completadas no desaparecen) */
+      renderPastelTaskCard(t) {
+        const isHecha = t.estado === "Hecha";
+        const isEnCurso = t.estado === "En curso";
+        const isEnRevision = t.estado === "En revisión";
+        const isBloq = Logic.isTaskBlocked(t) && !isHecha;
+        const prog = Logic.getTaskProgress(t);
+        const respNombre = Logic.formatMemberName(t.rol_responsable);
+
+        let pastelClass = "pastel-pendiente";
+        let statusBadge = `<span style="font-size:11px; font-weight:600; opacity:0.8; display:inline-flex; align-items:center; gap:4px;">${Icons.clock} Pendiente</span>`;
+
+        if (isHecha) {
+          pastelClass = "pastel-hecha";
+          statusBadge = `<span style="font-size:11px; font-weight:800; color:var(--accent); display:inline-flex; align-items:center; gap:4px;">${Icons.checkCircle} Realizada</span>`;
+        } else if (isEnCurso) {
+          pastelClass = "pastel-en-curso";
+          statusBadge = `<span style="font-size:11px; font-weight:800; color:var(--info); display:inline-flex; align-items:center; gap:4px;">${Icons.clock} En curso (${prog}%)</span>`;
+        } else if (isEnRevision) {
+          pastelClass = "pastel-en-revision";
+          statusBadge = `<span style="font-size:11px; font-weight:800; color:var(--purple); display:inline-flex; align-items:center; gap:4px;">${Icons.user} En revisión</span>`;
+        }
+
+        if (isBloq) {
+          statusBadge += ` <span style="font-size:11px; font-weight:700; color:var(--danger); display:inline-flex; align-items:center; gap:3px;">${Icons.lock} Bloqueada</span>`;
+        }
+
+        return `
+          <div class="pastel-card ${pastelClass} ${isBloq ? 'pastel-blocked' : ''}" onclick="App.openTaskModal('${t.id}')">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
+              <span style="font-family:monospace; font-weight:800; font-size:12px; color:var(--accent);">${t.id}</span>
+              ${statusBadge}
+            </div>
+            <div style="font-weight:700; font-size:13px; line-height:1.35; margin:3px 0;">
+              ${this.escapeHtml(t.titulo)}
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px; font-size:11.5px;">
+              <span style="display:inline-flex; align-items:center; gap:4px; opacity:0.9;">
+                ${Icons.user} ${this.escapeHtml(respNombre)}
+              </span>
+              <span style="font-size:11px; opacity:0.75;">S${t.semana_inicio}-S${t.semana_fin}</span>
+            </div>
+            <div class="progress-wrap" style="height:6px; margin-top:5px;">
+              <div class="progress-bar" style="width:${prog}%; ${isHecha ? 'background:var(--accent);' : (isEnCurso ? 'background:var(--info);' : '')}"></div>
+            </div>
+          </div>
         `;
       },
 
@@ -1120,6 +1369,11 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
       setActiveUser(u) {
         DataStore.state.config.usuario_actual = u;
         DataStore.save();
+        this.render();
+      },
+
+      setTreeFilter(f) {
+        this.treeFilter = f;
         this.render();
       },
 
@@ -1140,8 +1394,8 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
           `${DataStore.state.config.asignatura} • ${DataStore.state.config.docente} • ${i1} | ${i2} | ${i3}`;
 
         switch (this.currentTab) {
-          case "panel": c.innerHTML = this.renderPanelPrincipal(); break;
           case "arbol": c.innerHTML = this.renderVistaArbol(); break;
+          case "panel": c.innerHTML = this.renderPanelPrincipal(); break;
           case "tablero": c.innerHTML = this.renderVistaTablero(); break;
           case "cronograma": c.innerHTML = this.renderVistaCronograma(); break;
           case "semana": c.innerHTML = this.renderVistaSemana(); break;
@@ -1154,8 +1408,10 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
         }
       },
 
-      /* 1. PANEL PRINCIPAL */
-      renderPanelPrincipal() {
+      /* ========================================================================
+         2. VISTA ÁRBOL — LÍNEAS DE CHECKOUT DE IZQUIERDA A DERECHA (HORIZONTAL)
+         ======================================================================== */
+      renderVistaArbol() {
         const st = DataStore.state;
         const tareas = st.tareas;
         const p1 = tareas.filter(t => t.parte === 1);
@@ -1163,140 +1419,236 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
         const progTotal = Logic.getWeightedProgress(tareas);
         const progP1 = Logic.getWeightedProgress(p1);
         const progP2 = Logic.getWeightedProgress(p2);
-
         const u = st.config.usuario_actual || "Todos";
-        const misTareas = tareas.filter(t => Logic.taskBelongsToUser(t, u) && t.estado !== "Hecha");
-        const sActiva = Number(st.config.semana_actual_p1 || 1);
-        const pActiva = Number(st.config.parte_activa_semana || 1);
-        const tareasSemana = tareas.filter(t => t.parte === pActiva && t.semana_inicio <= sActiva && t.semana_fin >= sActiva);
-        const tareasBloqueadas = tareas.filter(t => Logic.isTaskBlocked(t) && t.estado !== "Hecha");
-        const tareasAtrasadas = tareas.filter(t => Logic.isTaskOverdue(t));
-        const verPendientes = st.verificaciones_pendientes.filter(v => !v.cerrado);
+
+        const fasesP1 = [...new Set(p1.map(t => t.fase))];
+        const fasesP2 = [...new Set(p2.map(t => t.fase))];
 
         return `
-          <div class="grid-4" style="margin-bottom:16px;">
-            <div class="card">
-              <div style="font-size:12px; color:var(--text-muted);">PROGRESO TOTAL</div>
-              <div style="font-size:28px; font-weight:800; color:var(--accent); margin:4px 0;">${progTotal}%</div>
-              <div class="progress-wrap"><div class="progress-bar" style="width:${progTotal}%"></div></div>
-              <div style="font-size:11.5px; color:var(--text-muted); margin-top:6px;">
-                ${tareas.filter(t => t.estado === "Hecha").length} de ${tareas.length} tareas hechas
+          <div class="checkout-tree-container">
+            <!-- Barra de control y filtros del árbol -->
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:14px; margin-bottom:22px; flex-wrap:wrap;">
+              <div>
+                <h2 style="font-size:18px; font-weight:800; display:flex; align-items:center; gap:8px;">
+                  ${Icons.tree}
+                  <span>Ruta en Árbol — Ramas de Checkout de Izquierda a Derecha</span>
+                </h2>
+                <p style="font-size:12.5px; color:var(--text-muted); margin-top:3px;">
+                  Flujo horizontal continuo por fases. Las tareas se pintan en color pastel (las realizadas no desaparecen). Toca cualquier tarjeta para ver sus pasos y criterio.
+                </p>
+              </div>
+
+              <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+                <button class="btn btn-sm ${this.treeFilter === 'todos' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('todos')">Todo el Proyecto</button>
+                <button class="btn btn-sm ${this.treeFilter === 'mis' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('mis')">Solo Mis Tareas (${this.escapeHtml(u)})</button>
+                <button class="btn btn-sm ${this.treeFilter === 'p1' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('p1')">Parte 1 (1er Bimestre)</button>
+                <button class="btn btn-sm ${this.treeFilter === 'p2' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('p2')">Parte 2 (2do Bimestre)</button>
               </div>
             </div>
 
-            <div class="card">
-              <div style="font-size:12px; color:var(--text-muted);">PARTE 1 (T1.01–T1.16)</div>
-              <div style="font-size:28px; font-weight:800; color:var(--info); margin:4px 0;">${progP1}%</div>
-              <div class="progress-wrap"><div class="progress-bar" style="width:${progP1}%; background:var(--info);"></div></div>
-              <div style="font-size:11.5px; color:var(--text-muted); margin-top:6px;">Prototipo en protoboard y piloto</div>
-            </div>
-
-            <div class="card">
-              <div style="font-size:12px; color:var(--text-muted);">PARTE 2 (T2.01–T2.17)</div>
-              <div style="font-size:28px; font-weight:800; color:var(--purple); margin:4px 0;">${progP2}%</div>
-              <div class="progress-wrap"><div class="progress-bar" style="width:${progP2}%; background:var(--purple);"></div></div>
-              <div style="font-size:11.5px; color:var(--text-muted); margin-top:6px;">PCB, acrílico, cámara y curvas</div>
-            </div>
-
-            <div class="card">
-              <div style="font-size:12px; color:var(--text-muted);">ESTADO DEL EQUIPO</div>
-              <div style="font-size:14px; font-weight:700; margin-top:6px;">3 Integrantes • Plan A</div>
-              <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">
-                🔴 ${tareasBloqueadas.length} bloqueadas • ⏰ ${tareasAtrasadas.length} atrasadas
-              </div>
-              <div style="margin-top:6px;">
-                <span class="badge tag-VERIFICAR">${verPendientes.length} [A VERIFICAR] abiertos</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="grid-2" style="margin-bottom:16px;">
-            <div class="card">
-              <div class="card-header">
-                <div class="card-title">👤 Mis Tareas Pendientes (${this.escapeHtml(u)})</div>
-                <span class="badge status-En-curso">${misTareas.length}</span>
-              </div>
-              ${misTareas.length === 0 ? `<p style="color:var(--text-muted);">No tienes tareas pendientes asignadas.</p>` : `
-                <div style="max-height:280px; overflow-y:auto;">
-                  ${misTareas.map(t => `
-                    <div class="task-item ${Logic.isTaskBlocked(t) ? 'blocked' : ''}" onclick="App.openTaskModal('${t.id}')">
-                      <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span class="task-id">${t.id}</span>
-                        ${this.renderStatusBadge(t)}
-                      </div>
-                      <div style="font-weight:600; margin:4px 0;">${this.escapeHtml(t.titulo)}</div>
-                      <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-muted);">
-                        <span>S${t.semana_inicio}-S${t.semana_fin} (${t.fecha_fin})</span>
-                        <span>${Logic.getTaskProgress(t)}% (${t.pasos.filter(p => p.hecho).length}/${t.pasos.length} pasos)</span>
-                      </div>
-                    </div>
-                  `).join("")}
+            <!-- NODO RAÍZ PRINCIPAL -->
+            <div style="display:flex; align-items:center; gap:16px; margin-bottom:26px;">
+              <div class="checkout-root-node">
+                <div style="width:30px; height:30px; border-radius:50%; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center;">
+                  ${Icons.leaf}
                 </div>
-              `}
-            </div>
-
-            <div class="card">
-              <div class="card-header">
-                <div class="card-title">📅 Tareas de Esta Semana (Parte ${pActiva}, Semana ${sActiva})</div>
-                <div style="display:flex; gap:6px;">
-                  <button class="btn btn-sm" onclick="App.cambiarSemanaActiva(-1)">◀ S${Math.max(1, sActiva - 1)}</button>
-                  <button class="btn btn-sm" onclick="App.cambiarSemanaActiva(1)">S${sActiva + 1} ▶</button>
+                <div>
+                  <div style="font-size:14px; font-weight:800;">Cámara de Germinación Inteligente IoT</div>
+                  <div style="font-size:11px; color:var(--text-muted);">Grupo 1 • EPN 2026-B</div>
+                </div>
+                <div style="margin-left:10px; background:var(--accent-soft); color:var(--accent); padding:3px 9px; border-radius:6px; font-size:12px; font-weight:700;">
+                  ${progTotal}% Avance
                 </div>
               </div>
-              ${tareasSemana.length === 0 ? `<p style="color:var(--text-muted);">No hay tareas programadas para esta semana.</p>` : `
-                <div style="max-height:280px; overflow-y:auto;">
-                  ${tareasSemana.map(t => `
-                    <div class="task-item ${t.estado === 'Hecha' ? 'done' : ''} ${Logic.isTaskBlocked(t) ? 'blocked' : ''}" onclick="App.openTaskModal('${t.id}')">
-                      <div style="display:flex; justify-content:space-between;">
-                        <span class="task-id">${t.id}</span>
-                        <span>${this.escapeHtml(t.rol_responsable)} • ${this.renderStatusBadge(t)}</span>
-                      </div>
-                      <div style="font-weight:600; margin:4px 0;">${this.escapeHtml(t.titulo)}</div>
-                      <div class="progress-wrap"><div class="progress-bar" style="width:${Logic.getTaskProgress(t)}%"></div></div>
-                    </div>
-                  `).join("")}
-                </div>
-              `}
-            </div>
-          </div>
-
-          <div class="grid-2">
-            <div class="card">
-              <div class="card-header">
-                <div class="card-title">🔒 Tareas Bloqueadas (${tareasBloqueadas.length})</div>
-              </div>
-              ${tareasBloqueadas.length === 0 ? `<p style="color:var(--accent);">✅ Ninguna tarea bloqueada en este momento.</p>` : `
-                <div style="max-height:250px; overflow-y:auto;">
-                  ${tareasBloqueadas.map(t => `
-                    <div class="task-item blocked" onclick="App.openTaskModal('${t.id}')">
-                      <div style="display:flex; justify-content:space-between;">
-                        <span class="task-id">${t.id}</span>
-                        <span style="color:var(--danger); font-size:12px; font-weight:700;">
-                          Faltan: ${Logic.getBlockingIds(t).join(', ')}
-                        </span>
-                      </div>
-                      <div style="font-weight:600;">${this.escapeHtml(t.titulo)}</div>
-                    </div>
-                  `).join("")}
-                </div>
-              `}
+              <div style="flex:1; height:2px; background:linear-gradient(90deg, var(--accent), var(--border));"></div>
             </div>
 
-            <div class="card">
-              <div class="card-header">
-                <div class="card-title">🔍 Elementos [A VERIFICAR] Pendientes (${verPendientes.length})</div>
-              </div>
-              <div style="max-height:250px; overflow-y:auto;">
-                ${verPendientes.map(v => `
-                  <div style="padding:7px 0; border-bottom:1px solid var(--border); display:flex; align-items:flex-start; gap:8px;">
-                    <input type="checkbox" onchange="App.toggleVerificacion('${v.id}')" title="Marcar verificado" />
-                    <div style="flex:1;">
-                      <span class="badge tag-VERIFICAR">${this.escapeHtml(v.origen)}</span>
-                      <span style="font-size:12.5px;">${this.escapeHtml(v.texto)}</span>
-                    </div>
+            <!-- RAMA SUPERIOR: PARTE 1 (PRIMER BIMESTRE) -->
+            ${(this.treeFilter === 'todos' || this.treeFilter === 'mis' || this.treeFilter === 'p1') ? `
+              <div class="checkout-branch parte-1">
+                <div class="checkout-branch-header">
+                  <div class="checkout-branch-title" style="color:var(--info);">
+                    <span style="width:12px; height:12px; border-radius:50%; background:var(--info); display:inline-block;"></span>
+                    <span>PARTE 1: Prototipo en Protoboard y Lote Piloto (1er Bimestre)</span>
                   </div>
-                `).join("")}
+                  <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:12px; font-weight:700; color:var(--info);">${progP1}% Completado</span>
+                    <div class="progress-wrap" style="width:90px;"><div class="progress-bar" style="width:${progP1}%; background:var(--info);"></div></div>
+                  </div>
+                </div>
+
+                <!-- Pista horizontal de fases de izquierda a derecha -->
+                <div class="checkout-phases-track">
+                  ${fasesP1.map((faseNombre, idx) => {
+                    let tFase = p1.filter(t => t.fase === faseNombre);
+                    if (this.treeFilter === 'mis' && u !== "Todos") {
+                      tFase = tFase.filter(t => Logic.taskBelongsToUser(t, u));
+                    }
+                    if (tFase.length === 0) return '';
+                    const progFase = Logic.getWeightedProgress(tFase);
+                    return `
+                      <div class="checkout-phase-col">
+                        <div class="checkout-phase-header">
+                          <span title="${this.escapeHtml(faseNombre)}">Fase ${idx + 1}: ${this.escapeHtml(faseNombre)}</span>
+                          <span style="font-size:11px; color:var(--text-muted); font-weight:700;">${progFase}%</span>
+                        </div>
+                        <div class="checkout-tasks-flow">
+                          ${tFase.map(t => this.renderPastelTaskCard(t)).join("")}
+                        </div>
+                      </div>
+                    `;
+                  }).join("")}
+                </div>
               </div>
+            ` : ''}
+
+            <!-- RAMA INFERIOR: PARTE 2 (SEGUNDO BIMESTRE) -->
+            ${(this.treeFilter === 'todos' || this.treeFilter === 'mis' || this.treeFilter === 'p2') ? `
+              <div class="checkout-branch parte-2">
+                <div class="checkout-branch-header">
+                  <div class="checkout-branch-title" style="color:var(--purple);">
+                    <span style="width:12px; height:12px; border-radius:50%; background:var(--purple); display:inline-block;"></span>
+                    <span>PARTE 2: Prototipo Final en PCB, Acrílico y Visión (2do Bimestre)</span>
+                  </div>
+                  <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:12px; font-weight:700; color:var(--purple);">${progP2}% Completado</span>
+                    <div class="progress-wrap" style="width:90px;"><div class="progress-bar" style="width:${progP2}%; background:var(--purple);"></div></div>
+                  </div>
+                </div>
+
+                <!-- Pista horizontal de fases de izquierda a derecha -->
+                <div class="checkout-phases-track">
+                  ${fasesP2.map((faseNombre, idx) => {
+                    let tFase = p2.filter(t => t.fase === faseNombre);
+                    if (this.treeFilter === 'mis' && u !== "Todos") {
+                      tFase = tFase.filter(t => Logic.taskBelongsToUser(t, u));
+                    }
+                    if (tFase.length === 0) return '';
+                    const progFase = Logic.getWeightedProgress(tFase);
+                    return `
+                      <div class="checkout-phase-col">
+                        <div class="checkout-phase-header">
+                          <span title="${this.escapeHtml(faseNombre)}">Fase ${idx + 1}: ${this.escapeHtml(faseNombre)}</span>
+                          <span style="font-size:11px; color:var(--text-muted); font-weight:700;">${progFase}%</span>
+                        </div>
+                        <div class="checkout-tasks-flow">
+                          ${tFase.map(t => this.renderPastelTaskCard(t)).join("")}
+                        </div>
+                      </div>
+                    `;
+                  }).join("")}
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      },
+
+      /* ========================================================================
+         1. PANEL PRINCIPAL — ENFOQUE LIMPIO ("¿CON QUÉ EMPEZAMOS HOY?")
+         ======================================================================== */
+      renderPanelPrincipal() {
+        const st = DataStore.state;
+        const tareas = st.tareas;
+        const u = st.config.usuario_actual || "Todos";
+        const sActiva = Number(st.config.semana_actual_p1 || 1);
+        const pActiva = Number(st.config.parte_activa_semana || 1);
+
+        // Tareas de la semana activa: SE MUESTRAN TODAS (las hechas en verde pastel, no se ocultan)
+        let tareasSemana = tareas.filter(t => t.parte === pActiva && t.semana_inicio <= sActiva && t.semana_fin >= sActiva);
+
+        const totalHechas = tareas.filter(t => t.estado === "Hecha").length;
+        const totalEnCurso = tareas.filter(t => t.estado === "En curso").length;
+        const progTotal = Logic.getWeightedProgress(tareas);
+
+        return `
+          <!-- HERO DE ENFOQUE ZEN -->
+          <div style="background:var(--bg-panel); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:20px; box-shadow:var(--shadow);">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;">
+              <div>
+                <div style="font-size:12px; text-transform:uppercase; letter-spacing:0.05em; color:var(--accent); font-weight:700;">
+                  Plan de Trabajo Activo
+                </div>
+                <h1 style="font-size:22px; font-weight:800; margin:4px 0;">
+                  ¿Con qué empezamos hoy?
+                </h1>
+                <p style="font-size:13.5px; color:var(--text-muted);">
+                  Integrante activo: <strong style="color:var(--text-main);">${this.escapeHtml(u)}</strong> • Parte ${pActiva} (Semana ${sActiva})
+                </p>
+              </div>
+
+              <!-- Botón directo al Árbol de Checkout Horizontal -->
+              <button onclick="App.switchTab('arbol')" class="btn btn-primary" style="padding:10px 18px; font-size:13.5px; gap:8px;">
+                ${Icons.tree}
+                <span>Ver Árbol de Checkout (Ramas)</span>
+              </button>
+            </div>
+
+            <!-- Métricas sobrias de salud del proyecto (sin saturación) -->
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-top:18px; padding-top:16px; border-top:1px solid var(--border);">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div style="font-size:24px; font-weight:800; color:var(--accent);">${progTotal}%</div>
+                <div style="font-size:12px; color:var(--text-muted); line-height:1.2;">Avance General del Proyecto</div>
+              </div>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div style="font-size:24px; font-weight:800; color:var(--accent);">${totalHechas}</div>
+                <div style="font-size:12px; color:var(--text-muted); line-height:1.2;">Tareas Realizadas (visibles en verde)</div>
+              </div>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div style="font-size:24px; font-weight:800; color:var(--info);">${totalEnCurso}</div>
+                <div style="font-size:12px; color:var(--text-muted); line-height:1.2;">Tareas En Curso</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECCIÓN: TAREAS DE LA SEMANA ACTIVA (TARJETAS PASTEL COMPLETAS) -->
+          <div style="background:var(--bg-panel); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:20px; box-shadow:var(--shadow);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <h2 style="font-size:16px; font-weight:800; display:flex; align-items:center; gap:6px;">
+                  ${Icons.calendar}
+                  <span>Tareas para la Semana ${sActiva}</span>
+                </h2>
+                <span class="badge tag-PDF">Parte ${pActiva}</span>
+              </div>
+              <div style="display:flex; gap:6px; align-items:center;">
+                <span style="font-size:12px; color:var(--text-muted); margin-right:4px;">Cambiar semana:</span>
+                <button class="btn btn-sm" onclick="App.cambiarSemanaActiva(-1)">◀ S${Math.max(1, sActiva - 1)}</button>
+                <button class="btn btn-sm" onclick="App.cambiarSemanaActiva(1)">S${Math.min(9, sActiva + 1)} ▶</button>
+              </div>
+            </div>
+
+            ${tareasSemana.length === 0 ? `
+              <div style="text-align:center; padding:32px; color:var(--text-muted);">
+                <p>No hay tareas programadas para la Semana ${sActiva}. Navega entre semanas con los botones de arriba.</p>
+              </div>
+            ` : `
+              <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(290px, 1fr)); gap:14px;">
+                ${tareasSemana.map(t => this.renderPastelTaskCard(t)).join("")}
+              </div>
+            `}
+          </div>
+
+          <!-- ACCESOS RÁPIDOS COMPACTOS -->
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:16px;">
+            <div class="card" onclick="App.switchTab('bitacora')" style="cursor:pointer;">
+              <div class="card-header">
+                <div class="card-title">${Icons.book} Bitácora de Laboratorio</div>
+                <span class="badge tag-PDF">Calibración & Germinación</span>
+              </div>
+              <p style="font-size:13px; color:var(--text-muted);">
+                Conversión ADC del sensor capacitivo en tiempo real y curva gráfica de germinación del lote piloto.
+              </p>
+            </div>
+
+            <div class="card" onclick="App.switchTab('compras')" style="cursor:pointer;">
+              <div class="card-header">
+                <div class="card-title">${Icons.cart} Compras y Tienda</div>
+                <span class="badge tag-DISENO">Secciones 6 & 18</span>
+              </div>
+              <p style="font-size:13px; color:var(--text-muted);">
+                Lista de materiales con cantidades, precios y checklist de pruebas en tienda (humidificador a 5 V directos).
+              </p>
             </div>
           </div>
         `;
@@ -1320,137 +1672,9 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
         }
       },
 
-      /* 2. VISTA ÁRBOL */
-      renderVistaArbol() {
-        const tareas = DataStore.state.tareas;
-        const p1 = tareas.filter(t => t.parte === 1);
-        const p2 = tareas.filter(t => t.parte === 2);
-        const progP1 = Logic.getWeightedProgress(p1);
-        const progP2 = Logic.getWeightedProgress(p2);
-
-        const renderFase = (parteNum, faseNombre) => {
-          const tFase = tareas.filter(t => t.parte === parteNum && t.fase === faseNombre);
-          const progFase = Logic.getWeightedProgress(tFase);
-          const fKey = `fase_${parteNum}_${faseNombre}`;
-          const colap = this.treeCollapsed[fKey];
-
-          return `
-            <div class="tree-node">
-              <div class="tree-header" onclick="App.toggleTree('${fKey}')">
-                <div style="font-weight:700;">${colap ? '▶' : '▼'} Fase: ${this.escapeHtml(faseNombre)} (${tFase.length} tareas)</div>
-                <div style="display:flex; align-items:center; gap:8px;">
-                  <span style="font-size:12px; font-weight:700;">${progFase}%</span>
-                  <div class="progress-wrap" style="width:70px;"><div class="progress-bar" style="width:${progFase}%"></div></div>
-                </div>
-              </div>
-              ${colap ? '' : `
-                <div style="margin-top:6px;">
-                  ${tFase.map(t => {
-                    const tKey = `task_${t.id}`;
-                    const tColap = this.treeCollapsed[tKey];
-                    const pProg = Logic.getTaskProgress(t);
-                    return `
-                      <div class="tree-node">
-                        <div class="tree-header" style="background:var(--bg-panel);" onclick="event.stopPropagation(); App.openTaskModal('${t.id}')">
-                          <div>
-                            <span class="task-id">${t.id}</span>
-                            <span style="font-weight:600; margin-left:6px;">${this.escapeHtml(t.titulo)}</span>
-                            <span style="font-size:12px; color:var(--text-muted); margin-left:6px;">• ${this.escapeHtml(t.rol_responsable)}</span>
-                          </div>
-                          <div style="display:flex; align-items:center; gap:8px;">
-                            ${this.renderStatusBadge(t)}
-                            <span style="font-size:12px;">${pProg}%</span>
-                            <button class="btn btn-sm" onclick="event.stopPropagation(); App.toggleTree('${tKey}')" title="Ver pasos">${tColap ? '▼ Pasos' : '▲ Pasos'}</button>
-                          </div>
-                        </div>
-                        ${tColap ? `
-                          <div style="margin-left:22px; padding:6px 0;">
-                            ${t.pasos.map(p => `
-                              <div style="display:flex; align-items:center; gap:8px; padding:3px 0; font-size:12.5px;">
-                                <input type="checkbox" ${p.hecho ? 'checked' : ''} onchange="App.togglePasoTree('${t.id}', '${p.id}', this.checked)" />
-                                <span style="${p.hecho ? 'text-decoration:line-through; color:var(--text-muted);' : ''}">${this.escapeHtml(p.texto)}</span>
-                              </div>
-                            `).join("")}
-                          </div>
-                        ` : ''}
-                      </div>
-                    `;
-                  }).join("")}
-                </div>
-              `}
-            </div>
-          `;
-        };
-
-        const fasesP1 = [...new Set(p1.map(t => t.fase))];
-        const fasesP2 = [...new Set(p2.map(t => t.fase))];
-
-        return `
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">🌿 Árbol Jerárquico del Proyecto</div>
-              <div style="display:flex; gap:6px;">
-                <button class="btn btn-sm" onclick="App.expandAllTree()">Expandir todo</button>
-                <button class="btn btn-sm" onclick="App.collapseAllTree()">Colapsar todo</button>
-              </div>
-            </div>
-
-            <!-- NODO RAÍZ -->
-            <div class="tree-header" style="background:var(--bg-hover); font-size:15px; font-weight:800;">
-              <div>🌱 Cámara de Germinación Inteligente para Semilleros (Grupo 1)</div>
-              <div>${Logic.getWeightedProgress(tareas)}% Avance Total</div>
-            </div>
-
-            <!-- PARTE 1 -->
-            <div class="tree-node">
-              <div class="tree-header" onclick="App.toggleTree('parte_1')">
-                <div style="font-weight:700; color:var(--info);">
-                  ${this.treeCollapsed['parte_1'] ? '▶' : '▼'} PARTE 1: Prototipado en Protoboard y Lote Piloto (1er Bimestre)
-                </div>
-                <div style="display:flex; align-items:center; gap:8px;">
-                  <span style="font-weight:700;">${progP1}%</span>
-                  <div class="progress-wrap" style="width:90px;"><div class="progress-bar" style="width:${progP1}%; background:var(--info);"></div></div>
-                </div>
-              </div>
-              ${this.treeCollapsed['parte_1'] ? '' : fasesP1.map(f => renderFase(1, f)).join("")}
-            </div>
-
-            <!-- PARTE 2 -->
-            <div class="tree-node">
-              <div class="tree-header" onclick="App.toggleTree('parte_2')">
-                <div style="font-weight:700; color:var(--purple);">
-                  ${this.treeCollapsed['parte_2'] ? '▶' : '▼'} PARTE 2: Prototipo Final en PCB, Estructura Acrílica y Visión (2do Bimestre)
-                </div>
-                <div style="display:flex; align-items:center; gap:8px;">
-                  <span style="font-weight:700;">${progP2}%</span>
-                  <div class="progress-wrap" style="width:90px;"><div class="progress-bar" style="width:${progP2}%; background:var(--purple);"></div></div>
-                </div>
-              </div>
-              ${this.treeCollapsed['parte_2'] ? '' : fasesP2.map(f => renderFase(2, f)).join("")}
-            </div>
-          </div>
-        `;
-      },
-
-      toggleTree(key) {
-        this.treeCollapsed[key] = !this.treeCollapsed[key];
-        this.render();
-      },
-      expandAllTree() { this.treeCollapsed = {}; this.render(); },
-      collapseAllTree() {
-        this.treeCollapsed = { parte_1: true, parte_2: true };
-        this.render();
-      },
-      togglePasoTree(tId, pId, checked) {
-        const t = DataStore.state.tareas.find(x => x.id === tId);
-        if (!t) return;
-        const p = t.pasos.find(x => x.id === pId);
-        if (p) p.hecho = checked;
-        DataStore.save();
-        this.render();
-      },
-
-      /* 3. VISTA TABLERO (KANBAN) */
+      /* ========================================================================
+         3. VISTA TABLERO (KANBAN CON TARJETAS PASTEL)
+         ======================================================================== */
       renderVistaTablero() {
         const st = DataStore.state;
         const f = this.kanbanFilters;
@@ -1472,7 +1696,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
           <div class="card" style="margin-bottom:14px;">
             <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
               <div style="flex:1; min-width:200px;">
-                <input type="text" placeholder="🔍 Buscar por ID, título o descripción..." value="${this.escapeHtml(f.busqueda)}" oninput="App.filtrarKanban('busqueda', this.value)" />
+                <input type="text" placeholder="Buscar por ID, título o descripción..." value="${this.escapeHtml(f.busqueda)}" oninput="App.filtrarKanban('busqueda', this.value)" />
               </div>
               <div style="width:160px;">
                 <select onchange="App.filtrarKanban('parte', this.value)">
@@ -1513,22 +1737,27 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
                   <div class="kanban-dropzone" ondragover="event.preventDefault(); this.classList.add('drag-over');" ondragleave="this.classList.remove('drag-over');" ondrop="App.handleKanbanDrop(event, '${est}')">
                     ${items.map(t => {
                       const bloq = Logic.isTaskBlocked(t) && t.estado !== "Hecha";
+                      let pastelClass = "pastel-pendiente";
+                      if (est === "Hecha") pastelClass = "pastel-hecha";
+                      else if (est === "En curso") pastelClass = "pastel-en-curso";
+                      else if (est === "En revisión") pastelClass = "pastel-en-revision";
+
                       return `
-                        <div class="task-item ${bloq ? 'blocked' : ''}" draggable="true" ondragstart="event.dataTransfer.setData('text/plain', '${t.id}')" onclick="App.openTaskModal('${t.id}')">
+                        <div class="pastel-card ${pastelClass} ${bloq ? 'pastel-blocked' : ''}" style="margin-bottom:8px;" draggable="true" ondragstart="event.dataTransfer.setData('text/plain', '${t.id}')" onclick="App.openTaskModal('${t.id}')">
                           <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <span class="task-id">${t.id}</span>
-                            <span style="font-size:11px; color:var(--text-muted);">S${t.semana_inicio}-S${t.semana_fin}</span>
+                            <span style="font-family:monospace; font-weight:800; font-size:12px; color:var(--accent);">${t.id}</span>
+                            <span style="font-size:11px; opacity:0.75;">S${t.semana_inicio}-S${t.semana_fin}</span>
                           </div>
-                          <div style="font-weight:600; margin:4px 0;">${this.escapeHtml(t.titulo)}</div>
+                          <div style="font-weight:700; margin:4px 0; font-size:13px; line-height:1.3;">${this.escapeHtml(t.titulo)}</div>
                           <div style="margin-bottom:6px;">${this.renderBadges(t.etiquetas)}</div>
-                          <div class="progress-wrap"><div class="progress-bar" style="width:${Logic.getTaskProgress(t)}%"></div></div>
-                          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px; font-size:11.5px; color:var(--text-muted);">
-                            <span>${this.escapeHtml(t.rol_responsable)}</span>
-                            ${bloq ? `<span style="color:var(--danger); font-weight:700;">🔒 Bloqueada</span>` : `<span>${t.pasos.filter(p => p.hecho).length}/${t.pasos.length}</span>`}
+                          <div class="progress-wrap" style="height:6px;"><div class="progress-bar" style="width:${Logic.getTaskProgress(t)}%"></div></div>
+                          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px; font-size:11.5px; opacity:0.85;">
+                            <span style="display:inline-flex; align-items:center; gap:4px;">${Icons.user} ${this.escapeHtml(t.rol_responsable)}</span>
+                            ${bloq ? `<span style="color:var(--danger); font-weight:700; display:inline-flex; align-items:center; gap:3px;">${Icons.lock} Bloqueada</span>` : `<span>${t.pasos.filter(p => p.hecho).length}/${t.pasos.length}</span>`}
                           </div>
                           <div style="display:flex; gap:4px; margin-top:6px;" onclick="event.stopPropagation();">
                             ${estados.filter(x => x !== est).map(dest => `
-                              <button class="btn btn-sm" style="flex:1; padding:2px;" onclick="App.moverEstadoRapido('${t.id}', '${dest}')" title="Mover a ${dest}">➔ ${dest.slice(0, 4)}</button>
+                              <button class="btn btn-sm" style="flex:1; padding:2px; font-size:11px;" onclick="App.moverEstadoRapido('${t.id}', '${dest}')" title="Mover a ${dest}">&rarr; ${dest.slice(0, 4)}</button>
                             `).join("")}
                           </div>
                         </div>
@@ -1570,8 +1799,11 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
         return `
           <div class="card" style="margin-bottom:14px;">
             <div class="card-header">
-              <div class="card-title">📅 Cronograma Relativo (Gantt) y Fechas Reales</div>
-              <button class="btn btn-sm btn-primary no-print" onclick="window.print()">🖨️ Versión Imprimible</button>
+              <div class="card-title">${Icons.gantt} Cronograma Relativo (Gantt) y Fechas Reales</div>
+              <button class="btn btn-sm btn-primary no-print" onclick="window.print()" style="gap:5px;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                <span>Versión Imprimible</span>
+              </button>
             </div>
             <div class="grid-3" style="margin-bottom:12px;">
               <div>
@@ -1583,7 +1815,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
                 <input type="date" value="${st.config.fecha_inicio_p2 || '2026-11-30'}" onchange="App.actualizarFechaInicio(2, this.value)" />
               </div>
               <div style="display:flex; align-items:flex-end;">
-                <button class="btn btn-sm" onclick="App.recalcularFechasBoton()">🔄 Recalcular Fechas de Tareas</button>
+                <button class="btn btn-sm" onclick="App.recalcularFechasBoton()">Recalcular Fechas de Tareas</button>
               </div>
             </div>
             <div style="font-size:12px; color:var(--text-muted);">
@@ -1672,7 +1904,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
             <!-- VISTA HOY -->
             <div class="card">
               <div class="card-header">
-                <div class="card-title">✅ Vista "Hoy" — Checklist Operativo Diario</div>
+                <div class="card-title" style="display:flex; align-items:center; gap:6px;">${Icons.calendar} Vista "Hoy" — Checklist Operativo Diario</div>
                 <span class="badge tag-PDF">Protocolo Piloto</span>
               </div>
               <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">
@@ -1684,7 +1916,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
                   <span><strong>Revisar nivel de agua del lote piloto</strong> (el humidificador nunca debe operar en seco).</span>
                 </label>
                 <div style="padding:6px; background:var(--bg-card); border-radius:6px;">
-                  <div style="font-size:12px; font-weight:700; margin-bottom:4px;">📸 Captura de fotos (2 a 4 veces al día):</div>
+                  <div style="font-size:12px; font-weight:700; margin-bottom:4px;">Captura de fotos del piloto (2 a 4 veces al día):</div>
                   <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:6px;">
                     <label style="display:flex; align-items:center; gap:4px; font-size:12px;">
                       <input type="checkbox" ${rut.foto_00 ? 'checked' : ''} onchange="App.toggleRutina('foto_00', this.checked)" /> 00:00 h
@@ -1718,7 +1950,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
             <!-- CUADRÍCULA SEMANAL POR INTEGRANTE -->
             <div class="card">
               <div class="card-header">
-                <div class="card-title">🗓️ Horario Semanal — Parte ${parte}, Semana ${semana}</div>
+                <div class="card-title">${Icons.calendar} Horario Semanal — Parte ${parte}, Semana ${semana}</div>
                 <div style="display:flex; gap:6px;">
                   <select style="width:auto;" onchange="App.cambiarParteSemana(this.value)">
                     <option value="1" ${parte === 1 ? 'selected' : ''}>Parte 1</option>
@@ -1783,7 +2015,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
         return `
           <div class="card" style="margin-bottom:14px;">
             <div class="card-header">
-              <div class="card-title">🕸️ Grafo de Dependencias y Ruta Crítica (CPM)</div>
+              <div class="card-title">${Icons.graph} Grafo de Dependencias y Ruta Crítica (CPM)</div>
               <span class="badge tag-VERIFICAR">${criticos.size} Tareas Críticas</span>
             </div>
             <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">
@@ -1808,10 +2040,10 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
                       ${this.escapeHtml(t.rol_responsable)} • P${t.parte} (S${t.semana_inicio}-S${t.semana_fin})
                     </div>
                     <div style="font-size:11.5px; margin-top:4px;">
-                      <strong>⬅ Predecesoras:</strong> ${deps.length ? deps.map(d => `<span class="badge ${criticos.has(d) ? 'tag-VERIFICAR' : 'status-Pendiente'}" style="cursor:pointer;" onclick="event.stopPropagation(); App.openTaskModal('${d}')">${d}</span>`).join(" ") : '<span style="color:var(--text-muted);">Ninguna</span>'}
+                      <strong>Predecesoras:</strong> ${deps.length ? deps.map(d => `<span class="badge ${criticos.has(d) ? 'tag-VERIFICAR' : 'status-Pendiente'}" style="cursor:pointer;" onclick="event.stopPropagation(); App.openTaskModal('${d}')">${d}</span>`).join(" ") : '<span style="color:var(--text-muted);">Ninguna</span>'}
                     </div>
                     <div style="font-size:11.5px; margin-top:4px;">
-                      <strong>➔ Sucesoras:</strong> ${succ.length ? succ.map(s => `<span class="badge ${criticos.has(s) ? 'tag-VERIFICAR' : 'status-Pendiente'}" style="cursor:pointer;" onclick="event.stopPropagation(); App.openTaskModal('${s}')">${s}</span>`).join(" ") : '<span style="color:var(--text-muted);">Ninguna</span>'}
+                      <strong>Sucesoras:</strong> ${succ.length ? succ.map(s => `<span class="badge ${criticos.has(s) ? 'tag-VERIFICAR' : 'status-Pendiente'}" style="cursor:pointer;" onclick="event.stopPropagation(); App.openTaskModal('${s}')">${s}</span>`).join(" ") : '<span style="color:var(--text-muted);">Ninguna</span>'}
                     </div>
                   </div>
                 `;
@@ -1859,7 +2091,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
               </div>
               <h2 id="modal-task-title" style="font-size:18px; margin-top:4px;">${this.escapeHtml(t.titulo)}</h2>
             </div>
-            <button class="btn btn-sm" onclick="App.closeTaskModal()" style="font-size:16px;" aria-label="Cerrar modal">✕</button>
+            <button class="btn btn-sm" onclick="App.closeTaskModal()" style="font-size:18px; line-height:1; padding:2px 8px;" aria-label="Cerrar modal">&times;</button>
           </div>
 
           <div class="modal-body">
@@ -1906,17 +2138,17 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
             </div>
 
             ${bloq ? `
-              <div style="background:var(--danger-soft); border:1px solid var(--danger); border-radius:8px; padding:8px 12px; margin-bottom:12px; font-size:12.5px; color:var(--danger);">
-                ⚠️ <strong>Esta tarea está bloqueada</strong> porque depende de: [${Logic.getBlockingIds(t).join(', ')}] que no están Hechas.
+              <div style="background:var(--danger-soft); border:1px solid var(--danger); border-radius:8px; padding:8px 12px; margin-bottom:12px; font-size:12.5px; color:var(--danger); display:flex; align-items:center; gap:6px;">
+                ${Icons.lock} <span><strong>Esta tarea está bloqueada</strong> porque depende de: [${Logic.getBlockingIds(t).join(', ')}] que no están Hechas.</span>
               </div>
             ` : ''}
 
             <!-- PESTAÑAS INTERNAS -->
             <div class="subtabs">
-              <button class="btn btn-sm ${sub === 'pasos' ? 'btn-primary' : ''}" onclick="App.cambiarSubtabModal('pasos')">✓ Cómo hacerlo (${t.pasos.length} pasos)</button>
-              <button class="btn btn-sm ${sub === 'info' ? 'btn-primary' : ''}" onclick="App.cambiarSubtabModal('info')">ℹ️ Metadatos y Dependencias</button>
-              <button class="btn btn-sm ${sub === 'notas' ? 'btn-primary' : ''}" onclick="App.cambiarSubtabModal('notas')">📝 Notas y Enlaces</button>
-              <button class="btn btn-sm ${sub === 'historial' ? 'btn-primary' : ''}" onclick="App.cambiarSubtabModal('historial')">📜 Historial (${(t.historial || []).length})</button>
+              <button class="btn btn-sm ${sub === 'pasos' ? 'btn-primary' : ''}" onclick="App.cambiarSubtabModal('pasos')">Cómo hacerlo (${t.pasos.length} pasos)</button>
+              <button class="btn btn-sm ${sub === 'info' ? 'btn-primary' : ''}" onclick="App.cambiarSubtabModal('info')">Metadatos y Dependencias</button>
+              <button class="btn btn-sm ${sub === 'notas' ? 'btn-primary' : ''}" onclick="App.cambiarSubtabModal('notas')">Notas y Enlaces</button>
+              <button class="btn btn-sm ${sub === 'historial' ? 'btn-primary' : ''}" onclick="App.cambiarSubtabModal('historial')">Historial (${(t.historial || []).length})</button>
             </div>
 
             <!-- CONTENIDO DE PESTAÑAS -->
@@ -1932,7 +2164,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
                     <div style="flex:1; font-size:13px; ${p.hecho ? 'text-decoration:line-through; color:var(--text-muted);' : ''}">
                       ${this.escapeHtml(p.texto)}
                     </div>
-                    <button class="btn btn-sm btn-danger" onclick="App.eliminarPasoModal('${t.id}', '${p.id}')" title="Eliminar paso">✕</button>
+                    <button class="btn btn-sm btn-danger" onclick="App.eliminarPasoModal('${t.id}', '${p.id}')" title="Eliminar paso" style="display:inline-flex; align-items:center; padding:4px;">${Icons.trash}</button>
                   </div>
                 `).join("")}
               </div>
@@ -1956,7 +2188,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
                     <label style="font-size:12px; font-weight:700;">Depende de (enlaces clicables):</label>
                     <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:4px;">
                       ${(t.depende_de || []).length === 0 ? '<span style="color:var(--text-muted); font-size:12px;">Sin dependencias</span>' : t.depende_de.map(dep => `
-                        <button class="btn btn-sm btn-warn" onclick="App.openTaskModal('${dep}')">➔ ${dep}</button>
+                        <button class="btn btn-sm btn-warn" onclick="App.openTaskModal('${dep}')">${dep}</button>
                       `).join("")}
                     </div>
                   </div>
@@ -2065,7 +2297,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
         return `
           <div class="card" style="margin-bottom:14px;">
             <div class="card-header">
-              <div class="card-title">📓 Bitácora de Laboratorio y Calculadoras</div>
+              <div class="card-title">${Icons.book} Bitácora de Laboratorio y Calculadoras</div>
               <div style="display:flex; gap:6px;">
                 <button class="btn btn-sm ${sub === 'listado' ? 'btn-primary' : ''}" onclick="App.cambiarBitacoraSubtab('listado')">Historial de Entradas</button>
                 <button class="btn btn-sm ${sub === 'calibracion' ? 'btn-primary' : ''}" onclick="App.cambiarBitacoraSubtab('calibracion')">19.1 Calibración Sensores</button>
@@ -2099,7 +2331,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
           <div class="grid-2">
             <div class="card">
               <div class="card-header">
-                <div class="card-title">🌱 Sensor Capacitivo de Sustrato v1.2 (#1 y #2)</div>
+                <div class="card-title">${Icons.leaf} Sensor Capacitivo de Sustrato v1.2 (#1 y #2)</div>
                 <span class="badge tag-PDF">Fórmula map() C++</span>
               </div>
               <div style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">
@@ -2114,7 +2346,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
                   <div><label style="font-size:11px;">ADC Prueba:</label><input type="number" value="${cal.cap1_adc_prueba}" oninput="App.actualizarCalib('cap1_adc_prueba', this.value)" /></div>
                 </div>
                 <div style="margin-top:8px; font-weight:700; color:var(--accent);">
-                  ➔ Porcentaje Calculado: ${pCap1}%
+                  Porcentaje Calculado: ${pCap1}%
                 </div>
               </div>
 
@@ -2126,14 +2358,14 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
                   <div><label style="font-size:11px;">ADC Prueba:</label><input type="number" value="${cal.cap2_adc_prueba}" oninput="App.actualizarCalib('cap2_adc_prueba', this.value)" /></div>
                 </div>
                 <div style="margin-top:8px; font-weight:700; color:var(--accent);">
-                  ➔ Porcentaje Calculado: ${pCap2}%
+                  Porcentaje Calculado: ${pCap2}%
                 </div>
               </div>
             </div>
 
             <div class="card">
               <div class="card-header">
-                <div class="card-title">💧 Nivel de Agua y 🫁 Sensor MQ-135</div>
+                <div class="card-title">Nivel de Agua y Sensor MQ-135</div>
               </div>
               <div style="background:var(--bg-card); padding:10px; border-radius:8px; margin-bottom:10px;">
                 <strong>Sensor de Nivel de Agua</strong>
@@ -2151,7 +2383,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
                   <div><label style="font-size:11px;">Con semillas germinando (Rs):</label><input type="number" value="${cal.mq135_rs_adc}" onchange="App.actualizarCalib('mq135_rs_adc', this.value)" /></div>
                 </div>
                 <div style="margin-top:8px; font-weight:700; color:var(--purple);">
-                  ➔ Índice Relativo Rs/R0 = ${ratioMQ}
+                  Índice Relativo Rs/R0 = ${ratioMQ}
                 </div>
               </div>
             </div>
@@ -2184,7 +2416,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
         return `
           <div class="card" style="margin-bottom:14px;">
             <div class="card-header">
-              <div class="card-title">📈 Curva de % Germinación en Tiempo Real</div>
+              <div class="card-title">Curva de % Germinación en Tiempo Real</div>
               <button class="btn btn-sm btn-primary" onclick="App.agregarVisitaPilotoPrompt()">+ Registrar Visita</button>
             </div>
             <div style="width:100%; overflow-x:auto;">
@@ -2209,7 +2441,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
 
           <div class="card">
             <div class="card-header">
-              <div class="card-title">🌱 Cuadrícula de Visitas del Lote Piloto (N = ${cfg.n_semillas} semillas)</div>
+              <div class="card-title">Cuadrícula de Visitas del Lote Piloto (N = ${cfg.n_semillas} semillas)</div>
             </div>
             <div class="table-wrap">
               <table>
@@ -2285,7 +2517,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
         return `
           <div class="card">
             <div class="card-header">
-              <div class="card-title">🍓 Lista de Verificación: Sesión con la Raspberry Pi (Sección 8.6)</div>
+              <div class="card-title">Lista de Verificación: Sesión con la Raspberry Pi (Sección 8.6)</div>
             </div>
             <div class="grid-3">
               <div style="background:var(--bg-card); padding:10px; border-radius:8px;">
@@ -2328,7 +2560,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
       renderFormularioNuevaEntrada() {
         return `
           <div class="card" style="max-width:700px; margin:0 auto;">
-            <div class="card-header"><div class="card-title">📝 Registrar Entrada de Bitácora</div></div>
+            <div class="card-header"><div class="card-title">Registrar Entrada de Bitácora</div></div>
             <form onsubmit="App.guardarEntradaBitacora(event)" style="display:flex; flex-direction:column; gap:10px;">
               <div class="grid-2">
                 <div>
@@ -2397,8 +2629,8 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
         return `
           <div class="card">
             <div class="card-header">
-              <div class="card-title">📖 Historial Cronológico de Bitácora (${b.length} registros)</div>
-              <button class="btn btn-sm" onclick="App.exportarBitacoraCSV()">📥 Exportar Bitácora CSV</button>
+              <div class="card-title">${Icons.book} Historial Cronológico de Bitácora (${b.length} registros)</div>
+              <button class="btn btn-sm" onclick="App.exportarBitacoraCSV()">Exportar Bitácora CSV</button>
             </div>
             ${b.length === 0 ? `<p style="color:var(--text-muted);">Sin entradas aún.</p>` : `
               <div style="display:flex; flex-direction:column; gap:10px;">
@@ -2443,7 +2675,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
         return `
           <div class="card" style="margin-bottom:14px;">
             <div class="card-header">
-              <div class="card-title">🏬 Lista de Verificación en la Tienda (Sección 18)</div>
+              <div class="card-title">${Icons.cart} Lista de Verificación en la Tienda (Sección 18)</div>
               <span class="badge tag-VERIFICAR">Checks para celular en mostrador</span>
             </div>
             <div class="grid-2">
@@ -2458,7 +2690,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
 
           <div class="card">
             <div class="card-header">
-              <div class="card-title">🛒 Materiales de Ingeniería (Secciones 6.1, 6.2 y 6.3)</div>
+              <div class="card-title">Materiales de Ingeniería (Secciones 6.1, 6.2 y 6.3)</div>
               <div style="display:flex; gap:6px;">
                 <select style="width:auto;" onchange="App.filtrarComprasParte(this.value)">
                   <option value="todas">Todos los materiales</option>
@@ -2534,7 +2766,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
         return `
           <div class="card" style="margin-bottom:14px;">
             <div class="card-header">
-              <div class="card-title">📑 Listas Técnicas y Registros del Proyecto</div>
+              <div class="card-title" style="display:flex; align-items:center; gap:6px;">${Icons.list} Listas Técnicas y Registros del Proyecto</div>
               <div style="display:flex; gap:6px; flex-wrap:wrap;">
                 <button class="btn btn-sm ${sub === 'decisiones' ? 'btn-primary' : ''}" onclick="App.cambiarListasSubtab('decisiones')">19 Decisiones (D01–D19)</button>
                 <button class="btn btn-sm ${sub === 'riesgos' ? 'btn-primary' : ''}" onclick="App.cambiarListasSubtab('riesgos')">16 Riesgos (R01–R16)</button>
@@ -2682,7 +2914,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
       renderPreguntas() {
         return `
           <div class="card">
-            <div class="card-header"><div class="card-title">❓ Preguntas para la Ing. Sinche (Sección 17)</div></div>
+            <div class="card-header"><div class="card-title" style="display:flex; align-items:center; gap:6px;">${Icons.list} Preguntas para la Ing. Sinche (Sección 17)</div></div>
             <div style="display:flex; flex-direction:column; gap:12px;">
               ${DataStore.state.preguntas.map(q => `
                 <div style="background:var(--bg-card); padding:12px; border-radius:8px; border:1px solid var(--border);">
@@ -2719,7 +2951,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
       renderPendientesInmediatos() {
         return `
           <div class="card">
-            <div class="card-header"><div class="card-title">⚡ Pendientes Inmediatos (Sección 20)</div></div>
+            <div class="card-header"><div class="card-title" style="display:flex; align-items:center; gap:6px;">${Icons.clock} Pendientes Inmediatos (Sección 20)</div></div>
             <div style="display:flex; flex-direction:column; gap:8px;">
               ${DataStore.state.pendientes_inmediatos.map(p => `
                 <label style="display:flex; align-items:center; gap:8px; padding:8px; background:var(--bg-card); border-radius:6px; font-size:13px;">
@@ -2745,7 +2977,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
         return `
           <div class="card">
             <div class="card-header">
-              <div class="card-title">📖 Plan Maestro v2.0 — Texto Íntegro de Referencia</div>
+              <div class="card-title" style="display:flex; align-items:center; gap:6px;">${Icons.docs} Plan Maestro v2.0 — Texto Íntegro de Referencia</div>
             </div>
             <pre style="background:var(--bg-input); padding:14px; border-radius:8px; font-family:monospace; font-size:12px; white-space:pre-wrap; line-height:1.45; max-height:75vh; overflow-y:auto; border:1px solid var(--border);">${this.escapeHtml(PLAN_MAESTRO_TEXTO_INTEGRO)}</pre>
           </div>
@@ -2761,7 +2993,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
         return `
           <div class="grid-2">
             <div class="card">
-              <div class="card-header"><div class="card-title">👥 Configuración del Equipo (Grupo 1)</div></div>
+              <div class="card-header"><div class="card-title" style="display:flex; align-items:center; gap:6px;">${Icons.user} Configuración del Equipo (Grupo 1)</div></div>
               <div style="display:flex; flex-direction:column; gap:10px;">
                 <div style="background:var(--bg-card); padding:8px; border-radius:6px; font-size:12px;">
                   <strong>Nombres en Ficha Oficial:</strong> ${cfg.integrantes_ficha}
@@ -2778,7 +3010,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
             </div>
 
             <div class="card">
-              <div class="card-header"><div class="card-title">☁️ Sincronización Opcional con Firebase Realtime Database</div></div>
+              <div class="card-header"><div class="card-title" style="display:flex; align-items:center; gap:6px;">${Icons.cloud} Sincronización Opcional con Firebase Realtime Database</div></div>
               <div style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">
                 Permite a los 3 integrantes sincronizar tareas y bitácora en vivo desde el celular sin necesidad de servidor propio.
               </div>
@@ -2800,22 +3032,22 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
                   <input type="password" placeholder="Clave de base de datos o token" value="${this.escapeHtml(fb.secretToken || '')}" onchange="App.actualizarFirebase('secretToken', this.value)" />
                 </div>
                 <div style="display:flex; gap:6px; margin-top:6px;">
-                  <button class="btn btn-sm btn-primary" onclick="DataStore.pushToFirebase(); alert('Datos enviados a Firebase.')">☁️ Subir a Firebase</button>
-                  <button class="btn btn-sm" onclick="DataStore.pullFromFirebase()">⬇️ Descargar de Firebase</button>
+                  <button class="btn btn-sm btn-primary" onclick="DataStore.pushToFirebase(); alert('Datos enviados a Firebase.')" style="display:inline-flex; align-items:center; gap:6px;">${Icons.upload} Subir a Firebase</button>
+                  <button class="btn btn-sm" onclick="DataStore.pullFromFirebase()" style="display:inline-flex; align-items:center; gap:6px;">${Icons.download} Descargar de Firebase</button>
                 </div>
               </div>
             </div>
           </div>
 
           <div class="card" style="margin-top:16px;">
-            <div class="card-header"><div class="card-title">📦 Copia de Seguridad, Exportación y Restablecimiento</div></div>
+            <div class="card-header"><div class="card-title" style="display:flex; align-items:center; gap:6px;">${Icons.storage} Copia de Seguridad, Exportación y Restablecimiento</div></div>
             <div style="display:flex; flex-wrap:wrap; gap:8px;">
-              <button class="btn btn-primary" onclick="App.exportarJSON()">💾 Exportar Todo en JSON</button>
-              <label class="btn" style="cursor:pointer;">
-                📂 Importar JSON <input type="file" accept=".json" style="display:none;" onchange="App.importarJSON(event)" />
+              <button class="btn btn-primary" onclick="App.exportarJSON()" style="display:inline-flex; align-items:center; gap:6px;">${Icons.download} Exportar Todo en JSON</button>
+              <label class="btn" style="cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+                ${Icons.upload} Importar JSON <input type="file" accept=".json" style="display:none;" onchange="App.importarJSON(event)" />
               </label>
-              <button class="btn" onclick="App.exportarTareasCSV()">📊 Exportar Tareas a CSV</button>
-              <button class="btn btn-danger" onclick="DataStore.reset()">⚠️ Restablecer Datos de Fábrica</button>
+              <button class="btn" onclick="App.exportarTareasCSV()" style="display:inline-flex; align-items:center; gap:6px;">${Icons.docs} Exportar Tareas a CSV</button>
+              <button class="btn btn-danger" onclick="DataStore.reset()" style="display:inline-flex; align-items:center; gap:6px;">${Icons.alert} Restablecer Datos de Fábrica</button>
             </div>
           </div>
         `;
