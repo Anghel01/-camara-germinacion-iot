@@ -1,5 +1,6 @@
 // Service Worker para funcionamiento 100% offline y soporte PWA
-const CACHE_NAME = 'germinacion-iot-v2.0';
+// Estrategia Network-First con fallback a Cache para garantizar actualizaciones automáticas
+const CACHE_NAME = 'germinacion-iot-v2.1';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -12,6 +13,7 @@ self.addEventListener('install', (event) => {
       return cache.addAll(ASSETS_TO_CACHE);
     })
   );
+  // Forzar activación inmediata de nueva versión
   self.skipWaiting();
 });
 
@@ -21,6 +23,7 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         keys.map((key) => {
           if (key !== CACHE_NAME) {
+            console.log('Limpiando cache antiguo:', key);
             return caches.delete(key);
           }
         })
@@ -31,29 +34,30 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Solo interceptar peticiones GET dentro del mismo origen
   if (event.request.method !== 'GET') return;
 
+  // Network-First: Intenta obtener la versión más reciente de GitHub Pages.
+  // Si no hay conexión (offline en el laboratorio o tienda), usa el cache guardado.
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      return fetch(event.request).then((networkResponse) => {
-        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-          return networkResponse;
+    fetch(event.request)
+      .then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
         }
-        const responseToCache = networkResponse.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseToCache);
-        });
         return networkResponse;
-      }).catch(() => {
-        // Fallback a index.html en caso de navegación offline
-        if (event.request.mode === 'navigate') {
-          return caches.match('./index.html');
-        }
-      });
-    })
+      })
+      .catch(() => {
+        return caches.match(event.request).then((cachedResponse) => {
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+          if (event.request.mode === 'navigate') {
+            return caches.match('./index.html');
+          }
+        });
+      })
   );
 });

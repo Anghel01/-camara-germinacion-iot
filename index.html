@@ -2895,7 +2895,21 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
     if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
-          .then(reg => console.log('PWA ServiceWorker activo:', reg.scope))
+          .then(reg => {
+            console.log('PWA ServiceWorker activo:', reg.scope);
+            // Comprobar automáticamente si Angelo subió una nueva versión a GitHub
+            reg.update();
+            reg.onupdatefound = () => {
+              const installingWorker = reg.installing;
+              if (installingWorker) {
+                installingWorker.onstatechange = () => {
+                  if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    console.log('Nueva versión de la app lista.');
+                  }
+                };
+              }
+            };
+          })
           .catch(err => console.log('PWA ServiceWorker error:', err));
       });
     }
