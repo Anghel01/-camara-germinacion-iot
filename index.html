@@ -388,52 +388,88 @@
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
     }
 
-    /* Pastel Hecha / Completada (Verde suave completo) */
-    .pastel-hecha {
-      background: rgba(16, 185, 129, 0.13) !important;
-      border-color: #10b981 !important;
+    /* Pastel Libre / Sin Asignar (flotando en la bolsa) */
+    .pastel-libre, .pastel-pendiente {
+      background: rgba(148, 163, 184, 0.08) !important;
+      border: 1.5px dashed rgba(148, 163, 184, 0.45) !important;
       color: var(--text-main) !important;
     }
-    :root[data-theme="claro"] .pastel-hecha {
-      background: #ecfdf5 !important;
-      border-color: #6ee7b7 !important;
-      color: #064e3b !important;
+    :root[data-theme="claro"] .pastel-libre, :root[data-theme="claro"] .pastel-pendiente {
+      background: #f8fafc !important;
+      border: 1.5px dashed #94a3b8 !important;
+      color: #334155 !important;
     }
 
-    /* Pastel En curso (Celeste / Azul suave completo) */
+    /* Pastel Angelo Conterón (Azul Celeste / Cian Pastel) */
+    .pastel-user-angelo {
+      background: rgba(14, 165, 233, 0.16) !important;
+      border: 1.5px solid #0284c7 !important;
+      color: var(--text-main) !important;
+    }
+    :root[data-theme="claro"] .pastel-user-angelo {
+      background: #e0f2fe !important;
+      border: 1.5px solid #38bdf8 !important;
+      color: #0369a1 !important;
+    }
+
+    /* Pastel Xavier Anatoa (Ámbar / Naranja Melocotón Cálido Pastel) */
+    .pastel-user-xavier {
+      background: rgba(245, 158, 11, 0.16) !important;
+      border: 1.5px solid #d97706 !important;
+      color: var(--text-main) !important;
+    }
+    :root[data-theme="claro"] .pastel-user-xavier {
+      background: #fef3c7 !important;
+      border: 1.5px solid #fbbf24 !important;
+      color: #92400e !important;
+    }
+
+    /* Pastel Fernando Guarderas (Lavanda / Púrpura Pastel) */
+    .pastel-user-fernando {
+      background: rgba(168, 85, 247, 0.16) !important;
+      border: 1.5px solid #9333ea !important;
+      color: var(--text-main) !important;
+    }
+    :root[data-theme="claro"] .pastel-user-fernando {
+      background: #f3e8ff !important;
+      border: 1.5px solid #c084fc !important;
+      color: #6b21a8 !important;
+    }
+
+    /* Pastel En curso genérico */
     .pastel-en-curso {
-      background: rgba(59, 130, 246, 0.13) !important;
-      border-color: #3b82f6 !important;
+      background: rgba(59, 130, 246, 0.14) !important;
+      border: 1.5px solid #3b82f6 !important;
       color: var(--text-main) !important;
     }
     :root[data-theme="claro"] .pastel-en-curso {
       background: #eff6ff !important;
-      border-color: #93c5fd !important;
+      border: 1.5px solid #93c5fd !important;
       color: #1e3a8a !important;
     }
 
-    /* Pastel En revisión (Púrpura / Lavanda suave completo) */
+    /* Pastel En Revisión (Rosa / Coral Pastel) */
     .pastel-en-revision {
-      background: rgba(168, 85, 247, 0.13) !important;
-      border-color: #a855f7 !important;
+      background: rgba(244, 63, 94, 0.16) !important;
+      border: 1.5px solid #e11d48 !important;
       color: var(--text-main) !important;
     }
     :root[data-theme="claro"] .pastel-en-revision {
-      background: #faf5ff !important;
-      border-color: #d8b4fe !important;
-      color: #581c87 !important;
+      background: #ffe4e6 !important;
+      border: 1.5px solid #fb7185 !important;
+      color: #9f1239 !important;
     }
 
-    /* Pastel Pendiente (Pizarra / Gris neutro suave) */
-    .pastel-pendiente {
-      background: rgba(148, 163, 184, 0.08) !important;
-      border-color: var(--border) !important;
+    /* Pastel Finalizada / Realizada (Verde Menta Pastel Completo) */
+    .pastel-hecha {
+      background: rgba(16, 185, 129, 0.18) !important;
+      border: 1.5px solid #10b981 !important;
       color: var(--text-main) !important;
     }
-    :root[data-theme="claro"] .pastel-pendiente {
-      background: #f8fafc !important;
-      border-color: #cbd5e1 !important;
-      color: #334155 !important;
+    :root[data-theme="claro"] .pastel-hecha {
+      background: #d1fae5 !important;
+      border: 1.5px solid #34d399 !important;
+      color: #065f46 !important;
     }
 
     .pastel-blocked {
@@ -748,6 +784,9 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
         const base = t.parte === 1 ? fechaBaseP1 : fechaBaseP2;
         return {
           ...t,
+          rol_sugerido_pdf: t.rol_responsable,
+          rol_responsable: "Sin asignar",
+          finalizada_por: "",
           pasos: t.pasos.map((texto, idx) => ({ id: `${t.id}-P${idx + 1}`, texto, hecho: false })),
           criterio_aprobado: false,
           estado: "Pendiente",
@@ -756,7 +795,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
           notas: "",
           enlaces: [],
           adjuntos: [],
-          historial: [{ fecha: ahora, autor: "Sistema", cambio: "Tarea cargada desde Plan Maestro v2.0" }],
+          historial: [{ fecha: ahora, autor: "Sistema", cambio: "Tarea cargada desde Plan Maestro v2.0 (disponible en bolsa de tareas)" }],
           creada: ahora,
           actualizada: ahora
         };
@@ -1016,6 +1055,14 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
         if (raw) {
           try {
             this.state = JSON.parse(raw);
+            if (this.state && Array.isArray(this.state.tareas)) {
+              this.state.tareas.forEach(t => {
+                if (t.estado === "Pendiente" && t.rol_responsable && t.rol_responsable.startsWith("Integrante")) {
+                  t.rol_sugerido_pdf = t.rol_responsable;
+                  t.rol_responsable = "Sin asignar";
+                }
+              });
+            }
           } catch (e) {
             this.state = crearDatosIniciales();
           }
@@ -1147,15 +1194,32 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
       },
 
       formatMemberName(rol) {
+        if (!rol || rol === "Sin asignar" || rol === "Libre") {
+          return "Sin asignar (Disponible)";
+        }
         const m = DataStore.state.config.integrantes;
         if (m && m[rol] && m[rol].nombre && m[rol].nombre !== rol) {
-          return `${rol} (${m[rol].nombre})`;
+          return m[rol].nombre;
         }
         return rol;
       },
 
+      getTaskPastelClass(t) {
+        if (t.estado === "Hecha") return "pastel-hecha";
+        if (t.estado === "En revisión") return "pastel-en-revision";
+        if (!t.rol_responsable || t.rol_responsable === "Sin asignar" || t.rol_responsable === "Libre") {
+          return "pastel-libre";
+        }
+        const r = (t.rol_responsable || "").toLowerCase();
+        if (r.includes("angelo") || r.includes("integrante 2")) return "pastel-user-angelo";
+        if (r.includes("xavier") || r.includes("integrante 1")) return "pastel-user-xavier";
+        if (r.includes("fernando") || r.includes("integrante 3")) return "pastel-user-fernando";
+        return "pastel-en-curso";
+      },
+
       taskBelongsToUser(t, u) {
-        if (!u || u === "Todos") return true;
+        if (!u || u === "Todos" || u === "todos") return true;
+        if (u === "Libres" || u === "libres") return !t.rol_responsable || t.rol_responsable === "Sin asignar" || t.rol_responsable === "Libre";
         if (t.rol_responsable === "Todos") return true;
         const m = DataStore.state.config.integrantes;
         for (const [rolKey, val] of Object.entries(m || {})) {
@@ -1311,53 +1375,209 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
         `;
       },
 
-      /* Renderizador de tarjetas en color pastel completo (las completadas no desaparecen) */
+      /* Renderizador de tarjetas en color pastel completo con bolsa de tareas libre y acciones rápidas */
       renderPastelTaskCard(t) {
         const isHecha = t.estado === "Hecha";
-        const isEnCurso = t.estado === "En curso";
         const isEnRevision = t.estado === "En revisión";
+        const isLibre = !t.rol_responsable || t.rol_responsable === "Sin asignar" || t.rol_responsable === "Libre";
+        const isEnCurso = t.estado === "En curso" || (!isHecha && !isEnRevision && !isLibre);
         const isBloq = Logic.isTaskBlocked(t) && !isHecha;
         const prog = Logic.getTaskProgress(t);
-        const respNombre = Logic.formatMemberName(t.rol_responsable);
+        const respNombre = isLibre ? "Disponible en bolsa" : Logic.formatMemberName(t.rol_responsable);
+        const pastelClass = Logic.getTaskPastelClass(t);
+        const usuarioActivo = DataStore.state.config.usuario_actual || "Angelo Conterón";
+        const miNombre = usuarioActivo === "Todos" ? "Angelo Conterón" : usuarioActivo;
 
-        let pastelClass = "pastel-pendiente";
-        let statusBadge = `<span style="font-size:11px; font-weight:600; opacity:0.8; display:inline-flex; align-items:center; gap:4px;">${Icons.clock} Pendiente</span>`;
-
+        let statusBadge = "";
         if (isHecha) {
-          pastelClass = "pastel-hecha";
-          statusBadge = `<span style="font-size:11px; font-weight:800; color:var(--accent); display:inline-flex; align-items:center; gap:4px;">${Icons.checkCircle} Realizada</span>`;
-        } else if (isEnCurso) {
-          pastelClass = "pastel-en-curso";
-          statusBadge = `<span style="font-size:11px; font-weight:800; color:var(--info); display:inline-flex; align-items:center; gap:4px;">${Icons.clock} En curso (${prog}%)</span>`;
+          const finPor = t.finalizada_por ? Logic.formatMemberName(t.finalizada_por) : respNombre;
+          statusBadge = `<span style="font-size:11px; font-weight:800; color:var(--accent); display:inline-flex; align-items:center; gap:4px;">${Icons.checkCircle} Finalizada (${this.escapeHtml(finPor)})</span>`;
         } else if (isEnRevision) {
-          pastelClass = "pastel-en-revision";
-          statusBadge = `<span style="font-size:11px; font-weight:800; color:var(--purple); display:inline-flex; align-items:center; gap:4px;">${Icons.user} En revisión</span>`;
+          statusBadge = `<span style="font-size:11px; font-weight:800; color:#fb7185; display:inline-flex; align-items:center; gap:4px;">${Icons.user} En revisión</span>`;
+        } else if (isLibre) {
+          statusBadge = `<span style="font-size:11px; font-weight:700; opacity:0.85; display:inline-flex; align-items:center; gap:4px;">${Icons.plus} Libre</span>`;
+        } else {
+          statusBadge = `<span style="font-size:11px; font-weight:800; display:inline-flex; align-items:center; gap:4px;">${Icons.clock} En curso (${prog}%)</span>`;
         }
 
         if (isBloq) {
-          statusBadge += ` <span style="font-size:11px; font-weight:700; color:var(--danger); display:inline-flex; align-items:center; gap:3px;">${Icons.lock} Bloqueada</span>`;
+          statusBadge += ` <span style="font-size:10.5px; font-weight:700; color:var(--danger); display:inline-flex; align-items:center; gap:3px;">${Icons.lock} Bloq</span>`;
+        }
+
+        // Acciones rápidas directamente en la tarjeta
+        let actionButtons = "";
+        if (isLibre) {
+          actionButtons = `
+            <div style="margin-top:7px; display:flex; gap:5px;" onclick="event.stopPropagation();">
+              <button class="btn btn-sm btn-primary" style="flex:1; padding:4px 8px; font-size:11.5px; font-weight:700; display:inline-flex; align-items:center; justify-content:center; gap:5px;" onclick="App.tomarTarea('${t.id}')">
+                ${Icons.plus} Tomar tarea (${this.escapeHtml(miNombre)})
+              </button>
+            </div>
+          `;
+        } else if (!isHecha) {
+          actionButtons = `
+            <div style="margin-top:7px; display:flex; gap:4px;" onclick="event.stopPropagation();">
+              <button class="btn btn-sm btn-primary" style="flex:1; padding:3px 6px; font-size:11px; font-weight:700; background:var(--accent); display:inline-flex; align-items:center; justify-content:center; gap:4px;" onclick="App.finalizarTarea('${t.id}')" title="Marcar como finalizada con criterio aprobado">
+                ${Icons.check} Finalizar
+              </button>
+              <button class="btn btn-sm" style="padding:3px 6px; font-size:11px;" onclick="App.pasarARevision('${t.id}')" title="Enviar a revisión de un compañero">
+                Revisar
+              </button>
+              <button class="btn btn-sm" style="padding:3px 6px; font-size:11px; opacity:0.75;" onclick="App.liberarTarea('${t.id}')" title="Soltar a la bolsa para que otro compañero la tome">
+                Soltar
+              </button>
+            </div>
+          `;
+        } else {
+          actionButtons = `
+            <div style="margin-top:5px; display:flex; justify-content:space-between; align-items:center;" onclick="event.stopPropagation();">
+              <span style="font-size:11px; font-weight:700; color:var(--accent); display:inline-flex; align-items:center; gap:4px;">${Icons.checkCircle} Criterio aprobado</span>
+              <button class="btn btn-sm" style="padding:1px 6px; font-size:10px; opacity:0.75;" onclick="App.reabrirTarea('${t.id}')">Reabrir</button>
+            </div>
+          `;
         }
 
         return `
           <div class="pastel-card ${pastelClass} ${isBloq ? 'pastel-blocked' : ''}" onclick="App.openTaskModal('${t.id}')">
             <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
-              <span style="font-family:monospace; font-weight:800; font-size:12px; color:var(--accent);">${t.id}</span>
+              <span style="font-family:monospace; font-weight:800; font-size:12px; opacity:0.9;">${t.id}</span>
               ${statusBadge}
             </div>
             <div style="font-weight:700; font-size:13px; line-height:1.35; margin:3px 0;">
               ${this.escapeHtml(t.titulo)}
             </div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px; font-size:11.5px;">
-              <span style="display:inline-flex; align-items:center; gap:4px; opacity:0.9;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:3px; font-size:11.5px;">
+              <span style="display:inline-flex; align-items:center; gap:4px; font-weight:600;">
                 ${Icons.user} ${this.escapeHtml(respNombre)}
               </span>
               <span style="font-size:11px; opacity:0.75;">S${t.semana_inicio}-S${t.semana_fin}</span>
             </div>
-            <div class="progress-wrap" style="height:6px; margin-top:5px;">
-              <div class="progress-bar" style="width:${prog}%; ${isHecha ? 'background:var(--accent);' : (isEnCurso ? 'background:var(--info);' : '')}"></div>
+            <div class="progress-wrap" style="height:5px; margin-top:4px;">
+              <div class="progress-bar" style="width:${prog}%; ${isHecha ? 'background:var(--accent);' : ''}"></div>
             </div>
+            ${actionButtons}
           </div>
         `;
+      },
+
+      tomarTarea(taskId) {
+        const t = DataStore.state.tareas.find(x => x.id === taskId);
+        if (!t) return;
+        let u = DataStore.state.config.usuario_actual || "Angelo Conterón";
+        if (u === "Todos") u = "Angelo Conterón";
+        t.rol_responsable = u;
+        t.estado = "En curso";
+        t.actualizada = new Date().toISOString();
+        t.historial.unshift({
+          fecha: t.actualizada,
+          autor: u,
+          cambio: `Tomó la tarea (puesta En curso)`
+        });
+        DataStore.save();
+        this.render();
+        if (this.activeModalTaskId === taskId) {
+          this.openTaskModal(taskId);
+        }
+      },
+
+      finalizarTarea(taskId) {
+        const t = DataStore.state.tareas.find(x => x.id === taskId);
+        if (!t) return;
+        let u = DataStore.state.config.usuario_actual || "Angelo Conterón";
+        if (u === "Todos") u = "Angelo Conterón";
+        t.estado = "Hecha";
+        t.criterio_aprobado = true;
+        if (t.pasos && t.pasos.length > 0) {
+          t.pasos.forEach(p => p.hecho = true);
+        }
+        t.finalizada_por = u;
+        t.actualizada = new Date().toISOString();
+        t.historial.unshift({
+          fecha: t.actualizada,
+          autor: u,
+          cambio: `Finalizó la tarea con criterio aprobado`
+        });
+        DataStore.save();
+        this.render();
+        if (this.activeModalTaskId === taskId) {
+          this.openTaskModal(taskId);
+        }
+      },
+
+      pasarARevision(taskId) {
+        const t = DataStore.state.tareas.find(x => x.id === taskId);
+        if (!t) return;
+        let u = DataStore.state.config.usuario_actual || "Angelo Conterón";
+        if (u === "Todos") u = "Angelo Conterón";
+        t.estado = "En revisión";
+        t.actualizada = new Date().toISOString();
+        t.historial.unshift({
+          fecha: t.actualizada,
+          autor: u,
+          cambio: `Envió la tarea a revisión cruzada (Revisor sugerido: ${t.revisor})`
+        });
+        DataStore.save();
+        this.render();
+        if (this.activeModalTaskId === taskId) {
+          this.openTaskModal(taskId);
+        }
+      },
+
+      liberarTarea(taskId) {
+        const t = DataStore.state.tareas.find(x => x.id === taskId);
+        if (!t) return;
+        let u = DataStore.state.config.usuario_actual || "Angelo Conterón";
+        if (u === "Todos") u = "Angelo Conterón";
+        const ant = t.rol_responsable;
+        t.rol_responsable = "Sin asignar";
+        t.estado = "Pendiente";
+        t.actualizada = new Date().toISOString();
+        t.historial.unshift({
+          fecha: t.actualizada,
+          autor: u,
+          cambio: `Liberó la tarea (era de ${ant}), queda disponible en la bolsa`
+        });
+        DataStore.save();
+        this.render();
+        if (this.activeModalTaskId === taskId) {
+          this.openTaskModal(taskId);
+        }
+      },
+
+      reabrirTarea(taskId) {
+        const t = DataStore.state.tareas.find(x => x.id === taskId);
+        if (!t) return;
+        let u = DataStore.state.config.usuario_actual || "Angelo Conterón";
+        if (u === "Todos") u = "Angelo Conterón";
+        t.estado = "En curso";
+        t.criterio_aprobado = false;
+        t.actualizada = new Date().toISOString();
+        t.historial.unshift({
+          fecha: t.actualizada,
+          autor: u,
+          cambio: `Reabrió la tarea (puesta En curso)`
+        });
+        DataStore.save();
+        this.render();
+        if (this.activeModalTaskId === taskId) {
+          this.openTaskModal(taskId);
+        }
+      },
+
+      liberarTodasPendientes() {
+        if (!confirm("¿Deseas soltar todas las tareas no terminadas a la bolsa para que queden disponibles y cualquiera las tome?")) return;
+        let count = 0;
+        DataStore.state.tareas.forEach(t => {
+          if (t.estado !== "Hecha") {
+            if (!t.rol_sugerido_pdf) t.rol_sugerido_pdf = t.rol_responsable;
+            t.rol_responsable = "Sin asignar";
+            t.estado = "Pendiente";
+            count++;
+          }
+        });
+        DataStore.save();
+        this.render();
+        alert(`Listo: ${count} tareas quedaron disponibles en la bolsa para que cualquiera las tome.`);
       },
 
       switchTab(tab) {
@@ -1424,25 +1644,51 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
         const fasesP1 = [...new Set(p1.map(t => t.fase))];
         const fasesP2 = [...new Set(p2.map(t => t.fase))];
 
+        const libresCount = tareas.filter(t => !t.rol_responsable || t.rol_responsable === "Sin asignar" || t.rol_responsable === "Libre").length;
+        const angeloCount = tareas.filter(t => (t.rol_responsable || "").includes("Angelo") || (t.rol_responsable || "").includes("Integrante 2")).length;
+        const xavierCount = tareas.filter(t => (t.rol_responsable || "").includes("Xavier") || (t.rol_responsable || "").includes("Integrante 1")).length;
+        const fernandoCount = tareas.filter(t => (t.rol_responsable || "").includes("Fernando") || (t.rol_responsable || "").includes("Integrante 3")).length;
+        const revisionCount = tareas.filter(t => t.estado === "En revisión").length;
+        const hechasCount = tareas.filter(t => t.estado === "Hecha").length;
+
         return `
           <div class="checkout-tree-container">
             <!-- Barra de control y filtros del árbol -->
-            <div style="display:flex; justify-content:space-between; align-items:center; gap:14px; margin-bottom:22px; flex-wrap:wrap;">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:14px; margin-bottom:18px; flex-wrap:wrap;">
               <div>
                 <h2 style="font-size:18px; font-weight:800; display:flex; align-items:center; gap:8px;">
                   ${Icons.tree}
                   <span>Ruta en Árbol — Ramas de Checkout de Izquierda a Derecha</span>
                 </h2>
                 <p style="font-size:12.5px; color:var(--text-muted); margin-top:3px;">
-                  Flujo horizontal continuo por fases. Las tareas se pintan en color pastel (las realizadas no desaparecen). Toca cualquier tarjeta para ver sus pasos y criterio.
+                  Las tareas están sueltas en la bolsa. Cualquiera puede tomar una tarea libre, se pinta de su color pastel individual y al finalizar se tiñe de verde sin desaparecer.
                 </p>
               </div>
 
               <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
-                <button class="btn btn-sm ${this.treeFilter === 'todos' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('todos')">Todo el Proyecto</button>
+                <button class="btn btn-sm ${this.treeFilter === 'todos' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('todos')">Todo</button>
+                <button class="btn btn-sm ${this.treeFilter === 'libres' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('libres')" style="font-weight:700;">Bolsa / Libres (${libresCount})</button>
                 <button class="btn btn-sm ${this.treeFilter === 'mis' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('mis')">Solo Mis Tareas (${this.escapeHtml(u)})</button>
-                <button class="btn btn-sm ${this.treeFilter === 'p1' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('p1')">Parte 1 (1er Bimestre)</button>
-                <button class="btn btn-sm ${this.treeFilter === 'p2' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('p2')">Parte 2 (2do Bimestre)</button>
+                <button class="btn btn-sm ${this.treeFilter === 'p1' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('p1')">Parte 1</button>
+                <button class="btn btn-sm ${this.treeFilter === 'p2' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('p2')">Parte 2</button>
+              </div>
+            </div>
+
+            <!-- BANNER DE BOLSA DE TAREAS Y ESTADOS PASTEL -->
+            <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:12px 16px; margin-bottom:22px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                <span style="font-size:12px; font-weight:800; text-transform:uppercase; color:var(--accent);">Bolsa de Tareas:</span>
+                <span class="badge pastel-libre" style="font-size:11.5px; padding:4px 9px;">${libresCount} Disponibles</span>
+                <span class="badge pastel-user-angelo" style="font-size:11.5px; padding:4px 9px;">Angelo: ${angeloCount}</span>
+                <span class="badge pastel-user-xavier" style="font-size:11.5px; padding:4px 9px;">Xavier: ${xavierCount}</span>
+                <span class="badge pastel-user-fernando" style="font-size:11.5px; padding:4px 9px;">Fernando: ${fernandoCount}</span>
+                <span class="badge pastel-en-revision" style="font-size:11.5px; padding:4px 9px;">${revisionCount} En revisión</span>
+                <span class="badge pastel-hecha" style="font-size:11.5px; padding:4px 9px;">${hechasCount} Finalizadas</span>
+              </div>
+              <div style="display:flex; gap:6px;">
+                <button class="btn btn-sm" onclick="App.liberarTodasPendientes()" style="font-size:11px; opacity:0.85;" title="Soltar a la bolsa todas las tareas pendientes para tomarlas libremente">
+                  Soltar pendientes a la bolsa
+                </button>
               </div>
             </div>
 
@@ -1464,7 +1710,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
             </div>
 
             <!-- RAMA SUPERIOR: PARTE 1 (PRIMER BIMESTRE) -->
-            ${(this.treeFilter === 'todos' || this.treeFilter === 'mis' || this.treeFilter === 'p1') ? `
+            ${(this.treeFilter === 'todos' || this.treeFilter === 'mis' || this.treeFilter === 'libres' || this.treeFilter === 'p1') ? `
               <div class="checkout-branch parte-1">
                 <div class="checkout-branch-header">
                   <div class="checkout-branch-title" style="color:var(--info);">
@@ -1483,6 +1729,8 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
                     let tFase = p1.filter(t => t.fase === faseNombre);
                     if (this.treeFilter === 'mis' && u !== "Todos") {
                       tFase = tFase.filter(t => Logic.taskBelongsToUser(t, u));
+                    } else if (this.treeFilter === 'libres') {
+                      tFase = tFase.filter(t => Logic.taskBelongsToUser(t, 'Libres'));
                     }
                     if (tFase.length === 0) return '';
                     const progFase = Logic.getWeightedProgress(tFase);
@@ -1503,7 +1751,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
             ` : ''}
 
             <!-- RAMA INFERIOR: PARTE 2 (SEGUNDO BIMESTRE) -->
-            ${(this.treeFilter === 'todos' || this.treeFilter === 'mis' || this.treeFilter === 'p2') ? `
+            ${(this.treeFilter === 'todos' || this.treeFilter === 'mis' || this.treeFilter === 'libres' || this.treeFilter === 'p2') ? `
               <div class="checkout-branch parte-2">
                 <div class="checkout-branch-header">
                   <div class="checkout-branch-title" style="color:var(--purple);">
@@ -1522,6 +1770,8 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
                     let tFase = p2.filter(t => t.fase === faseNombre);
                     if (this.treeFilter === 'mis' && u !== "Todos") {
                       tFase = tFase.filter(t => Logic.taskBelongsToUser(t, u));
+                    } else if (this.treeFilter === 'libres') {
+                      tFase = tFase.filter(t => Logic.taskBelongsToUser(t, 'Libres'));
                     }
                     if (tFase.length === 0) return '';
                     const progFase = Logic.getWeightedProgress(tFase);
@@ -1705,12 +1955,13 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
                   <option value="2" ${f.parte === '2' ? 'selected' : ''}>Parte 2 (T2)</option>
                 </select>
               </div>
-              <div style="width:180px;">
+              <div style="width:190px;">
                 <select onchange="App.filtrarKanban('responsable', this.value)">
                   <option value="todos" ${f.responsable === 'todos' ? 'selected' : ''}>Todos los responsables</option>
-                  <option value="Integrante 1" ${f.responsable === 'Integrante 1' ? 'selected' : ''}>${this.escapeHtml(Logic.formatMemberName('Integrante 1'))}</option>
-                  <option value="Integrante 2" ${f.responsable === 'Integrante 2' ? 'selected' : ''}>${this.escapeHtml(Logic.formatMemberName('Integrante 2'))}</option>
-                  <option value="Integrante 3" ${f.responsable === 'Integrante 3' ? 'selected' : ''}>${this.escapeHtml(Logic.formatMemberName('Integrante 3'))}</option>
+                  <option value="libres" ${f.responsable === 'libres' ? 'selected' : ''}>Libres / Sin asignar (Bolsa)</option>
+                  <option value="Angelo Conterón" ${f.responsable === 'Angelo Conterón' ? 'selected' : ''}>Angelo Conterón</option>
+                  <option value="Xavier Anatoa" ${f.responsable === 'Xavier Anatoa' ? 'selected' : ''}>Xavier Anatoa</option>
+                  <option value="Fernando Guarderas" ${f.responsable === 'Fernando Guarderas' ? 'selected' : ''}>Fernando Guarderas</option>
                 </select>
               </div>
               <div style="width:160px;">
@@ -1735,34 +1986,11 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
                     <span class="badge status-${est.replace(/\s+/g, '-').replace('ó', 'o')}">${items.length}</span>
                   </div>
                   <div class="kanban-dropzone" ondragover="event.preventDefault(); this.classList.add('drag-over');" ondragleave="this.classList.remove('drag-over');" ondrop="App.handleKanbanDrop(event, '${est}')">
-                    ${items.map(t => {
-                      const bloq = Logic.isTaskBlocked(t) && t.estado !== "Hecha";
-                      let pastelClass = "pastel-pendiente";
-                      if (est === "Hecha") pastelClass = "pastel-hecha";
-                      else if (est === "En curso") pastelClass = "pastel-en-curso";
-                      else if (est === "En revisión") pastelClass = "pastel-en-revision";
-
-                      return `
-                        <div class="pastel-card ${pastelClass} ${bloq ? 'pastel-blocked' : ''}" style="margin-bottom:8px;" draggable="true" ondragstart="event.dataTransfer.setData('text/plain', '${t.id}')" onclick="App.openTaskModal('${t.id}')">
-                          <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <span style="font-family:monospace; font-weight:800; font-size:12px; color:var(--accent);">${t.id}</span>
-                            <span style="font-size:11px; opacity:0.75;">S${t.semana_inicio}-S${t.semana_fin}</span>
-                          </div>
-                          <div style="font-weight:700; margin:4px 0; font-size:13px; line-height:1.3;">${this.escapeHtml(t.titulo)}</div>
-                          <div style="margin-bottom:6px;">${this.renderBadges(t.etiquetas)}</div>
-                          <div class="progress-wrap" style="height:6px;"><div class="progress-bar" style="width:${Logic.getTaskProgress(t)}%"></div></div>
-                          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px; font-size:11.5px; opacity:0.85;">
-                            <span style="display:inline-flex; align-items:center; gap:4px;">${Icons.user} ${this.escapeHtml(t.rol_responsable)}</span>
-                            ${bloq ? `<span style="color:var(--danger); font-weight:700; display:inline-flex; align-items:center; gap:3px;">${Icons.lock} Bloqueada</span>` : `<span>${t.pasos.filter(p => p.hecho).length}/${t.pasos.length}</span>`}
-                          </div>
-                          <div style="display:flex; gap:4px; margin-top:6px;" onclick="event.stopPropagation();">
-                            ${estados.filter(x => x !== est).map(dest => `
-                              <button class="btn btn-sm" style="flex:1; padding:2px; font-size:11px;" onclick="App.moverEstadoRapido('${t.id}', '${dest}')" title="Mover a ${dest}">&rarr; ${dest.slice(0, 4)}</button>
-                            `).join("")}
-                          </div>
-                        </div>
-                      `;
-                    }).join("")}
+                    ${items.map(t => `
+                      <div draggable="true" ondragstart="event.dataTransfer.setData('text/plain', '${t.id}')" style="margin-bottom:10px;">
+                        ${this.renderPastelTaskCard(t)}
+                      </div>
+                    `).join("")}
                   </div>
                 </div>
               `;
@@ -2095,6 +2323,43 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
           </div>
 
           <div class="modal-body">
+            <!-- BANNER DE BOLSA & ACCIÓN RÁPIDA -->
+            ${(!t.rol_responsable || t.rol_responsable === 'Sin asignar' || t.rol_responsable === 'Libre') ? `
+              <div style="background:rgba(148, 163, 184, 0.08); border:1.5px dashed var(--accent); border-radius:8px; padding:12px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+                <div>
+                  <div style="font-size:11px; font-weight:800; color:var(--accent); text-transform:uppercase;">Bolsa de Tareas: Libre / Suelta</div>
+                  <div style="font-size:13px; font-weight:700; margin-top:2px;">Nadie ha tomado esta tarea todavía. Puedes asignártela para comenzar a trabajar.</div>
+                  ${t.rol_sugerido_pdf ? `<div style="font-size:11.5px; color:var(--text-muted); margin-top:2px;">(Sugerencia original del PDF: ${this.escapeHtml(t.rol_sugerido_pdf)})</div>` : ''}
+                </div>
+                <button class="btn btn-primary" onclick="App.tomarTarea('${t.id}')" style="display:inline-flex; align-items:center; gap:6px; font-weight:700; padding:8px 14px;">
+                  ${Icons.plus} Tomar esta tarea como ${this.escapeHtml(DataStore.state.config.usuario_actual || 'Angelo Conterón')}
+                </button>
+              </div>
+            ` : `
+              <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:12px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+                <div>
+                  <div style="font-size:11px; font-weight:800; opacity:0.8; text-transform:uppercase;">Estado & Asignación</div>
+                  <div style="font-size:14px; font-weight:700; margin-top:2px; display:flex; align-items:center; gap:6px;">
+                    ${Icons.user}
+                    <span>${this.escapeHtml(Logic.formatMemberName(t.rol_responsable))}</span>
+                    <span class="badge ${Logic.getTaskPastelClass(t)}" style="font-size:11px;">${t.estado}</span>
+                  </div>
+                </div>
+                <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                  ${t.estado !== 'Hecha' ? `
+                    <button class="btn btn-primary" onclick="App.finalizarTarea('${t.id}')" style="background:var(--accent); display:inline-flex; align-items:center; gap:6px;">
+                      ${Icons.check} Finalizar Tarea
+                    </button>
+                    <button class="btn" onclick="App.pasarARevision('${t.id}')">Enviar a Revisión</button>
+                    <button class="btn" onclick="App.liberarTarea('${t.id}')" style="color:var(--text-muted);">Soltar Tarea a la Bolsa</button>
+                  ` : `
+                    <span class="badge pastel-hecha" style="display:inline-flex; align-items:center; gap:4px; font-size:12px; padding:6px 10px;">${Icons.checkCircle} Finalizada con criterio aprobado</span>
+                    <button class="btn btn-sm" onclick="App.reabrirTarea('${t.id}')">Reabrir</button>
+                  `}
+                </div>
+              </div>
+            `}
+
             <!-- BANNER DE CRITERIO DE ACEPTACIÓN -->
             <div class="acceptance-banner">
               <div>
@@ -2120,10 +2385,11 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
               <div>
                 <label style="font-size:11.5px; color:var(--text-muted);">Responsable:</label>
                 <select onchange="App.actualizarCampoTarea('${t.id}', 'rol_responsable', this.value)">
-                  <option value="Todos" ${t.rol_responsable === 'Todos' ? 'selected' : ''}>Todos</option>
-                  <option value="Integrante 1" ${t.rol_responsable === 'Integrante 1' ? 'selected' : ''}>${this.escapeHtml(Logic.formatMemberName('Integrante 1'))}</option>
-                  <option value="Integrante 2" ${t.rol_responsable === 'Integrante 2' ? 'selected' : ''}>${this.escapeHtml(Logic.formatMemberName('Integrante 2'))}</option>
-                  <option value="Integrante 3" ${t.rol_responsable === 'Integrante 3' ? 'selected' : ''}>${this.escapeHtml(Logic.formatMemberName('Integrante 3'))}</option>
+                  <option value="Sin asignar" ${(!t.rol_responsable || t.rol_responsable === 'Sin asignar' || t.rol_responsable === 'Libre') ? 'selected' : ''}>Sin asignar (Libre en bolsa)</option>
+                  <option value="Angelo Conterón" ${(t.rol_responsable === 'Angelo Conterón' || t.rol_responsable === 'Integrante 2') ? 'selected' : ''}>Angelo Conterón</option>
+                  <option value="Xavier Anatoa" ${(t.rol_responsable === 'Xavier Anatoa' || t.rol_responsable === 'Integrante 1') ? 'selected' : ''}>Xavier Anatoa</option>
+                  <option value="Fernando Guarderas" ${(t.rol_responsable === 'Fernando Guarderas' || t.rol_responsable === 'Integrante 3') ? 'selected' : ''}>Fernando Guarderas</option>
+                  <option value="Todos" ${t.rol_responsable === 'Todos' ? 'selected' : ''}>Todos (Equipo)</option>
                 </select>
               </div>
               <div>
