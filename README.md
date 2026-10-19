@@ -32,15 +32,14 @@ Para que tú (**Angelo Conterón**, `@Anghel01`) y tus compañeros de equipo (**
    git add .
    git commit -m "feat: Aplicacion Plan Maestro v2.0 Camara Germinacion Grupo 1 - Angelo Conteron @Anghel01"
    git branch -M main
-   git remote add origin https://github.com/Anghel01/camara-germinacion-iot.git
+   git remote add origin https://github.com/Anghel01/-camara-germinacion-iot.git
    git push -u origin main
    ```
-   *(Nota: Si aún no has creado el repositorio en GitHub, créalo en https://github.com/new con el nombre exacto `camara-germinacion-iot` en modo Público y sin inicializar con README/License).*
 
 2. En tu repositorio de GitHub, ve a **Settings** ➔ **Pages**.
 3. En **Source**, selecciona `Deploy from a branch`, en Branch elige `main` y directorio `/(root)`. Haz clic en **Save**.
 4. En unos 60 segundos tu aplicación estará activa y disponible en:  
-   👉 **`https://anghel01.github.io/camara-germinacion-iot/`**
+   👉 **`https://anghel01.github.io/-camara-germinacion-iot/`**
 5. Abre esa URL en el navegador de tu celular (Chrome o Safari) y toca en **"Agregar a pantalla de inicio"** o **"Instalar aplicación"**. Se instalará como una App nativa con icono de germinación gracias a su Service Worker (`sw.js`) y `manifest.json`, permitiendo uso 100% offline.
 
 ---
