@@ -561,43 +561,39 @@
 </head>
 <body>
 
-  <!-- BARRA SUPERIOR -->
+  <!-- BARRA SUPERIOR ADAPTADA (DESKTOP & MOBILE) -->
   <header class="topbar">
     <div class="brand">
-      <div class="brand-icon" title="Cámara de Germinación Inteligente">
+      <div class="brand-icon" title="Cámara de Germinación Inteligente IoT">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);"><path d="M11 20A7 7 0 0 1 4 13a7 7 0 0 1 7-7c4 0 9 3 9 7a7 7 0 0 1-7 7z"/><path d="M11 20V10"/><path d="M11 14h4"/></svg>
       </div>
       <div>
-        <div class="brand-title">Cámara de Germinación Inteligente — Grupo 1 (EPN)</div>
-        <div class="brand-sub" id="topbar-subtitle">Sistemas IoT 2026-B • PhD. Soraya Sinche • Plan Maestro v2.0</div>
+        <div class="brand-title">Cámara de Germinación IoT — Grupo 1 (EPN)</div>
+        <div class="brand-sub" id="topbar-subtitle">Sistemas IoT 2026-B • PhD. Soraya Sinche</div>
       </div>
-      <a href="https://github.com/Anghel01" target="_blank" rel="noopener" class="badge tag-PDF" style="text-decoration:none; margin-left:6px; display:inline-flex; align-items:center; gap:5px;" title="Ver perfil GitHub de Angelo Conterón">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
-        <span>@Anghel01</span>
-      </a>
+      <div class="milestone-header-chip" id="topbar-milestones">
+        <span class="milestone-badge-p1">P1: 23 Nov</span>
+        <span class="milestone-badge-p2">P2: 25 Ene</span>
+      </div>
     </div>
 
     <div class="topbar-controls">
       <div style="display:flex; align-items:center; gap:6px;">
-        <label for="user-selector" style="font-size:12px; color:var(--text-muted); white-space:nowrap;">Vista de:</label>
-        <select id="user-selector" style="width:auto; min-width:180px;" onchange="App.setActiveUser(this.value)" aria-label="Seleccionar integrante activo">
-          <option value="Angelo Conterón" selected>Angelo Conterón (Tú)</option>
-          <option value="Xavier Anatoa">Xavier Anatoa (Hardware)</option>
-          <option value="Fernando Guarderas">Fernando Guarderas (Servidor)</option>
-          <option value="Todos">Todos (Equipo Grupo 1)</option>
+        <label for="user-selector" style="font-size:11.5px; color:var(--text-muted); white-space:nowrap;">Integrante:</label>
+        <select id="user-selector" style="width:auto; min-width:160px; font-size:12px; padding:5px 8px;" onchange="App.setActiveUser(this.value)" aria-label="Seleccionar integrante activo">
+          <option value="Angelo Conterón" selected>Angelo Conterón</option>
+          <option value="Xavier Anatoa">Xavier Anatoa</option>
+          <option value="Fernando Guarderas">Fernando Guarderas</option>
+          <option value="Todos">Todos (Equipo)</option>
         </select>
       </div>
       <span id="sync-indicator" class="badge status-Pendiente" style="display:inline-flex; align-items:center; gap:5px;" title="Almacenamiento local activo">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-        <span>LocalStorage</span>
+        <span>Local</span>
       </span>
-      <button class="btn btn-sm" onclick="App.toggleTheme()" style="gap:5px;" title="Cambiar modo claro/oscuro">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <button class="btn btn-sm" onclick="App.toggleTheme()" style="gap:4px;" title="Cambiar modo claro/oscuro">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
         <span>Tema</span>
-      </button>
-      <button class="btn btn-sm btn-primary" onclick="App.switchTab('bitacora')" style="gap:5px;">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        <span>+ Bitácora</span>
       </button>
     </div>
   </header>
@@ -2073,6 +2069,8 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
           tema: "oscuro",
           fecha_inicio_p1: fechaBaseP1,
           fecha_inicio_p2: fechaBaseP2,
+          fecha_entrega_p1: "2026-11-23",
+          fecha_entrega_p2: "2027-01-25",
           semana_actual_p1: 1,
           parte_activa_semana: 1,
           integrantes: {
@@ -2180,6 +2178,8 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
           this.state = initialData;
           this.save();
         }
+        if (!this.state.config.fecha_entrega_p1) this.state.config.fecha_entrega_p1 = "2026-11-23";
+        if (!this.state.config.fecha_entrega_p2) this.state.config.fecha_entrega_p2 = "2027-01-25";
         this.updateSyncBadge();
       },
 
@@ -2264,6 +2264,13 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
        LÓGICA DEL PROYECTO
        ============================================================================ */
     const Logic = {
+      getDaysRemaining(fechaStr) {
+        if (!fechaStr) return 0;
+        const target = new Date(fechaStr + "T23:59:59");
+        const diff = Math.ceil((target - new Date()) / (1000 * 60 * 60 * 24));
+        return Math.max(0, diff);
+      },
+
       getTaskProgress(t) {
         if (!t.pasos || t.pasos.length === 0) return t.estado === "Hecha" ? 100 : 0;
         const hechos = t.pasos.filter(p => p.hecho).length;
@@ -2691,8 +2698,46 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
       },
 
       switchTab(tab) {
-        this.currentTab = tab;
-        document.querySelectorAll(".nav-btn").forEach(b => b.classList.toggle("active", b.getAttribute("data-tab") === tab));
+        // Mapeo inteligente sin redundancias
+        if (tab === "arbol" || tab === "tablero" || tab === "dependencias") {
+          this.currentTab = "tareas";
+          if (tab === "tablero") this.tasksSubView = "tablero";
+          else if (tab === "dependencias") this.tasksSubView = "grafo";
+          else this.tasksSubView = "arbol";
+        } else if (tab === "semana") {
+          this.currentTab = "cronograma";
+          this.cronoSubView = "semana";
+        } else if (tab === "compras" || tab === "listas" || tab === "referencia" || tab === "config") {
+          this.currentTab = "recursos";
+          this.recursosSubTab = tab;
+        } else {
+          this.currentTab = tab;
+        }
+
+        // Actualizar tabs de escritorio y móvil
+        document.querySelectorAll(".nav-btn").forEach(b => b.classList.toggle("active", b.getAttribute("data-tab") === this.currentTab));
+        document.querySelectorAll(".bottom-nav-item").forEach(b => b.classList.toggle("active", b.getAttribute("data-tab") === this.currentTab));
+        this.render();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      },
+
+      setTasksSubView(v) {
+        this.tasksSubView = v;
+        this.render();
+      },
+
+      setCronoSubView(v) {
+        this.cronoSubView = v;
+        this.render();
+      },
+
+      setRecursosSubTab(st) {
+        this.recursosSubTab = st;
+        this.render();
+      },
+
+      setTaskSearch(q) {
+        this.taskSearchQuery = (q || "").toLowerCase().trim();
         this.render();
       },
 
@@ -2724,17 +2769,27 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
           `${DataStore.state.config.asignatura} • ${DataStore.state.config.docente} • ${i1} | ${i2} | ${i3}`;
 
         switch (this.currentTab) {
-          case "arbol": c.innerHTML = this.renderVistaArbol(); break;
           case "panel": c.innerHTML = this.renderPanelPrincipal(); break;
-          case "tablero": c.innerHTML = this.renderVistaTablero(); break;
-          case "cronograma": c.innerHTML = this.renderVistaCronograma(); break;
-          case "semana": c.innerHTML = this.renderVistaSemana(); break;
-          case "dependencias": c.innerHTML = this.renderVistaDependencias(); break;
+          case "tareas":
+          case "arbol":
+          case "tablero":
+          case "dependencias":
+            c.innerHTML = this.renderVistaTareasHub();
+            break;
+          case "cronograma":
+          case "semana":
+            c.innerHTML = this.renderVistaCronogramaHub();
+            break;
           case "bitacora": c.innerHTML = this.renderVistaBitacora(); break;
-          case "compras": c.innerHTML = this.renderVistaCompras(); break;
-          case "listas": c.innerHTML = this.renderVistaListas(); break;
-          case "referencia": c.innerHTML = this.renderVistaReferencia(); break;
-          case "config": c.innerHTML = this.renderVistaConfig(); break;
+          case "recursos":
+          case "compras":
+          case "listas":
+          case "referencia":
+          case "config":
+            c.innerHTML = this.renderVistaRecursosHub();
+            break;
+          default:
+            c.innerHTML = this.renderPanelPrincipal();
         }
       },
 
@@ -2904,112 +2959,513 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
         `;
       },
 
+      
       /* ========================================================================
-         1. PANEL PRINCIPAL — ENFOQUE LIMPIO ("¿CON QUÉ EMPEZAMOS HOY?")
+         MÉTODOS DEL HUB DE TAREAS Y VISTAS INTEGRADAS
+         ======================================================================== */
+      renderVistaTareasHub() {
+        const sub = this.tasksSubView || "arbol";
+        return `
+          <div style="margin-bottom:16px; background:var(--bg-panel); border:1px solid var(--border); border-radius:12px; padding:14px 18px; box-shadow:var(--shadow);">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+              <div>
+                <h1 style="font-size:20px; font-weight:800; display:flex; align-items:center; gap:8px; margin:0;">
+                  ${Icons.tree}
+                  <span>Gestión de Tareas del Equipo</span>
+                </h1>
+                <p style="font-size:12.5px; color:var(--text-muted); margin-top:2px; margin-bottom:0;">
+                  Todas las tareas están disponibles en la bolsa. Puedes alternar la vista entre Árbol de Ramas, Tarjetas o Tablero Kanban.
+                </p>
+              </div>
+
+              <!-- Selector de modo de vista -->
+              <div style="display:flex; background:var(--bg-card); padding:3px; border-radius:8px; border:1px solid var(--border); gap:3px;">
+                <button class="btn btn-sm ${sub === 'arbol' ? 'btn-primary' : ''}" onclick="App.setTasksSubView('arbol')" style="gap:5px;">
+                  ${Icons.tree} <span>Árbol de Ramas</span>
+                </button>
+                <button class="btn btn-sm ${sub === 'grid' ? 'btn-primary' : ''}" onclick="App.setTasksSubView('grid')" style="gap:5px;">
+                  ${Icons.list} <span>Tarjetas</span>
+                </button>
+                <button class="btn btn-sm ${sub === 'tablero' ? 'btn-primary' : ''}" onclick="App.setTasksSubView('tablero')" style="gap:5px;">
+                  ${Icons.board} <span>Tablero Kanban</span>
+                </button>
+                <button class="btn btn-sm ${sub === 'grafo' ? 'btn-primary' : ''}" onclick="App.setTasksSubView('grafo')" style="gap:5px;">
+                  ${Icons.graph} <span>Dependencias</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          ${sub === 'arbol' ? this.renderVistaArbol() : ''}
+          ${sub === 'grid' ? this.renderVistaGridTareas() : ''}
+          ${sub === 'tablero' ? this.renderVistaTablero() : ''}
+          ${sub === 'grafo' ? this.renderVistaDependencias() : ''}
+        `;
+      },
+
+      renderVistaCronogramaHub() {
+        const sub = this.cronoSubView || "gantt";
+        return `
+          <div style="margin-bottom:16px; background:var(--bg-panel); border:1px solid var(--border); border-radius:12px; padding:14px 18px; box-shadow:var(--shadow);">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+              <div>
+                <h1 style="font-size:20px; font-weight:800; display:flex; align-items:center; gap:8px; margin:0;">
+                  ${Icons.gantt}
+                  <span>Cronograma y Planificación Temporal</span>
+                </h1>
+                <p style="font-size:12.5px; color:var(--text-muted); margin-top:2px; margin-bottom:0;">
+                  Hitos oficiales: <strong>Parte 1 (23 de Noviembre 2026)</strong> y <strong>Parte 2 (25 de Enero 2027)</strong>.
+                </p>
+              </div>
+
+              <!-- Selector de modo -->
+              <div style="display:flex; background:var(--bg-card); padding:3px; border-radius:8px; border:1px solid var(--border); gap:3px;">
+                <button class="btn btn-sm ${sub === 'gantt' ? 'btn-primary' : ''}" onclick="App.setCronoSubView('gantt')" style="gap:5px;">
+                  ${Icons.gantt} <span>Gantt por Semanas</span>
+                </button>
+                <button class="btn btn-sm ${sub === 'semana' ? 'btn-primary' : ''}" onclick="App.setCronoSubView('semana')" style="gap:5px;">
+                  ${Icons.calendar} <span>Horario y Rutinas</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          ${sub === 'gantt' ? this.renderVistaCronograma() : this.renderVistaSemana()}
+        `;
+      },
+
+      renderVistaRecursosHub() {
+        const st = this.recursosSubTab || "compras";
+        return `
+          <div style="margin-bottom:16px; background:var(--bg-panel); border:1px solid var(--border); border-radius:12px; padding:14px 18px; box-shadow:var(--shadow);">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
+              <div>
+                <h1 style="font-size:20px; font-weight:800; display:flex; align-items:center; gap:8px; margin:0;">
+                  ${Icons.storage}
+                  <span>Proyecto y Recursos Técnicos</span>
+                </h1>
+                <p style="font-size:12.5px; color:var(--text-muted); margin-top:2px; margin-bottom:0;">
+                  Compras, decisiones de diseño, matriz de riesgos, pruebas de hardware, preguntas a la docente y configuración.
+                </p>
+              </div>
+            </div>
+
+            <!-- Subtabs secundarias sin saturar el menú principal -->
+            <div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:4px; scrollbar-width:thin;">
+              <button class="btn btn-sm ${st === 'compras' ? 'btn-primary' : ''}" onclick="App.setRecursosSubTab('compras')" style="gap:5px;">
+                ${Icons.cart} <span>Compras & Tienda</span>
+              </button>
+              <button class="btn btn-sm ${st === 'decisiones' ? 'btn-primary' : ''}" onclick="App.setRecursosSubTab('decisiones')" style="gap:5px;">
+                ${Icons.list} <span>Decisiones (D01-D19)</span>
+              </button>
+              <button class="btn btn-sm ${st === 'riesgos' ? 'btn-primary' : ''}" onclick="App.setRecursosSubTab('riesgos')" style="gap:5px;">
+                ${Icons.alert} <span>Riesgos (R01-R16)</span>
+              </button>
+              <button class="btn btn-sm ${st === 'pruebas' ? 'btn-primary' : ''}" onclick="App.setRecursosSubTab('pruebas')" style="gap:5px;">
+                ${Icons.check} <span>Pruebas (P1-P14)</span>
+              </button>
+              <button class="btn btn-sm ${st === 'docente' ? 'btn-primary' : ''}" onclick="App.setRecursosSubTab('docente')" style="gap:5px;">
+                ${Icons.user} <span>Docente (Q1-Q6)</span>
+              </button>
+              <button class="btn btn-sm ${st === 'referencia' ? 'btn-primary' : ''}" onclick="App.setRecursosSubTab('referencia')" style="gap:5px;">
+                ${Icons.docs} <span>Plan Maestro</span>
+              </button>
+              <button class="btn btn-sm ${st === 'config' ? 'btn-primary' : ''}" onclick="App.setRecursosSubTab('config')" style="gap:5px;">
+                ${Icons.settings} <span>Configuración & Sync</span>
+              </button>
+            </div>
+          </div>
+
+          ${st === 'compras' ? this.renderVistaCompras() : ''}
+          ${st === 'decisiones' ? this.renderVistaDecisionesModulo() : ''}
+          ${st === 'riesgos' ? this.renderVistaRiesgosModulo() : ''}
+          ${st === 'pruebas' ? this.renderVistaPruebasModulo() : ''}
+          ${st === 'docente' ? this.renderVistaDocenteModulo() : ''}
+          ${st === 'referencia' ? this.renderVistaReferencia() : ''}
+          ${st === 'config' ? this.renderVistaConfig() : ''}
+        `;
+      },
+
+      /* Sub-módulos limpios para Recursos */
+      renderVistaDecisionesModulo() {
+        return `
+          <div class="card">
+            <div class="card-header"><div class="card-title">${Icons.list} Decisiones de Diseño (D01 a D19)</div></div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              ${DataStore.state.decisiones.map(d => `
+                <div style="background:var(--bg-card); padding:12px; border-radius:8px; border:1px solid var(--border);">
+                  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                      <span class="task-id">${d.id}</span>
+                      <strong style="font-size:13.5px;">${this.escapeHtml(d.titulo)}</strong>
+                    </div>
+                    <select onchange="App.actualizarEstadoDecision('${d.id}', this.value)" style="width:auto; font-size:12px; padding:3px 8px;">
+                      <option value="propuesta" ${d.estado === 'propuesta' ? 'selected' : ''}>Propuesta</option>
+                      <option value="confirmada" ${d.estado === 'confirmada' ? 'selected' : ''}>Confirmada</option>
+                      <option value="descartada" ${d.estado === 'descartada' ? 'selected' : ''}>Descartada</option>
+                    </select>
+                  </div>
+                  <div style="font-size:12px; color:var(--text-muted); margin-top:6px; line-height:1.4;">
+                    <div><strong>Por qué:</strong> ${this.escapeHtml(d.por_que)}</div>
+                    <div><strong>Riesgo:</strong> ${this.escapeHtml(d.riesgo)}</div>
+                    <div><strong>Mitigación:</strong> ${this.escapeHtml(d.mitigacion)}</div>
+                  </div>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        `;
+      },
+
+      renderVistaRiesgosModulo() {
+        return `
+          <div class="card">
+            <div class="card-header"><div class="card-title">${Icons.alert} Matriz de Riesgos y Mitigación (R01 a R16)</div></div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              ${DataStore.state.riesgos.map(r => `
+                <div style="background:var(--bg-card); padding:12px; border-radius:8px; border:1px solid var(--border);">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span class="task-id">${r.id}</span>
+                    <select onchange="App.actualizarEstadoRiesgo('${r.id}', this.value)" style="width:auto; font-size:12px; padding:3px 8px;">
+                      <option value="abierto" ${r.estado === 'abierto' ? 'selected' : ''}>Abierto</option>
+                      <option value="mitigado" ${r.estado === 'mitigado' ? 'selected' : ''}>Mitigado</option>
+                      <option value="cerrado" ${r.estado === 'cerrado' ? 'selected' : ''}>Cerrado</option>
+                    </select>
+                  </div>
+                  <div style="font-weight:700; margin:6px 0; font-size:13.5px;">${this.escapeHtml(r.titulo)}</div>
+                  <div style="font-size:12px; color:var(--text-muted); line-height:1.4;">
+                    <div><strong>Qué puede fallar:</strong> ${this.escapeHtml(r.que_puede_fallar)}</div>
+                    <div style="color:var(--accent); font-weight:600; margin-top:2px;"><strong>Mitigación:</strong> ${this.escapeHtml(r.mitigacion)}</div>
+                  </div>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        `;
+      },
+
+      renderVistaPruebasModulo() {
+        return `
+          <div class="card">
+            <div class="card-header"><div class="card-title">${Icons.check} Protocolo de Pruebas Unitarias e Integrales (P1 a P14)</div></div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              ${DataStore.state.pruebas.map(p => `
+                <div style="background:var(--bg-card); padding:12px; border-radius:8px; border:1px solid var(--border);">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span class="task-id">${p.id} (Parte ${p.parte})</span>
+                    <select onchange="App.actualizarResultadoPrueba('${p.id}', this.value)" style="width:auto; font-size:12px; padding:3px 8px;">
+                      <option value="pendiente" ${p.resultado === 'pendiente' ? 'selected' : ''}>Pendiente</option>
+                      <option value="exitosa" ${p.resultado === 'exitosa' ? 'selected' : ''}>Exitosa</option>
+                      <option value="fallo" ${p.resultado === 'fallo' ? 'selected' : ''}>Fallo</option>
+                    </select>
+                  </div>
+                  <div style="font-weight:700; margin:6px 0; font-size:13.5px;">${this.escapeHtml(p.que_se_prueba)}</div>
+                  <div style="font-size:12px; color:var(--text-muted); line-height:1.4;">
+                    <div><strong>Criterio de éxito:</strong> ${this.escapeHtml(p.criterio_exito)}</div>
+                  </div>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        `;
+      },
+
+      renderVistaDocenteModulo() {
+        return `
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">${Icons.user} Preguntas Oficiales para la Docente PhD. Soraya Sinche (Q1 a Q6)</div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+              ${DataStore.state.preguntas.map(q => `
+                <div style="background:var(--bg-card); padding:14px; border-radius:8px; border:1px solid var(--border);">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span class="task-id" style="font-size:14px;">${q.id}</span>
+                    <select onchange="App.actualizarEstadoPregunta('${q.id}', this.value)" style="width:auto; font-size:12px; padding:3px 8px;">
+                      <option value="pendiente" ${q.estado === 'pendiente' ? 'selected' : ''}>Pendiente</option>
+                      <option value="respondida" ${q.estado === 'respondida' ? 'selected' : ''}>Respondida</option>
+                    </select>
+                  </div>
+                  <div style="font-weight:700; margin:8px 0; font-size:14px;">${this.escapeHtml(q.pregunta)}</div>
+                  <div style="font-size:12px; color:var(--text-muted); margin-bottom:6px;">${this.escapeHtml(q.notas || '')}</div>
+                  <div style="margin-top:6px;">
+                    <label style="font-size:11.5px; font-weight:800; color:var(--accent);">Respuesta oficial de la Ing. Sinche:</label>
+                    <textarea rows="2" placeholder="Escribir respuesta obtenida de la docente..." onchange="App.actualizarRespuestaPregunta('${q.id}', this.value)" style="margin-top:4px;">${this.escapeHtml(q.respuesta || '')}</textarea>
+                  </div>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        `;
+      },
+
+      /* Vista Grid de Tarjetas de Tareas */
+      renderVistaGridTareas() {
+        const st = DataStore.state;
+        const tareas = st.tareas;
+        const u = st.config.usuario_actual || "Todos";
+
+        let filtradas = tareas;
+        if (this.treeFilter === 'libres') {
+          filtradas = filtradas.filter(t => !t.rol_responsable || t.rol_responsable === "Sin asignar" || t.rol_responsable === "Libre");
+        } else if (this.treeFilter === 'mis' && u !== "Todos") {
+          filtradas = filtradas.filter(t => Logic.taskBelongsToUser(t, u));
+        } else if (this.treeFilter === 'p1') {
+          filtradas = filtradas.filter(t => t.parte === 1);
+        } else if (this.treeFilter === 'p2') {
+          filtradas = filtradas.filter(t => t.parte === 2);
+        } else if (this.treeFilter === 'hechas') {
+          filtradas = filtradas.filter(t => t.estado === "Hecha");
+        } else if (this.treeFilter === 'angelo') {
+          filtradas = filtradas.filter(t => (t.rol_responsable || "").includes("Angelo") || (t.rol_responsable || "").includes("Integrante 2"));
+        } else if (this.treeFilter === 'xavier') {
+          filtradas = filtradas.filter(t => (t.rol_responsable || "").includes("Xavier") || (t.rol_responsable || "").includes("Integrante 1"));
+        } else if (this.treeFilter === 'fernando') {
+          filtradas = filtradas.filter(t => (t.rol_responsable || "").includes("Fernando") || (t.rol_responsable || "").includes("Integrante 3"));
+        }
+
+        if (this.taskSearchQuery) {
+          const q = this.taskSearchQuery;
+          filtradas = filtradas.filter(t => 
+            t.id.toLowerCase().includes(q) || 
+            t.titulo.toLowerCase().includes(q) || 
+            (t.descripcion || "").toLowerCase().includes(q) ||
+            t.fase.toLowerCase().includes(q)
+          );
+        }
+
+        return `
+          <div style="background:var(--bg-panel); border:1px solid var(--border); border-radius:12px; padding:18px; box-shadow:var(--shadow);">
+            <!-- Barra de búsqueda y filtros rápidos -->
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:16px; flex-wrap:wrap;">
+              <div style="flex:1; min-width:240px; position:relative;">
+                <input type="text" placeholder="Buscar tarea por ID, título, fase o componente..." value="${this.escapeHtml(this.taskSearchQuery)}" oninput="App.setTaskSearch(this.value)" style="padding-left:12px; font-size:13px; border-radius:8px;" />
+              </div>
+              <div style="font-size:12px; color:var(--text-muted); font-weight:600;">
+                Mostrando ${filtradas.length} de ${tareas.length} tareas
+              </div>
+            </div>
+
+            <!-- Filtros pills -->
+            <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px;">
+              <button class="btn btn-sm ${this.treeFilter === 'todos' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('todos')">Todo (${tareas.length})</button>
+              <button class="btn btn-sm ${this.treeFilter === 'libres' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('libres')" style="font-weight:800; border:1.5px dashed var(--accent);">🌟 Bolsa / Libres (${tareas.filter(t => !t.rol_responsable || t.rol_responsable === 'Sin asignar' || t.rol_responsable === 'Libre').length})</button>
+              <button class="btn btn-sm ${this.treeFilter === 'mis' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('mis')">Mis Tareas (${this.escapeHtml(u)})</button>
+              <button class="btn btn-sm ${this.treeFilter === 'p1' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('p1')">Parte 1 (23 Nov)</button>
+              <button class="btn btn-sm ${this.treeFilter === 'p2' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('p2')">Parte 2 (25 Ene)</button>
+              <button class="btn btn-sm ${this.treeFilter === 'hechas' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('hechas')" style="color:var(--accent);">✔ Finalizadas (${tareas.filter(t => t.estado === 'Hecha').length})</button>
+            </div>
+
+            ${filtradas.length === 0 ? `
+              <div style="text-align:center; padding:40px; color:var(--text-muted); background:var(--bg-card); border-radius:10px; border:1px dashed var(--border);">
+                <p style="font-size:14px; font-weight:700;">No se encontraron tareas con los filtros seleccionados.</p>
+                <button class="btn btn-sm btn-primary" onclick="App.setTreeFilter('todos'); App.setTaskSearch('');" style="margin-top:8px;">Ver todas las tareas</button>
+              </div>
+            ` : `
+              <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(290px, 1fr)); gap:14px;">
+                ${filtradas.map(t => this.renderPastelTaskCard(t)).join("")}
+              </div>
+            `}
+          </div>
+        `;
+      },
+
+      /* ========================================================================
+         1. PANEL PRINCIPAL — DASHBOARD DE EQUIPO CON HITOS, KPIS Y TAREAS VISIBLES
          ======================================================================== */
       renderPanelPrincipal() {
         const st = DataStore.state;
         const tareas = st.tareas;
-        const u = st.config.usuario_actual || "Todos";
-        const sActiva = Number(st.config.semana_actual_p1 || 1);
-        const pActiva = Number(st.config.parte_activa_semana || 1);
+        const u = st.config.usuario_actual || "Angelo Conterón";
+        const miNombre = u === "Todos" ? "Angelo Conterón" : u;
 
-        // Tareas de la semana activa: SE MUESTRAN TODAS (las hechas en verde pastel, no se ocultan)
-        let tareasSemana = tareas.filter(t => t.parte === pActiva && t.semana_inicio <= sActiva && t.semana_fin >= sActiva);
+        const p1 = tareas.filter(t => t.parte === 1);
+        const p2 = tareas.filter(t => t.parte === 2);
+        const progTotal = Logic.getWeightedProgress(tareas);
+        const progP1 = Logic.getWeightedProgress(p1);
+        const progP2 = Logic.getWeightedProgress(p2);
 
+        const libresCount = tareas.filter(t => !t.rol_responsable || t.rol_responsable === "Sin asignar" || t.rol_responsable === "Libre").length;
         const totalHechas = tareas.filter(t => t.estado === "Hecha").length;
         const totalEnCurso = tareas.filter(t => t.estado === "En curso").length;
-        const progTotal = Logic.getWeightedProgress(tareas);
+        const totalRevision = tareas.filter(t => t.estado === "En revisión").length;
+
+        const angeloCount = tareas.filter(t => (t.rol_responsable || "").includes("Angelo") || (t.rol_responsable || "").includes("Integrante 2")).length;
+        const xavierCount = tareas.filter(t => (t.rol_responsable || "").includes("Xavier") || (t.rol_responsable || "").includes("Integrante 1")).length;
+        const fernandoCount = tareas.filter(t => (t.rol_responsable || "").includes("Fernando") || (t.rol_responsable || "").includes("Integrante 3")).length;
+
+        // Días restantes a los hitos oficiales
+        const diasP1 = Logic.getDaysRemaining(st.config.fecha_entrega_p1 || "2026-11-23");
+        const diasP2 = Logic.getDaysRemaining(st.config.fecha_entrega_p2 || "2027-01-25");
+
+        const subView = this.tasksSubView || "arbol";
 
         return `
-          <!-- HERO DE ENFOQUE ZEN -->
-          <div style="background:var(--bg-panel); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:20px; box-shadow:var(--shadow);">
-            <div style="display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;">
+          <!-- BANNER HERO DEL EQUIPO CON HITOS OFICIALES -->
+          <div style="background:var(--bg-panel); border:1px solid var(--border); border-radius:14px; padding:20px; margin-bottom:18px; box-shadow:var(--shadow);">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap;">
               <div>
-                <div style="font-size:12px; text-transform:uppercase; letter-spacing:0.05em; color:var(--accent); font-weight:700;">
-                  Plan de Trabajo Activo
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                  <span class="badge tag-PDF">EPN Sistemas IoT • Grupo 1</span>
+                  <span class="badge tag-DISENO">Plan Maestro v2.0</span>
                 </div>
-                <h1 style="font-size:22px; font-weight:800; margin:4px 0;">
-                  ¿Con qué empezamos hoy?
+                <h1 style="font-size:22px; font-weight:800; margin:0 0 4px 0; letter-spacing:-0.01em;">
+                  Cámara de Germinación Inteligente IoT
                 </h1>
-                <p style="font-size:13.5px; color:var(--text-muted);">
-                  Integrante activo: <strong style="color:var(--text-main);">${this.escapeHtml(u)}</strong> • Parte ${pActiva} (Semana ${sActiva})
+                <p style="font-size:13px; color:var(--text-muted); margin:0;">
+                  Tablero de equipo para saber <strong>QUÉ</strong> hacer, <strong>CÓMO</strong>, <strong>CUÁNDO</strong> y <strong>QUIÉN</strong> lo toma de la bolsa libre.
                 </p>
               </div>
 
-              <!-- Botón directo al Árbol de Checkout Horizontal -->
-              <button onclick="App.switchTab('arbol')" class="btn btn-primary" style="padding:10px 18px; font-size:13.5px; gap:8px;">
-                ${Icons.tree}
-                <span>Ver Árbol de Checkout (Ramas)</span>
+              <!-- Selector rápido de usuario en el hero -->
+              <div style="display:flex; align-items:center; gap:8px; background:var(--bg-card); padding:8px 12px; border-radius:10px; border:1px solid var(--border);">
+                <div style="width:28px; height:28px; border-radius:50%; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px;">
+                  ${miNombre.charAt(0)}
+                </div>
+                <div>
+                  <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Mi Sesión:</div>
+                  <div style="font-size:13px; font-weight:800; color:var(--text-main);">${this.escapeHtml(miNombre)}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- HITOS OFICIALES DE ENTREGA (23 NOV Y 25 ENE) -->
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:12px; margin-top:16px; padding-top:16px; border-top:1px solid var(--border);">
+              <!-- Hito Parte 1 -->
+              <div style="background:var(--bg-card); border:1.5px solid var(--info); border-radius:10px; padding:12px 14px; display:flex; flex-direction:column; gap:6px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <span style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--info); display:inline-flex; align-items:center; gap:5px;">
+                    🏁 Hito Entrega Parte 1
+                  </span>
+                  <span class="badge" style="background:var(--info-soft); color:var(--info); font-weight:800;">
+                    Quedan ${diasP1} días
+                  </span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:baseline;">
+                  <div style="font-size:17px; font-weight:800;">23 de Noviembre de 2026</div>
+                  <div style="font-size:12.5px; font-weight:700; color:var(--info);">${progP1}%</div>
+                </div>
+                <div class="progress-wrap" style="height:6px;"><div class="progress-bar" style="width:${progP1}%; background:var(--info);"></div></div>
+                <div style="font-size:11.5px; color:var(--text-muted); line-height:1.3;">
+                  Prototipo en protoboard, lote piloto de 4-5 días, telemetría MQTT y primer informe técnico.
+                </div>
+              </div>
+
+              <!-- Hito Parte 2 -->
+              <div style="background:var(--bg-card); border:1.5px solid var(--purple); border-radius:10px; padding:12px 14px; display:flex; flex-direction:column; gap:6px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <span style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--purple); display:inline-flex; align-items:center; gap:5px;">
+                    🏆 Hito Defensa Final Parte 2
+                  </span>
+                  <span class="badge" style="background:var(--purple-soft); color:var(--purple); font-weight:800;">
+                    Quedan ${diasP2} días
+                  </span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:baseline;">
+                  <div style="font-size:17px; font-weight:800;">25 de Enero de 2027</div>
+                  <div style="font-size:12.5px; font-weight:700; color:var(--purple);">${progP2}%</div>
+                </div>
+                <div class="progress-wrap" style="height:6px;"><div class="progress-bar" style="width:${progP2}%; background:var(--purple);"></div></div>
+                <div style="font-size:11.5px; color:var(--text-muted); line-height:1.3;">
+                  PCB definitiva, estructura acrílica, visión OpenCV (ESP32-CAM) y dos lotes reales autónomos.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4 TARJETAS KPI DE EQUIPO (PASTEL Y SUAVES) -->
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-bottom:18px;">
+            <!-- Total -->
+            <div class="card" style="padding:14px; border-radius:12px; display:flex; flex-direction:column; gap:4px;">
+              <div style="font-size:11.5px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Total Tareas</div>
+              <div style="display:flex; justify-content:space-between; align-items:baseline;">
+                <span style="font-size:26px; font-weight:800; color:var(--text-main);">${tareas.length}</span>
+                <span style="font-size:13px; font-weight:700; color:var(--accent);">${progTotal}% total</span>
+              </div>
+              <div class="progress-wrap" style="height:5px;"><div class="progress-bar" style="width:${progTotal}%;"></div></div>
+            </div>
+
+            <!-- Bolsa Libres -->
+            <div class="card" style="padding:14px; border-radius:12px; border:1.5px dashed var(--accent); background:rgba(16, 185, 129, 0.05); cursor:pointer;" onclick="App.setTreeFilter('libres'); App.setTasksSubView('grid');" title="Clic para ver tareas libres para tomar">
+              <div style="font-size:11.5px; color:var(--accent); font-weight:800; text-transform:uppercase;">🌟 Libres en Bolsa</div>
+              <div style="display:flex; justify-content:space-between; align-items:baseline;">
+                <span style="font-size:26px; font-weight:800; color:var(--accent);">${libresCount}</span>
+                <span style="font-size:11px; font-weight:700; color:var(--accent);">Tomar en 1-clic</span>
+              </div>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Disponibles para cualquiera</div>
+            </div>
+
+            <!-- En curso -->
+            <div class="card" style="padding:14px; border-radius:12px; display:flex; flex-direction:column; gap:4px;">
+              <div style="font-size:11.5px; color:var(--info); font-weight:700; text-transform:uppercase;">En Curso</div>
+              <div style="display:flex; justify-content:space-between; align-items:baseline;">
+                <span style="font-size:26px; font-weight:800; color:var(--info);">${totalEnCurso}</span>
+                <span style="font-size:11.5px; color:var(--text-muted);">${totalRevision} en revisión</span>
+              </div>
+              <div style="font-size:11px; color:var(--text-muted);">Siendo desarrolladas ahora</div>
+            </div>
+
+            <!-- Finalizadas -->
+            <div class="card pastel-hecha" style="padding:14px; border-radius:12px; display:flex; flex-direction:column; gap:4px; border:1.5px solid #10b981;">
+              <div style="font-size:11.5px; font-weight:800; text-transform:uppercase; color:#065f46;">✔ Finalizadas</div>
+              <div style="display:flex; justify-content:space-between; align-items:baseline;">
+                <span style="font-size:26px; font-weight:800; color:#065f46;">${totalHechas}</span>
+                <span style="font-size:11.5px; font-weight:700; color:#065f46;">Verde menta</span>
+              </div>
+              <div style="font-size:11px; color:#065f46; opacity:0.85;">Permanecen siempre visibles</div>
+            </div>
+          </div>
+
+          <!-- FILA DE ESTADO DE LOS 3 INTEGRANTES -->
+          <div style="background:var(--bg-panel); border:1px solid var(--border); border-radius:12px; padding:12px 16px; margin-bottom:18px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+            <div style="font-size:12px; font-weight:800; text-transform:uppercase; color:var(--text-muted);">
+              Carga del Equipo (3 Integrantes):
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button class="btn btn-sm pastel-user-angelo" onclick="App.setTreeFilter('angelo'); App.setTasksSubView('grid');" style="font-size:12px; font-weight:700;">
+                Angelo Conterón (${angeloCount})
+              </button>
+              <button class="btn btn-sm pastel-user-xavier" onclick="App.setTreeFilter('xavier'); App.setTasksSubView('grid');" style="font-size:12px; font-weight:700;">
+                Xavier Anatoa (${xavierCount})
+              </button>
+              <button class="btn btn-sm pastel-user-fernando" onclick="App.setTreeFilter('fernando'); App.setTasksSubView('grid');" style="font-size:12px; font-weight:700;">
+                Fernando Guarderas (${fernandoCount})
               </button>
             </div>
-
-            <!-- Métricas sobrias de salud del proyecto (sin saturación) -->
-            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-top:18px; padding-top:16px; border-top:1px solid var(--border);">
-              <div style="display:flex; align-items:center; gap:10px;">
-                <div style="font-size:24px; font-weight:800; color:var(--accent);">${progTotal}%</div>
-                <div style="font-size:12px; color:var(--text-muted); line-height:1.2;">Avance General del Proyecto</div>
-              </div>
-              <div style="display:flex; align-items:center; gap:10px;">
-                <div style="font-size:24px; font-weight:800; color:var(--accent);">${totalHechas}</div>
-                <div style="font-size:12px; color:var(--text-muted); line-height:1.2;">Tareas Realizadas (visibles en verde)</div>
-              </div>
-              <div style="display:flex; align-items:center; gap:10px;">
-                <div style="font-size:24px; font-weight:800; color:var(--info);">${totalEnCurso}</div>
-                <div style="font-size:12px; color:var(--text-muted); line-height:1.2;">Tareas En Curso</div>
-              </div>
-            </div>
           </div>
 
-          <!-- SECCIÓN: TAREAS DE LA SEMANA ACTIVA (TARJETAS PASTEL COMPLETAS) -->
-          <div style="background:var(--bg-panel); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:20px; box-shadow:var(--shadow);">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
-              <div style="display:flex; align-items:center; gap:8px;">
-                <h2 style="font-size:16px; font-weight:800; display:flex; align-items:center; gap:6px;">
-                  ${Icons.calendar}
-                  <span>Tareas para la Semana ${sActiva}</span>
+          <!-- EXPLORADOR PRINCIPAL DE TAREAS ("EN LA PANTALLA PRINCIPAL SE VEAN MEJOR LAS TAREAS") -->
+          <div style="background:var(--bg-panel); border:1px solid var(--border); border-radius:14px; padding:18px; box-shadow:var(--shadow);">
+            <!-- Barra de control de vista en el dashboard -->
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:16px; flex-wrap:wrap;">
+              <div>
+                <h2 style="font-size:18px; font-weight:800; display:flex; align-items:center; gap:8px; margin:0;">
+                  ${Icons.tree}
+                  <span>Tareas del Proyecto IoT</span>
                 </h2>
-                <span class="badge tag-PDF">Parte ${pActiva}</span>
+                <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">
+                  Visualiza el flujo de trabajo en Árbol de Ramas, Tarjetas o Tablero Kanban.
+                </div>
               </div>
-              <div style="display:flex; gap:6px; align-items:center;">
-                <span style="font-size:12px; color:var(--text-muted); margin-right:4px;">Cambiar semana:</span>
-                <button class="btn btn-sm" onclick="App.cambiarSemanaActiva(-1)">◀ S${Math.max(1, sActiva - 1)}</button>
-                <button class="btn btn-sm" onclick="App.cambiarSemanaActiva(1)">S${Math.min(9, sActiva + 1)} ▶</button>
+
+              <!-- Switcher de modo en el dashboard -->
+              <div style="display:flex; background:var(--bg-card); padding:3px; border-radius:8px; border:1px solid var(--border); gap:3px;">
+                <button class="btn btn-sm ${subView === 'arbol' ? 'btn-primary' : ''}" onclick="App.setTasksSubView('arbol')" style="gap:5px;">
+                  ${Icons.tree} <span>Árbol de Ramas</span>
+                </button>
+                <button class="btn btn-sm ${subView === 'grid' ? 'btn-primary' : ''}" onclick="App.setTasksSubView('grid')" style="gap:5px;">
+                  ${Icons.list} <span>Tarjetas Grid</span>
+                </button>
+                <button class="btn btn-sm ${subView === 'tablero' ? 'btn-primary' : ''}" onclick="App.setTasksSubView('tablero')" style="gap:5px;">
+                  ${Icons.board} <span>Tablero</span>
+                </button>
               </div>
             </div>
 
-            ${tareasSemana.length === 0 ? `
-              <div style="text-align:center; padding:32px; color:var(--text-muted);">
-                <p>No hay tareas programadas para la Semana ${sActiva}. Navega entre semanas con los botones de arriba.</p>
-              </div>
-            ` : `
-              <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(290px, 1fr)); gap:14px;">
-                ${tareasSemana.map(t => this.renderPastelTaskCard(t)).join("")}
-              </div>
-            `}
-          </div>
-
-          <!-- ACCESOS RÁPIDOS COMPACTOS -->
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:16px;">
-            <div class="card" onclick="App.switchTab('bitacora')" style="cursor:pointer;">
-              <div class="card-header">
-                <div class="card-title">${Icons.book} Bitácora de Laboratorio</div>
-                <span class="badge tag-PDF">Calibración & Germinación</span>
-              </div>
-              <p style="font-size:13px; color:var(--text-muted);">
-                Conversión ADC del sensor capacitivo en tiempo real y curva gráfica de germinación del lote piloto.
-              </p>
-            </div>
-
-            <div class="card" onclick="App.switchTab('compras')" style="cursor:pointer;">
-              <div class="card-header">
-                <div class="card-title">${Icons.cart} Compras y Tienda</div>
-                <span class="badge tag-DISENO">Secciones 6 & 18</span>
-              </div>
-              <p style="font-size:13px; color:var(--text-muted);">
-                Lista de materiales con cantidades, precios y checklist de pruebas en tienda (humidificador a 5 V directos).
-              </p>
-            </div>
+            <!-- Contenido dinámico según el modo elegido -->
+            ${subView === 'arbol' ? this.renderVistaArbol() : ''}
+            ${subView === 'grid' ? this.renderVistaGridTareas() : ''}
+            ${subView === 'tablero' ? this.renderVistaTablero() : ''}
           </div>
         `;
       },
@@ -3158,6 +3614,22 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
             </div>
             <div style="font-size:12px; color:var(--text-muted);">
               Semanas relativas: Parte 1 (Semana 1 a 6) | Parte 2 (Semana 1 a 9). Hoy es ${hoy}. Tareas con borde dorado pertenecen a la Ruta Crítica.
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:10px; margin-top:12px;">
+              <div style="background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.3); border-radius:8px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                  <div style="font-size:11px; text-transform:uppercase; letter-spacing:0.5px; font-weight:800; color:#3b82f6;">Hito Entrega Parte 1</div>
+                  <div style="font-size:14px; font-weight:800;">23 de Noviembre 2026</div>
+                </div>
+                <span class="badge" style="background:#3b82f6; color:#fff; font-weight:800;">${Logic.getDaysRemaining(st.config.fecha_entrega_p1 || '2026-11-23')}d restantes</span>
+              </div>
+              <div style="background:rgba(168,85,247,0.1); border:1px solid rgba(168,85,247,0.3); border-radius:8px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                  <div style="font-size:11px; text-transform:uppercase; letter-spacing:0.5px; font-weight:800; color:#a855f7;">Hito Entrega Parte 2</div>
+                  <div style="font-size:14px; font-weight:800;">25 de Enero 2027</div>
+                </div>
+                <span class="badge" style="background:#a855f7; color:#fff; font-weight:800;">${Logic.getDaysRemaining(st.config.fecha_entrega_p2 || '2027-01-25')}d restantes</span>
+              </div>
             </div>
           </div>
 
