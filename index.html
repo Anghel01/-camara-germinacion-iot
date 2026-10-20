@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="oscuro">
+<html lang="es" data-theme="claro">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
@@ -34,26 +34,69 @@
     }
 
     :root[data-theme="claro"] {
-      --bg-main: #f1f5f9;
+      --bg-main: #f5f7fc;
       --bg-panel: #ffffff;
-      --bg-card: #f8fafc;
-      --bg-hover: #e2e8f0;
-      --bg-input: #ffffff;
+      --bg-card: #ffffff;
+      --bg-hover: #f1f5f9;
+      --bg-input: #f8fafc;
       --text-main: #0f172a;
-      --text-muted: #475569;
-      --border: #cbd5e1;
-      --accent: #059669;
-      --accent-hover: #047857;
-      --accent-soft: rgba(5, 150, 105, 0.12);
-      --info: #2563eb;
-      --info-soft: rgba(37, 99, 235, 0.12);
-      --warn: #d97706;
-      --warn-soft: rgba(217, 119, 6, 0.14);
-      --danger: #dc2626;
-      --danger-soft: rgba(220, 38, 38, 0.12);
-      --purple: #7e22ce;
-      --purple-soft: rgba(126, 34, 206, 0.12);
-      --shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --accent: #10b981;
+      --accent-hover: #059669;
+      --accent-soft: #ecfdf5;
+      --info: #3b82f6;
+      --info-soft: #eff6ff;
+      --warn: #f59e0b;
+      --warn-soft: #fffbeb;
+      --danger: #ef4444;
+      --danger-soft: #fef2f2;
+      --purple: #8b5cf6;
+      --purple-soft: #f5f3ff;
+      --peach: #f97316;
+      --peach-soft: #fff7ed;
+      --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.04);
+      --shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+      --shadow-lg: 0 16px 36px rgba(15, 23, 42, 0.08);
+    }
+
+    /* ESTILO DRIBBLE / PASTEL MODERNO PARA TARJETAS */
+    .dribbble-pastel-card {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 16px 18px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      cursor: pointer;
+      position: relative;
+    }
+    .dribbble-pastel-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+    }
+    :root[data-theme="oscuro"] .dribbble-pastel-card {
+      background: var(--bg-card);
+      border-color: var(--border);
+    }
+
+    /* CONTENEDOR DE ÁRBOL SVG BÉZIER HORIZONTAL */
+    .svg-tree-container {
+      width: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px 20px;
+      box-shadow: var(--shadow);
+    }
+    :root[data-theme="oscuro"] .svg-tree-container {
+      background: var(--bg-panel);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -2066,7 +2109,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
           variedad_frejol: "Por definir en T1.01 [A VERIFICAR]",
           dueno_piloto: "Xavier Anatoa (Integrante 1)",
           usuario_actual: "Angelo Conterón",
-          tema: "oscuro",
+          tema: "claro",
           fecha_inicio_p1: fechaBaseP1,
           fecha_inicio_p2: fechaBaseP2,
           fecha_entrega_p1: "2026-11-23",
@@ -2180,6 +2223,10 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
         }
         if (!this.state.config.fecha_entrega_p1) this.state.config.fecha_entrega_p1 = "2026-11-23";
         if (!this.state.config.fecha_entrega_p2) this.state.config.fecha_entrega_p2 = "2027-01-25";
+        if (!this.state.config.tema || this.state.config.tema === "oscuro") {
+          this.state.config.tema = "claro";
+          document.documentElement.setAttribute("data-theme", "claro");
+        }
         this.updateSyncBadge();
       },
 
@@ -2796,482 +2843,9 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
       /* ========================================================================
          2. VISTA ÁRBOL — LÍNEAS DE CHECKOUT DE IZQUIERDA A DERECHA (HORIZONTAL)
          ======================================================================== */
-      renderVistaArbol() {
-        const st = DataStore.state;
-        const tareas = st.tareas;
-        const p1 = tareas.filter(t => t.parte === 1);
-        const p2 = tareas.filter(t => t.parte === 2);
-        const progTotal = Logic.getWeightedProgress(tareas);
-        const progP1 = Logic.getWeightedProgress(p1);
-        const progP2 = Logic.getWeightedProgress(p2);
-        const u = st.config.usuario_actual || "Todos";
-
-        const fasesP1 = [...new Set(p1.map(t => t.fase))];
-        const fasesP2 = [...new Set(p2.map(t => t.fase))];
-
-        const libresCount = tareas.filter(t => !t.rol_responsable || t.rol_responsable === "Sin asignar" || t.rol_responsable === "Libre").length;
-        const angeloCount = tareas.filter(t => (t.rol_responsable || "").includes("Angelo") || (t.rol_responsable || "").includes("Integrante 2")).length;
-        const xavierCount = tareas.filter(t => (t.rol_responsable || "").includes("Xavier") || (t.rol_responsable || "").includes("Integrante 1")).length;
-        const fernandoCount = tareas.filter(t => (t.rol_responsable || "").includes("Fernando") || (t.rol_responsable || "").includes("Integrante 3")).length;
-        const revisionCount = tareas.filter(t => t.estado === "En revisión").length;
-        const hechasCount = tareas.filter(t => t.estado === "Hecha").length;
-
-        return `
-          <div class="checkout-tree-container">
-            <!-- Barra de control y filtros del árbol -->
-            <div style="display:flex; justify-content:space-between; align-items:center; gap:14px; margin-bottom:18px; flex-wrap:wrap;">
-              <div>
-                <h2 style="font-size:18px; font-weight:800; display:flex; align-items:center; gap:8px;">
-                  ${Icons.tree}
-                  <span>Ruta en Árbol — Ramas de Checkout de Izquierda a Derecha</span>
-                </h2>
-                <p style="font-size:12.5px; color:var(--text-muted); margin-top:3px;">
-                  Las tareas están sueltas en la bolsa. Cualquiera puede tomar una tarea libre, se pinta de su color pastel individual y al finalizar se tiñe de verde sin desaparecer.
-                </p>
-              </div>
-
-              <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
-                <button class="btn btn-sm ${this.treeFilter === 'todos' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('todos')">Todo</button>
-                <button class="btn btn-sm ${this.treeFilter === 'libres' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('libres')" style="font-weight:700;">Bolsa / Libres (${libresCount})</button>
-                <button class="btn btn-sm ${this.treeFilter === 'mis' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('mis')">Solo Mis Tareas (${this.escapeHtml(u)})</button>
-                <button class="btn btn-sm ${this.treeFilter === 'p1' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('p1')">Parte 1</button>
-                <button class="btn btn-sm ${this.treeFilter === 'p2' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('p2')">Parte 2</button>
-              </div>
-            </div>
-
-            <!-- BANNER DE BOLSA DE TAREAS Y ESTADOS PASTEL -->
-            <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:12px 16px; margin-bottom:22px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
-              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                <span style="font-size:12px; font-weight:800; text-transform:uppercase; color:var(--accent);">Bolsa de Tareas:</span>
-                <span class="badge pastel-libre" style="font-size:11.5px; padding:4px 9px;">${libresCount} Disponibles</span>
-                <span class="badge pastel-user-angelo" style="font-size:11.5px; padding:4px 9px;">Angelo: ${angeloCount}</span>
-                <span class="badge pastel-user-xavier" style="font-size:11.5px; padding:4px 9px;">Xavier: ${xavierCount}</span>
-                <span class="badge pastel-user-fernando" style="font-size:11.5px; padding:4px 9px;">Fernando: ${fernandoCount}</span>
-                <span class="badge pastel-en-revision" style="font-size:11.5px; padding:4px 9px;">${revisionCount} En revisión</span>
-                <span class="badge pastel-hecha" style="font-size:11.5px; padding:4px 9px;">${hechasCount} Finalizadas</span>
-              </div>
-              <div style="display:flex; gap:6px;">
-                <button class="btn btn-sm" onclick="App.liberarTodasPendientes()" style="font-size:11px; opacity:0.85;" title="Soltar a la bolsa todas las tareas pendientes para tomarlas libremente">
-                  Soltar pendientes a la bolsa
-                </button>
-              </div>
-            </div>
-
-            <!-- NODO RAÍZ PRINCIPAL -->
-            <div style="display:flex; align-items:center; gap:16px; margin-bottom:26px;">
-              <div class="checkout-root-node">
-                <div style="width:30px; height:30px; border-radius:50%; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center;">
-                  ${Icons.leaf}
-                </div>
-                <div>
-                  <div style="font-size:14px; font-weight:800;">Cámara de Germinación Inteligente IoT</div>
-                  <div style="font-size:11px; color:var(--text-muted);">Grupo 1 • EPN 2026-B</div>
-                </div>
-                <div style="margin-left:10px; background:var(--accent-soft); color:var(--accent); padding:3px 9px; border-radius:6px; font-size:12px; font-weight:700;">
-                  ${progTotal}% Avance
-                </div>
-              </div>
-              <div style="flex:1; height:2px; background:linear-gradient(90deg, var(--accent), var(--border));"></div>
-            </div>
-
-            <!-- RAMA SUPERIOR: PARTE 1 (PRIMER BIMESTRE) -->
-            ${(this.treeFilter === 'todos' || this.treeFilter === 'mis' || this.treeFilter === 'libres' || this.treeFilter === 'p1') ? `
-              <div class="checkout-branch parte-1">
-                <div class="checkout-branch-header">
-                  <div class="checkout-branch-title" style="color:var(--info);">
-                    <span style="width:12px; height:12px; border-radius:50%; background:var(--info); display:inline-block;"></span>
-                    <span>PARTE 1: Prototipo en Protoboard y Lote Piloto (1er Bimestre)</span>
-                  </div>
-                  <div style="display:flex; align-items:center; gap:10px;">
-                    <span style="font-size:12px; font-weight:700; color:var(--info);">${progP1}% Completado</span>
-                    <div class="progress-wrap" style="width:90px;"><div class="progress-bar" style="width:${progP1}%; background:var(--info);"></div></div>
-                  </div>
-                </div>
-
-                <!-- Pista horizontal de fases de izquierda a derecha -->
-                <div class="checkout-phases-track">
-                  ${fasesP1.map((faseNombre, idx) => {
-                    let tFase = p1.filter(t => t.fase === faseNombre);
-                    if (this.treeFilter === 'mis' && u !== "Todos") {
-                      tFase = tFase.filter(t => Logic.taskBelongsToUser(t, u));
-                    } else if (this.treeFilter === 'libres') {
-                      tFase = tFase.filter(t => Logic.taskBelongsToUser(t, 'Libres'));
-                    }
-                    if (tFase.length === 0) return '';
-                    const progFase = Logic.getWeightedProgress(tFase);
-                    return `
-                      <div class="checkout-phase-col">
-                        <div class="checkout-phase-header">
-                          <span title="${this.escapeHtml(faseNombre)}">Fase ${idx + 1}: ${this.escapeHtml(faseNombre)}</span>
-                          <span style="font-size:11px; color:var(--text-muted); font-weight:700;">${progFase}%</span>
-                        </div>
-                        <div class="checkout-tasks-flow">
-                          ${tFase.map(t => this.renderPastelTaskCard(t)).join("")}
-                        </div>
-                      </div>
-                    `;
-                  }).join("")}
-                </div>
-              </div>
-            ` : ''}
-
-            <!-- RAMA INFERIOR: PARTE 2 (SEGUNDO BIMESTRE) -->
-            ${(this.treeFilter === 'todos' || this.treeFilter === 'mis' || this.treeFilter === 'libres' || this.treeFilter === 'p2') ? `
-              <div class="checkout-branch parte-2">
-                <div class="checkout-branch-header">
-                  <div class="checkout-branch-title" style="color:var(--purple);">
-                    <span style="width:12px; height:12px; border-radius:50%; background:var(--purple); display:inline-block;"></span>
-                    <span>PARTE 2: Prototipo Final en PCB, Acrílico y Visión (2do Bimestre)</span>
-                  </div>
-                  <div style="display:flex; align-items:center; gap:10px;">
-                    <span style="font-size:12px; font-weight:700; color:var(--purple);">${progP2}% Completado</span>
-                    <div class="progress-wrap" style="width:90px;"><div class="progress-bar" style="width:${progP2}%; background:var(--purple);"></div></div>
-                  </div>
-                </div>
-
-                <!-- Pista horizontal de fases de izquierda a derecha -->
-                <div class="checkout-phases-track">
-                  ${fasesP2.map((faseNombre, idx) => {
-                    let tFase = p2.filter(t => t.fase === faseNombre);
-                    if (this.treeFilter === 'mis' && u !== "Todos") {
-                      tFase = tFase.filter(t => Logic.taskBelongsToUser(t, u));
-                    } else if (this.treeFilter === 'libres') {
-                      tFase = tFase.filter(t => Logic.taskBelongsToUser(t, 'Libres'));
-                    }
-                    if (tFase.length === 0) return '';
-                    const progFase = Logic.getWeightedProgress(tFase);
-                    return `
-                      <div class="checkout-phase-col">
-                        <div class="checkout-phase-header">
-                          <span title="${this.escapeHtml(faseNombre)}">Fase ${idx + 1}: ${this.escapeHtml(faseNombre)}</span>
-                          <span style="font-size:11px; color:var(--text-muted); font-weight:700;">${progFase}%</span>
-                        </div>
-                        <div class="checkout-tasks-flow">
-                          ${tFase.map(t => this.renderPastelTaskCard(t)).join("")}
-                        </div>
-                      </div>
-                    `;
-                  }).join("")}
-                </div>
-              </div>
-            ` : ''}
-          </div>
-        `;
-      },
-
       
       /* ========================================================================
-         MÉTODOS DEL HUB DE TAREAS Y VISTAS INTEGRADAS
-         ======================================================================== */
-      renderVistaTareasHub() {
-        const sub = this.tasksSubView || "arbol";
-        return `
-          <div style="margin-bottom:16px; background:var(--bg-panel); border:1px solid var(--border); border-radius:12px; padding:14px 18px; box-shadow:var(--shadow);">
-            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
-              <div>
-                <h1 style="font-size:20px; font-weight:800; display:flex; align-items:center; gap:8px; margin:0;">
-                  ${Icons.tree}
-                  <span>Gestión de Tareas del Equipo</span>
-                </h1>
-                <p style="font-size:12.5px; color:var(--text-muted); margin-top:2px; margin-bottom:0;">
-                  Todas las tareas están disponibles en la bolsa. Puedes alternar la vista entre Árbol de Ramas, Tarjetas o Tablero Kanban.
-                </p>
-              </div>
-
-              <!-- Selector de modo de vista -->
-              <div style="display:flex; background:var(--bg-card); padding:3px; border-radius:8px; border:1px solid var(--border); gap:3px;">
-                <button class="btn btn-sm ${sub === 'arbol' ? 'btn-primary' : ''}" onclick="App.setTasksSubView('arbol')" style="gap:5px;">
-                  ${Icons.tree} <span>Árbol de Ramas</span>
-                </button>
-                <button class="btn btn-sm ${sub === 'grid' ? 'btn-primary' : ''}" onclick="App.setTasksSubView('grid')" style="gap:5px;">
-                  ${Icons.list} <span>Tarjetas</span>
-                </button>
-                <button class="btn btn-sm ${sub === 'tablero' ? 'btn-primary' : ''}" onclick="App.setTasksSubView('tablero')" style="gap:5px;">
-                  ${Icons.board} <span>Tablero Kanban</span>
-                </button>
-                <button class="btn btn-sm ${sub === 'grafo' ? 'btn-primary' : ''}" onclick="App.setTasksSubView('grafo')" style="gap:5px;">
-                  ${Icons.graph} <span>Dependencias</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          ${sub === 'arbol' ? this.renderVistaArbol() : ''}
-          ${sub === 'grid' ? this.renderVistaGridTareas() : ''}
-          ${sub === 'tablero' ? this.renderVistaTablero() : ''}
-          ${sub === 'grafo' ? this.renderVistaDependencias() : ''}
-        `;
-      },
-
-      renderVistaCronogramaHub() {
-        const sub = this.cronoSubView || "gantt";
-        return `
-          <div style="margin-bottom:16px; background:var(--bg-panel); border:1px solid var(--border); border-radius:12px; padding:14px 18px; box-shadow:var(--shadow);">
-            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
-              <div>
-                <h1 style="font-size:20px; font-weight:800; display:flex; align-items:center; gap:8px; margin:0;">
-                  ${Icons.gantt}
-                  <span>Cronograma y Planificación Temporal</span>
-                </h1>
-                <p style="font-size:12.5px; color:var(--text-muted); margin-top:2px; margin-bottom:0;">
-                  Hitos oficiales: <strong>Parte 1 (23 de Noviembre 2026)</strong> y <strong>Parte 2 (25 de Enero 2027)</strong>.
-                </p>
-              </div>
-
-              <!-- Selector de modo -->
-              <div style="display:flex; background:var(--bg-card); padding:3px; border-radius:8px; border:1px solid var(--border); gap:3px;">
-                <button class="btn btn-sm ${sub === 'gantt' ? 'btn-primary' : ''}" onclick="App.setCronoSubView('gantt')" style="gap:5px;">
-                  ${Icons.gantt} <span>Gantt por Semanas</span>
-                </button>
-                <button class="btn btn-sm ${sub === 'semana' ? 'btn-primary' : ''}" onclick="App.setCronoSubView('semana')" style="gap:5px;">
-                  ${Icons.calendar} <span>Horario y Rutinas</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          ${sub === 'gantt' ? this.renderVistaCronograma() : this.renderVistaSemana()}
-        `;
-      },
-
-      renderVistaRecursosHub() {
-        const st = this.recursosSubTab || "compras";
-        return `
-          <div style="margin-bottom:16px; background:var(--bg-panel); border:1px solid var(--border); border-radius:12px; padding:14px 18px; box-shadow:var(--shadow);">
-            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
-              <div>
-                <h1 style="font-size:20px; font-weight:800; display:flex; align-items:center; gap:8px; margin:0;">
-                  ${Icons.storage}
-                  <span>Proyecto y Recursos Técnicos</span>
-                </h1>
-                <p style="font-size:12.5px; color:var(--text-muted); margin-top:2px; margin-bottom:0;">
-                  Compras, decisiones de diseño, matriz de riesgos, pruebas de hardware, preguntas a la docente y configuración.
-                </p>
-              </div>
-            </div>
-
-            <!-- Subtabs secundarias sin saturar el menú principal -->
-            <div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:4px; scrollbar-width:thin;">
-              <button class="btn btn-sm ${st === 'compras' ? 'btn-primary' : ''}" onclick="App.setRecursosSubTab('compras')" style="gap:5px;">
-                ${Icons.cart} <span>Compras & Tienda</span>
-              </button>
-              <button class="btn btn-sm ${st === 'decisiones' ? 'btn-primary' : ''}" onclick="App.setRecursosSubTab('decisiones')" style="gap:5px;">
-                ${Icons.list} <span>Decisiones (D01-D19)</span>
-              </button>
-              <button class="btn btn-sm ${st === 'riesgos' ? 'btn-primary' : ''}" onclick="App.setRecursosSubTab('riesgos')" style="gap:5px;">
-                ${Icons.alert} <span>Riesgos (R01-R16)</span>
-              </button>
-              <button class="btn btn-sm ${st === 'pruebas' ? 'btn-primary' : ''}" onclick="App.setRecursosSubTab('pruebas')" style="gap:5px;">
-                ${Icons.check} <span>Pruebas (P1-P14)</span>
-              </button>
-              <button class="btn btn-sm ${st === 'docente' ? 'btn-primary' : ''}" onclick="App.setRecursosSubTab('docente')" style="gap:5px;">
-                ${Icons.user} <span>Docente (Q1-Q6)</span>
-              </button>
-              <button class="btn btn-sm ${st === 'referencia' ? 'btn-primary' : ''}" onclick="App.setRecursosSubTab('referencia')" style="gap:5px;">
-                ${Icons.docs} <span>Plan Maestro</span>
-              </button>
-              <button class="btn btn-sm ${st === 'config' ? 'btn-primary' : ''}" onclick="App.setRecursosSubTab('config')" style="gap:5px;">
-                ${Icons.settings} <span>Configuración & Sync</span>
-              </button>
-            </div>
-          </div>
-
-          ${st === 'compras' ? this.renderVistaCompras() : ''}
-          ${st === 'decisiones' ? this.renderVistaDecisionesModulo() : ''}
-          ${st === 'riesgos' ? this.renderVistaRiesgosModulo() : ''}
-          ${st === 'pruebas' ? this.renderVistaPruebasModulo() : ''}
-          ${st === 'docente' ? this.renderVistaDocenteModulo() : ''}
-          ${st === 'referencia' ? this.renderVistaReferencia() : ''}
-          ${st === 'config' ? this.renderVistaConfig() : ''}
-        `;
-      },
-
-      /* Sub-módulos limpios para Recursos */
-      renderVistaDecisionesModulo() {
-        return `
-          <div class="card">
-            <div class="card-header"><div class="card-title">${Icons.list} Decisiones de Diseño (D01 a D19)</div></div>
-            <div style="display:flex; flex-direction:column; gap:10px;">
-              ${DataStore.state.decisiones.map(d => `
-                <div style="background:var(--bg-card); padding:12px; border-radius:8px; border:1px solid var(--border);">
-                  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-                    <div style="display:flex; align-items:center; gap:8px;">
-                      <span class="task-id">${d.id}</span>
-                      <strong style="font-size:13.5px;">${this.escapeHtml(d.titulo)}</strong>
-                    </div>
-                    <select onchange="App.actualizarEstadoDecision('${d.id}', this.value)" style="width:auto; font-size:12px; padding:3px 8px;">
-                      <option value="propuesta" ${d.estado === 'propuesta' ? 'selected' : ''}>Propuesta</option>
-                      <option value="confirmada" ${d.estado === 'confirmada' ? 'selected' : ''}>Confirmada</option>
-                      <option value="descartada" ${d.estado === 'descartada' ? 'selected' : ''}>Descartada</option>
-                    </select>
-                  </div>
-                  <div style="font-size:12px; color:var(--text-muted); margin-top:6px; line-height:1.4;">
-                    <div><strong>Por qué:</strong> ${this.escapeHtml(d.por_que)}</div>
-                    <div><strong>Riesgo:</strong> ${this.escapeHtml(d.riesgo)}</div>
-                    <div><strong>Mitigación:</strong> ${this.escapeHtml(d.mitigacion)}</div>
-                  </div>
-                </div>
-              `).join("")}
-            </div>
-          </div>
-        `;
-      },
-
-      renderVistaRiesgosModulo() {
-        return `
-          <div class="card">
-            <div class="card-header"><div class="card-title">${Icons.alert} Matriz de Riesgos y Mitigación (R01 a R16)</div></div>
-            <div style="display:flex; flex-direction:column; gap:10px;">
-              ${DataStore.state.riesgos.map(r => `
-                <div style="background:var(--bg-card); padding:12px; border-radius:8px; border:1px solid var(--border);">
-                  <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span class="task-id">${r.id}</span>
-                    <select onchange="App.actualizarEstadoRiesgo('${r.id}', this.value)" style="width:auto; font-size:12px; padding:3px 8px;">
-                      <option value="abierto" ${r.estado === 'abierto' ? 'selected' : ''}>Abierto</option>
-                      <option value="mitigado" ${r.estado === 'mitigado' ? 'selected' : ''}>Mitigado</option>
-                      <option value="cerrado" ${r.estado === 'cerrado' ? 'selected' : ''}>Cerrado</option>
-                    </select>
-                  </div>
-                  <div style="font-weight:700; margin:6px 0; font-size:13.5px;">${this.escapeHtml(r.titulo)}</div>
-                  <div style="font-size:12px; color:var(--text-muted); line-height:1.4;">
-                    <div><strong>Qué puede fallar:</strong> ${this.escapeHtml(r.que_puede_fallar)}</div>
-                    <div style="color:var(--accent); font-weight:600; margin-top:2px;"><strong>Mitigación:</strong> ${this.escapeHtml(r.mitigacion)}</div>
-                  </div>
-                </div>
-              `).join("")}
-            </div>
-          </div>
-        `;
-      },
-
-      renderVistaPruebasModulo() {
-        return `
-          <div class="card">
-            <div class="card-header"><div class="card-title">${Icons.check} Protocolo de Pruebas Unitarias e Integrales (P1 a P14)</div></div>
-            <div style="display:flex; flex-direction:column; gap:10px;">
-              ${DataStore.state.pruebas.map(p => `
-                <div style="background:var(--bg-card); padding:12px; border-radius:8px; border:1px solid var(--border);">
-                  <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span class="task-id">${p.id} (Parte ${p.parte})</span>
-                    <select onchange="App.actualizarResultadoPrueba('${p.id}', this.value)" style="width:auto; font-size:12px; padding:3px 8px;">
-                      <option value="pendiente" ${p.resultado === 'pendiente' ? 'selected' : ''}>Pendiente</option>
-                      <option value="exitosa" ${p.resultado === 'exitosa' ? 'selected' : ''}>Exitosa</option>
-                      <option value="fallo" ${p.resultado === 'fallo' ? 'selected' : ''}>Fallo</option>
-                    </select>
-                  </div>
-                  <div style="font-weight:700; margin:6px 0; font-size:13.5px;">${this.escapeHtml(p.que_se_prueba)}</div>
-                  <div style="font-size:12px; color:var(--text-muted); line-height:1.4;">
-                    <div><strong>Criterio de éxito:</strong> ${this.escapeHtml(p.criterio_exito)}</div>
-                  </div>
-                </div>
-              `).join("")}
-            </div>
-          </div>
-        `;
-      },
-
-      renderVistaDocenteModulo() {
-        return `
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">${Icons.user} Preguntas Oficiales para la Docente PhD. Soraya Sinche (Q1 a Q6)</div>
-            </div>
-            <div style="display:flex; flex-direction:column; gap:12px;">
-              ${DataStore.state.preguntas.map(q => `
-                <div style="background:var(--bg-card); padding:14px; border-radius:8px; border:1px solid var(--border);">
-                  <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span class="task-id" style="font-size:14px;">${q.id}</span>
-                    <select onchange="App.actualizarEstadoPregunta('${q.id}', this.value)" style="width:auto; font-size:12px; padding:3px 8px;">
-                      <option value="pendiente" ${q.estado === 'pendiente' ? 'selected' : ''}>Pendiente</option>
-                      <option value="respondida" ${q.estado === 'respondida' ? 'selected' : ''}>Respondida</option>
-                    </select>
-                  </div>
-                  <div style="font-weight:700; margin:8px 0; font-size:14px;">${this.escapeHtml(q.pregunta)}</div>
-                  <div style="font-size:12px; color:var(--text-muted); margin-bottom:6px;">${this.escapeHtml(q.notas || '')}</div>
-                  <div style="margin-top:6px;">
-                    <label style="font-size:11.5px; font-weight:800; color:var(--accent);">Respuesta oficial de la Ing. Sinche:</label>
-                    <textarea rows="2" placeholder="Escribir respuesta obtenida de la docente..." onchange="App.actualizarRespuestaPregunta('${q.id}', this.value)" style="margin-top:4px;">${this.escapeHtml(q.respuesta || '')}</textarea>
-                  </div>
-                </div>
-              `).join("")}
-            </div>
-          </div>
-        `;
-      },
-
-      /* Vista Grid de Tarjetas de Tareas */
-      renderVistaGridTareas() {
-        const st = DataStore.state;
-        const tareas = st.tareas;
-        const u = st.config.usuario_actual || "Todos";
-
-        let filtradas = tareas;
-        if (this.treeFilter === 'libres') {
-          filtradas = filtradas.filter(t => !t.rol_responsable || t.rol_responsable === "Sin asignar" || t.rol_responsable === "Libre");
-        } else if (this.treeFilter === 'mis' && u !== "Todos") {
-          filtradas = filtradas.filter(t => Logic.taskBelongsToUser(t, u));
-        } else if (this.treeFilter === 'p1') {
-          filtradas = filtradas.filter(t => t.parte === 1);
-        } else if (this.treeFilter === 'p2') {
-          filtradas = filtradas.filter(t => t.parte === 2);
-        } else if (this.treeFilter === 'hechas') {
-          filtradas = filtradas.filter(t => t.estado === "Hecha");
-        } else if (this.treeFilter === 'angelo') {
-          filtradas = filtradas.filter(t => (t.rol_responsable || "").includes("Angelo") || (t.rol_responsable || "").includes("Integrante 2"));
-        } else if (this.treeFilter === 'xavier') {
-          filtradas = filtradas.filter(t => (t.rol_responsable || "").includes("Xavier") || (t.rol_responsable || "").includes("Integrante 1"));
-        } else if (this.treeFilter === 'fernando') {
-          filtradas = filtradas.filter(t => (t.rol_responsable || "").includes("Fernando") || (t.rol_responsable || "").includes("Integrante 3"));
-        }
-
-        if (this.taskSearchQuery) {
-          const q = this.taskSearchQuery;
-          filtradas = filtradas.filter(t => 
-            t.id.toLowerCase().includes(q) || 
-            t.titulo.toLowerCase().includes(q) || 
-            (t.descripcion || "").toLowerCase().includes(q) ||
-            t.fase.toLowerCase().includes(q)
-          );
-        }
-
-        return `
-          <div style="background:var(--bg-panel); border:1px solid var(--border); border-radius:12px; padding:18px; box-shadow:var(--shadow);">
-            <!-- Barra de búsqueda y filtros rápidos -->
-            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:16px; flex-wrap:wrap;">
-              <div style="flex:1; min-width:240px; position:relative;">
-                <input type="text" placeholder="Buscar tarea por ID, título, fase o componente..." value="${this.escapeHtml(this.taskSearchQuery)}" oninput="App.setTaskSearch(this.value)" style="padding-left:12px; font-size:13px; border-radius:8px;" />
-              </div>
-              <div style="font-size:12px; color:var(--text-muted); font-weight:600;">
-                Mostrando ${filtradas.length} de ${tareas.length} tareas
-              </div>
-            </div>
-
-            <!-- Filtros pills -->
-            <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px;">
-              <button class="btn btn-sm ${this.treeFilter === 'todos' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('todos')">Todo (${tareas.length})</button>
-              <button class="btn btn-sm ${this.treeFilter === 'libres' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('libres')" style="font-weight:800; border:1.5px dashed var(--accent);">🌟 Bolsa / Libres (${tareas.filter(t => !t.rol_responsable || t.rol_responsable === 'Sin asignar' || t.rol_responsable === 'Libre').length})</button>
-              <button class="btn btn-sm ${this.treeFilter === 'mis' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('mis')">Mis Tareas (${this.escapeHtml(u)})</button>
-              <button class="btn btn-sm ${this.treeFilter === 'p1' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('p1')">Parte 1 (23 Nov)</button>
-              <button class="btn btn-sm ${this.treeFilter === 'p2' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('p2')">Parte 2 (25 Ene)</button>
-              <button class="btn btn-sm ${this.treeFilter === 'hechas' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('hechas')" style="color:var(--accent);">✔ Finalizadas (${tareas.filter(t => t.estado === 'Hecha').length})</button>
-            </div>
-
-            ${filtradas.length === 0 ? `
-              <div style="text-align:center; padding:40px; color:var(--text-muted); background:var(--bg-card); border-radius:10px; border:1px dashed var(--border);">
-                <p style="font-size:14px; font-weight:700;">No se encontraron tareas con los filtros seleccionados.</p>
-                <button class="btn btn-sm btn-primary" onclick="App.setTreeFilter('todos'); App.setTaskSearch('');" style="margin-top:8px;">Ver todas las tareas</button>
-              </div>
-            ` : `
-              <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(290px, 1fr)); gap:14px;">
-                ${filtradas.map(t => this.renderPastelTaskCard(t)).join("")}
-              </div>
-            `}
-          </div>
-        `;
-      },
-
-      /* ========================================================================
-         1. PANEL PRINCIPAL — DASHBOARD DE EQUIPO CON HITOS, KPIS Y TAREAS VISIBLES
+         1. PANEL PRINCIPAL / DASHBOARD EJECUTIVO (Inspirado en 002521.png, 002454.png y 002357.png)
          ======================================================================== */
       renderPanelPrincipal() {
         const st = DataStore.state;
@@ -3294,175 +2868,182 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
         const xavierCount = tareas.filter(t => (t.rol_responsable || "").includes("Xavier") || (t.rol_responsable || "").includes("Integrante 1")).length;
         const fernandoCount = tareas.filter(t => (t.rol_responsable || "").includes("Fernando") || (t.rol_responsable || "").includes("Integrante 3")).length;
 
-        // Días restantes a los hitos oficiales
         const diasP1 = Logic.getDaysRemaining(st.config.fecha_entrega_p1 || "2026-11-23");
         const diasP2 = Logic.getDaysRemaining(st.config.fecha_entrega_p2 || "2027-01-25");
 
         const subView = this.tasksSubView || "arbol";
 
         return `
-          <!-- BANNER HERO DEL EQUIPO CON HITOS OFICIALES -->
-          <div style="background:var(--bg-panel); border:1px solid var(--border); border-radius:14px; padding:20px; margin-bottom:18px; box-shadow:var(--shadow);">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap;">
+          <!-- HERO / ENCABEZADO MODERNO DRIBBBLE (Inspirado en 002454.png y 002357.png) -->
+          <div style="background:var(--bg-panel); border:1px solid var(--border); border-radius:20px; padding:22px; margin-bottom:18px; box-shadow:var(--shadow);">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;">
               <div>
-                <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-                  <span class="badge tag-PDF">EPN Sistemas IoT • Grupo 1</span>
-                  <span class="badge tag-DISENO">Plan Maestro v2.0</span>
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px; flex-wrap:wrap;">
+                  <span class="badge" style="background:#eff6ff; color:#2563eb; font-weight:800; font-size:11px;">EPN • Sistemas IoT (2026-B)</span>
+                  <span class="badge" style="background:#f5f3ff; color:#7c3aed; font-weight:800; font-size:11px;">Grupo 1 • Plan Maestro v2.0</span>
+                  <span class="badge" style="background:#ecfdf5; color:#059669; font-weight:800; font-size:11px;">v3.0 Dribbble Pastel</span>
                 </div>
-                <h1 style="font-size:22px; font-weight:800; margin:0 0 4px 0; letter-spacing:-0.01em;">
-                  Cámara de Germinación Inteligente IoT
+                <h1 style="font-size:24px; font-weight:800; margin:0 0 6px 0; color:var(--text-main); letter-spacing:-0.02em;">
+                  Hola, ${this.escapeHtml(miNombre.split(" ")[0])}!
                 </h1>
                 <p style="font-size:13px; color:var(--text-muted); margin:0;">
-                  Tablero de equipo para saber <strong>QUÉ</strong> hacer, <strong>CÓMO</strong>, <strong>CUÁNDO</strong> y <strong>QUIÉN</strong> lo toma de la bolsa libre.
+                  Cámara de Germinación Inteligente IoT • Todas las tareas disponibles en la bolsa compartida.
                 </p>
               </div>
 
-              <!-- Selector rápido de usuario en el hero -->
-              <div style="display:flex; align-items:center; gap:8px; background:var(--bg-card); padding:8px 12px; border-radius:10px; border:1px solid var(--border);">
-                <div style="width:28px; height:28px; border-radius:50%; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px;">
-                  ${miNombre.charAt(0)}
+              <!-- Selector de usuario y botón de refrescar versión -->
+              <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                <div style="display:flex; align-items:center; gap:8px; background:var(--bg-card); padding:8px 14px; border-radius:12px; border:1px solid var(--border);">
+                  <div style="width:32px; height:32px; border-radius:50%; background:#3b82f6; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px;">
+                    ${miNombre.charAt(0)}
+                  </div>
+                  <div>
+                    <div style="font-size:10.5px; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Mi Sesión:</div>
+                    <div style="font-size:13px; font-weight:800; color:var(--text-main);">${this.escapeHtml(miNombre)}</div>
+                  </div>
                 </div>
-                <div>
-                  <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Mi Sesión:</div>
-                  <div style="font-size:13px; font-weight:800; color:var(--text-main);">${this.escapeHtml(miNombre)}</div>
-                </div>
+
+                <button class="btn btn-sm" onclick="App.forzarActualizacion()" title="Limpiar caché y forzar descarga de la última versión" style="gap:5px; padding:8px 12px; font-size:11.5px; font-weight:700;">
+                  ${Icons.cloud}
+                  <span>Refrescar versión</span>
+                </button>
               </div>
             </div>
 
             <!-- HITOS OFICIALES DE ENTREGA (23 NOV Y 25 ENE) -->
-            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:12px; margin-top:16px; padding-top:16px; border-top:1px solid var(--border);">
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:14px; margin-top:20px; padding-top:18px; border-top:1px solid var(--border);">
               <!-- Hito Parte 1 -->
-              <div style="background:var(--bg-card); border:1.5px solid var(--info); border-radius:10px; padding:12px 14px; display:flex; flex-direction:column; gap:6px;">
+              <div style="background:var(--bg-card); border:1.5px solid #3b82f6; border-radius:14px; padding:14px 16px; display:flex; flex-direction:column; gap:8px;">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                  <span style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--info); display:inline-flex; align-items:center; gap:5px;">
-                    🏁 Hito Entrega Parte 1
+                  <span style="font-size:11.5px; font-weight:800; text-transform:uppercase; color:#2563eb; display:inline-flex; align-items:center; gap:6px;">
+                    ${Icons.calendar} Hito Entrega Parte 1
                   </span>
-                  <span class="badge" style="background:var(--info-soft); color:var(--info); font-weight:800;">
+                  <span class="badge" style="background:#eff6ff; color:#2563eb; font-weight:800; font-size:11.5px;">
                     Quedan ${diasP1} días
                   </span>
                 </div>
                 <div style="display:flex; justify-content:space-between; align-items:baseline;">
-                  <div style="font-size:17px; font-weight:800;">23 de Noviembre de 2026</div>
-                  <div style="font-size:12.5px; font-weight:700; color:var(--info);">${progP1}%</div>
+                  <div style="font-size:18px; font-weight:800; color:var(--text-main);">23 de Noviembre de 2026</div>
+                  <div style="font-size:13px; font-weight:800; color:#2563eb;">${progP1}%</div>
                 </div>
-                <div class="progress-wrap" style="height:6px;"><div class="progress-bar" style="width:${progP1}%; background:var(--info);"></div></div>
-                <div style="font-size:11.5px; color:var(--text-muted); line-height:1.3;">
+                <div class="progress-wrap" style="height:7px; background:#e2e8f0;"><div class="progress-bar" style="width:${progP1}%; background:#3b82f6;"></div></div>
+                <div style="font-size:11.5px; color:var(--text-muted); line-height:1.35;">
                   Prototipo en protoboard, lote piloto de 4-5 días, telemetría MQTT y primer informe técnico.
                 </div>
               </div>
 
               <!-- Hito Parte 2 -->
-              <div style="background:var(--bg-card); border:1.5px solid var(--purple); border-radius:10px; padding:12px 14px; display:flex; flex-direction:column; gap:6px;">
+              <div style="background:var(--bg-card); border:1.5px solid #8b5cf6; border-radius:14px; padding:14px 16px; display:flex; flex-direction:column; gap:8px;">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                  <span style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--purple); display:inline-flex; align-items:center; gap:5px;">
-                    🏆 Hito Defensa Final Parte 2
+                  <span style="font-size:11.5px; font-weight:800; text-transform:uppercase; color:#7c3aed; display:inline-flex; align-items:center; gap:6px;">
+                    ${Icons.checkCircle} Hito Defensa Final Parte 2
                   </span>
-                  <span class="badge" style="background:var(--purple-soft); color:var(--purple); font-weight:800;">
+                  <span class="badge" style="background:#f5f3ff; color:#7c3aed; font-weight:800; font-size:11.5px;">
                     Quedan ${diasP2} días
                   </span>
                 </div>
                 <div style="display:flex; justify-content:space-between; align-items:baseline;">
-                  <div style="font-size:17px; font-weight:800;">25 de Enero de 2027</div>
-                  <div style="font-size:12.5px; font-weight:700; color:var(--purple);">${progP2}%</div>
+                  <div style="font-size:18px; font-weight:800; color:var(--text-main);">25 de Enero de 2027</div>
+                  <div style="font-size:13px; font-weight:800; color:#7c3aed;">${progP2}%</div>
                 </div>
-                <div class="progress-wrap" style="height:6px;"><div class="progress-bar" style="width:${progP2}%; background:var(--purple);"></div></div>
-                <div style="font-size:11.5px; color:var(--text-muted); line-height:1.3;">
+                <div class="progress-wrap" style="height:7px; background:#e2e8f0;"><div class="progress-bar" style="width:${progP2}%; background:#8b5cf6;"></div></div>
+                <div style="font-size:11.5px; color:var(--text-muted); line-height:1.35;">
                   PCB definitiva, estructura acrílica, visión OpenCV (ESP32-CAM) y dos lotes reales autónomos.
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- 4 TARJETAS KPI DE EQUIPO (PASTEL Y SUAVES) -->
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-bottom:18px;">
+          <!-- 4 TARJETAS KPI PASTEL (Inspiradas en 002357.png) -->
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:14px; margin-bottom:20px;">
             <!-- Total -->
-            <div class="card" style="padding:14px; border-radius:12px; display:flex; flex-direction:column; gap:4px;">
-              <div style="font-size:11.5px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Total Tareas</div>
+            <div class="card" style="padding:16px; border-radius:16px; background:#faf5ff; border:1px solid #e9d5ff; display:flex; flex-direction:column; gap:4px;">
+              <div style="font-size:11px; color:#7e22ce; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">Total Tareas</div>
               <div style="display:flex; justify-content:space-between; align-items:baseline;">
-                <span style="font-size:26px; font-weight:800; color:var(--text-main);">${tareas.length}</span>
-                <span style="font-size:13px; font-weight:700; color:var(--accent);">${progTotal}% total</span>
+                <span style="font-size:28px; font-weight:800; color:#581c87;">${tareas.length}</span>
+                <span style="font-size:13px; font-weight:800; color:#7e22ce;">${progTotal}% total</span>
               </div>
-              <div class="progress-wrap" style="height:5px;"><div class="progress-bar" style="width:${progTotal}%;"></div></div>
+              <div class="progress-wrap" style="height:6px; background:rgba(126,34,206,0.15);"><div class="progress-bar" style="width:${progTotal}%; background:#7e22ce;"></div></div>
             </div>
 
             <!-- Bolsa Libres -->
-            <div class="card" style="padding:14px; border-radius:12px; border:1.5px dashed var(--accent); background:rgba(16, 185, 129, 0.05); cursor:pointer;" onclick="App.setTreeFilter('libres'); App.setTasksSubView('grid');" title="Clic para ver tareas libres para tomar">
-              <div style="font-size:11.5px; color:var(--accent); font-weight:800; text-transform:uppercase;">🌟 Libres en Bolsa</div>
+            <div class="card" style="padding:16px; border-radius:16px; background:#eff6ff; border:1.5px dashed #60a5fa; cursor:pointer;" onclick="App.setTreeFilter('libres'); App.setTasksSubView('arbol');" title="Clic para ver las tareas disponibles para tomar">
+              <div style="font-size:11px; color:#1d4ed8; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">🌟 Libres en Bolsa</div>
               <div style="display:flex; justify-content:space-between; align-items:baseline;">
-                <span style="font-size:26px; font-weight:800; color:var(--accent);">${libresCount}</span>
-                <span style="font-size:11px; font-weight:700; color:var(--accent);">Tomar en 1-clic</span>
+                <span style="font-size:28px; font-weight:800; color:#1e40af;">${libresCount}</span>
+                <span style="font-size:11.5px; font-weight:800; color:#2563eb;">Tomar en 1-clic</span>
               </div>
-              <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Disponibles para cualquiera</div>
+              <div style="font-size:11px; color:#1e40af; opacity:0.85; margin-top:4px;">Cualquiera puede tomarlas</div>
             </div>
 
             <!-- En curso -->
-            <div class="card" style="padding:14px; border-radius:12px; display:flex; flex-direction:column; gap:4px;">
-              <div style="font-size:11.5px; color:var(--info); font-weight:700; text-transform:uppercase;">En Curso</div>
+            <div class="card" style="padding:16px; border-radius:16px; background:#fff7ed; border:1px solid #fed7aa; display:flex; flex-direction:column; gap:4px;">
+              <div style="font-size:11px; color:#c2410c; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">En Curso</div>
               <div style="display:flex; justify-content:space-between; align-items:baseline;">
-                <span style="font-size:26px; font-weight:800; color:var(--info);">${totalEnCurso}</span>
-                <span style="font-size:11.5px; color:var(--text-muted);">${totalRevision} en revisión</span>
+                <span style="font-size:28px; font-weight:800; color:#9a3412;">${totalEnCurso}</span>
+                <span style="font-size:11.5px; font-weight:700; color:#c2410c;">${totalRevision} en revisión</span>
               </div>
-              <div style="font-size:11px; color:var(--text-muted);">Siendo desarrolladas ahora</div>
+              <div style="font-size:11px; color:#9a3412; opacity:0.85;">Siendo ejecutadas ahora</div>
             </div>
 
             <!-- Finalizadas -->
-            <div class="card pastel-hecha" style="padding:14px; border-radius:12px; display:flex; flex-direction:column; gap:4px; border:1.5px solid #10b981;">
-              <div style="font-size:11.5px; font-weight:800; text-transform:uppercase; color:#065f46;">✔ Finalizadas</div>
+            <div class="card" style="padding:16px; border-radius:16px; background:#f0fdf4; border:1.5px solid #86efac; cursor:pointer;" onclick="App.setTreeFilter('hechas'); App.setTasksSubView('arbol');" title="Clic para ver las tareas finalizadas">
+              <div style="font-size:11px; font-weight:800; text-transform:uppercase; color:#15803d; letter-spacing:0.5px;">✔ Finalizadas</div>
               <div style="display:flex; justify-content:space-between; align-items:baseline;">
-                <span style="font-size:26px; font-weight:800; color:#065f46;">${totalHechas}</span>
-                <span style="font-size:11.5px; font-weight:700; color:#065f46;">Verde menta</span>
+                <span style="font-size:28px; font-weight:800; color:#14532d;">${totalHechas}</span>
+                <span style="font-size:11.5px; font-weight:800; color:#15803d;">Verde menta</span>
               </div>
-              <div style="font-size:11px; color:#065f46; opacity:0.85;">Permanecen siempre visibles</div>
+              <div style="font-size:11px; color:#15803d; opacity:0.85;">Permanecen siempre visibles</div>
             </div>
           </div>
 
-          <!-- FILA DE ESTADO DE LOS 3 INTEGRANTES -->
-          <div style="background:var(--bg-panel); border:1px solid var(--border); border-radius:12px; padding:12px 16px; margin-bottom:18px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
-            <div style="font-size:12px; font-weight:800; text-transform:uppercase; color:var(--text-muted);">
-              Carga del Equipo (3 Integrantes):
+          <!-- ESTADO DEL EQUIPO (3 INTEGRANTES) -->
+          <div style="background:var(--bg-panel); border:1px solid var(--border); border-radius:14px; padding:12px 18px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; box-shadow:var(--shadow-sm);">
+            <div style="font-size:12px; font-weight:800; text-transform:uppercase; color:var(--text-muted); letter-spacing:0.5px;">
+              Carga del Equipo:
             </div>
             <div style="display:flex; gap:8px; flex-wrap:wrap;">
-              <button class="btn btn-sm pastel-user-angelo" onclick="App.setTreeFilter('angelo'); App.setTasksSubView('grid');" style="font-size:12px; font-weight:700;">
+              <button class="btn btn-sm pastel-user-angelo" onclick="App.setTreeFilter('angelo'); App.setTasksSubView('arbol');" style="font-size:12px; font-weight:800; padding:6px 12px; border-radius:10px;">
                 Angelo Conterón (${angeloCount})
               </button>
-              <button class="btn btn-sm pastel-user-xavier" onclick="App.setTreeFilter('xavier'); App.setTasksSubView('grid');" style="font-size:12px; font-weight:700;">
+              <button class="btn btn-sm pastel-user-xavier" onclick="App.setTreeFilter('xavier'); App.setTasksSubView('arbol');" style="font-size:12px; font-weight:800; padding:6px 12px; border-radius:10px;">
                 Xavier Anatoa (${xavierCount})
               </button>
-              <button class="btn btn-sm pastel-user-fernando" onclick="App.setTreeFilter('fernando'); App.setTasksSubView('grid');" style="font-size:12px; font-weight:700;">
+              <button class="btn btn-sm pastel-user-fernando" onclick="App.setTreeFilter('fernando'); App.setTasksSubView('arbol');" style="font-size:12px; font-weight:800; padding:6px 12px; border-radius:10px;">
                 Fernando Guarderas (${fernandoCount})
               </button>
             </div>
           </div>
 
-          <!-- EXPLORADOR PRINCIPAL DE TAREAS ("EN LA PANTALLA PRINCIPAL SE VEAN MEJOR LAS TAREAS") -->
-          <div style="background:var(--bg-panel); border:1px solid var(--border); border-radius:14px; padding:18px; box-shadow:var(--shadow);">
-            <!-- Barra de control de vista en el dashboard -->
-            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:16px; flex-wrap:wrap;">
+          <!-- EXPLORADOR PRINCIPAL DE TAREAS -->
+          <div style="background:var(--bg-panel); border:1px solid var(--border); border-radius:20px; padding:22px; box-shadow:var(--shadow);">
+            <!-- Barra de selección de vista -->
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px; flex-wrap:wrap;">
               <div>
-                <h2 style="font-size:18px; font-weight:800; display:flex; align-items:center; gap:8px; margin:0;">
+                <h2 style="font-size:20px; font-weight:800; display:flex; align-items:center; gap:8px; margin:0; color:var(--text-main);">
                   ${Icons.tree}
-                  <span>Tareas del Proyecto IoT</span>
+                  <span>Flujo de Tareas del Proyecto</span>
                 </h2>
-                <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">
-                  Visualiza el flujo de trabajo en Árbol de Ramas, Tarjetas o Tablero Kanban.
+                <div style="font-size:12.5px; color:var(--text-muted); margin-top:2px;">
+                  Elige entre el Árbol Bézier de Ramas, la Cuadrícula de Tarjetas Pastel o el Tablero Kanban.
                 </div>
               </div>
 
-              <!-- Switcher de modo en el dashboard -->
-              <div style="display:flex; background:var(--bg-card); padding:3px; border-radius:8px; border:1px solid var(--border); gap:3px;">
-                <button class="btn btn-sm ${subView === 'arbol' ? 'btn-primary' : ''}" onclick="App.setTasksSubView('arbol')" style="gap:5px;">
+              <!-- Switcher de sub-vista -->
+              <div style="display:flex; background:var(--bg-card); padding:4px; border-radius:10px; border:1px solid var(--border); gap:4px;">
+                <button class="btn btn-sm ${subView === 'arbol' ? 'btn-primary' : ''}" onclick="App.setTasksSubView('arbol')" style="gap:5px; font-weight:700;">
                   ${Icons.tree} <span>Árbol de Ramas</span>
                 </button>
-                <button class="btn btn-sm ${subView === 'grid' ? 'btn-primary' : ''}" onclick="App.setTasksSubView('grid')" style="gap:5px;">
+                <button class="btn btn-sm ${subView === 'grid' ? 'btn-primary' : ''}" onclick="App.setTasksSubView('grid')" style="gap:5px; font-weight:700;">
                   ${Icons.list} <span>Tarjetas Grid</span>
                 </button>
-                <button class="btn btn-sm ${subView === 'tablero' ? 'btn-primary' : ''}" onclick="App.setTasksSubView('tablero')" style="gap:5px;">
+                <button class="btn btn-sm ${subView === 'tablero' ? 'btn-primary' : ''}" onclick="App.setTasksSubView('tablero')" style="gap:5px; font-weight:700;">
                   ${Icons.board} <span>Tablero</span>
                 </button>
               </div>
             </div>
 
-            <!-- Contenido dinámico según el modo elegido -->
+            <!-- Contenido dinámico de la vista elegida -->
             ${subView === 'arbol' ? this.renderVistaArbol() : ''}
             ${subView === 'grid' ? this.renderVistaGridTareas() : ''}
             ${subView === 'tablero' ? this.renderVistaTablero() : ''}
@@ -3470,27 +3051,492 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
         `;
       },
 
-      cambiarSemanaActiva(delta) {
-        let s = Number(DataStore.state.config.semana_actual_p1 || 1) + delta;
-        if (s < 1) s = 1;
-        if (s > 9) s = 9;
-        DataStore.state.config.semana_actual_p1 = s;
-        DataStore.save();
-        this.render();
+      async forzarActualizacion() {
+        if ('caches' in window) {
+          try {
+            const keys = await caches.keys();
+            await Promise.all(keys.map(k => caches.delete(k)));
+          } catch (e) {}
+        }
+        if ('serviceWorker' in navigator) {
+          try {
+            const regs = await navigator.serviceWorker.getRegistrations();
+            for (let r of regs) {
+              await r.unregister();
+            }
+          } catch (e) {}
+        }
+        window.location.reload(true);
       },
 
-      toggleVerificacion(id) {
-        const v = DataStore.state.verificaciones_pendientes.find(x => x.id === id);
-        if (v) {
-          v.cerrado = !v.cerrado;
-          DataStore.save();
-          this.render();
+
+      /* ========================================================================
+         2. VISTA ÁRBOL — DIAGRAMA DE RAMAS HORIZONTALES CON LÍNEAS CURVAS BÉZIER
+            (Inspirado directamente en las capturas del usuario: 002335.png y 002521.png)
+         ======================================================================== */
+      renderVistaArbol() {
+        const st = DataStore.state;
+        const allTareas = st.tareas;
+        const u = st.config.usuario_actual || "Angelo Conterón";
+
+        // Filtro de tareas
+        let tareas = allTareas;
+        if (this.treeFilter === 'libres') {
+          tareas = tareas.filter(t => !t.rol_responsable || t.rol_responsable === "Sin asignar" || t.rol_responsable === "Libre");
+        } else if (this.treeFilter === 'angelo') {
+          tareas = tareas.filter(t => (t.rol_responsable || "").includes("Angelo") || (t.rol_responsable || "").includes("Integrante 2"));
+        } else if (this.treeFilter === 'xavier') {
+          tareas = tareas.filter(t => (t.rol_responsable || "").includes("Xavier") || (t.rol_responsable || "").includes("Integrante 1"));
+        } else if (this.treeFilter === 'fernando') {
+          tareas = tareas.filter(t => (t.rol_responsable || "").includes("Fernando") || (t.rol_responsable || "").includes("Integrante 3"));
+        } else if (this.treeFilter === 'p1') {
+          tareas = tareas.filter(t => t.parte === 1);
+        } else if (this.treeFilter === 'p2') {
+          tareas = tareas.filter(t => t.parte === 2);
+        } else if (this.treeFilter === 'hechas') {
+          tareas = tareas.filter(t => t.estado === "Hecha");
+        } else if (this.treeFilter === 'mis' && u !== "Todos") {
+          tareas = tareas.filter(t => Logic.taskBelongsToUser(t, u));
         }
+
+        if (this.taskSearchQuery) {
+          const q = this.taskSearchQuery;
+          tareas = tareas.filter(t => t.id.toLowerCase().includes(q) || t.titulo.toLowerCase().includes(q) || (t.descripcion || "").toLowerCase().includes(q));
+        }
+
+        const p1 = tareas.filter(t => t.parte === 1);
+        const p2 = tareas.filter(t => t.parte === 2);
+
+        // Agrupar tareas por fase
+        const getFases = (partTareas) => {
+          const map = {};
+          partTareas.forEach(t => {
+            const f = t.fase || "General";
+            if (!map[f]) map[f] = [];
+            map[f].push(t);
+          });
+          return map;
+        };
+
+        const fasesP1 = getFases(p1);
+        const fasesP2 = getFases(p2);
+
+        // Parámetros de coordenadas SVG
+        const colX = [30, 240, 520, 850];
+        const nodeW = [160, 220, 270, 310];
+        const rowHeight = 46;
+        const rowGap = 10;
+
+        let currentY = 40;
+        const taskPositions = {};
+        const fasePositions = {};
+        const partePositions = {};
+
+        // Layout P1
+        const startYP1 = currentY;
+        const hasP1 = Object.keys(fasesP1).length > 0;
+        if (hasP1) {
+          Object.keys(fasesP1).forEach(fase => {
+            const startYFase = currentY;
+            fasesP1[fase].forEach(t => {
+              taskPositions[t.id] = { x: colX[3], y: currentY, w: nodeW[3], h: rowHeight, task: t };
+              currentY += rowHeight + rowGap;
+            });
+            const endYFase = currentY - rowGap;
+            fasePositions['P1_' + fase] = {
+              x: colX[2],
+              y: (startYFase + endYFase) / 2 - 20,
+              w: nodeW[2],
+              h: 40,
+              label: fase,
+              tasks: fasesP1[fase]
+            };
+            currentY += 14;
+          });
+          const endYP1 = currentY - 14;
+          partePositions['P1'] = {
+            x: colX[1],
+            y: (startYP1 + endYP1) / 2 - 24,
+            w: nodeW[1],
+            h: 48,
+            label: "Parte 1: Prototipo & Piloto",
+            sub: "Hito: 23 Noviembre 2026",
+            color: "#facc15",
+            stroke: "#eab308",
+            textColor: "#713f12"
+          };
+          currentY += 28;
+        }
+
+        // Layout P2
+        const startYP2 = currentY;
+        const hasP2 = Object.keys(fasesP2).length > 0;
+        if (hasP2) {
+          Object.keys(fasesP2).forEach(fase => {
+            const startYFase = currentY;
+            fasesP2[fase].forEach(t => {
+              taskPositions[t.id] = { x: colX[3], y: currentY, w: nodeW[3], h: rowHeight, task: t };
+              currentY += rowHeight + rowGap;
+            });
+            const endYFase = currentY - rowGap;
+            fasePositions['P2_' + fase] = {
+              x: colX[2],
+              y: (startYFase + endYFase) / 2 - 20,
+              w: nodeW[2],
+              h: 40,
+              label: fase,
+              tasks: fasesP2[fase]
+            };
+            currentY += 14;
+          });
+          const endYP2 = currentY - 14;
+          partePositions['P2'] = {
+            x: colX[1],
+            y: (startYP2 + endYP2) / 2 - 24,
+            w: nodeW[1],
+            h: 48,
+            label: "Parte 2: Sistema Final & Visión",
+            sub: "Hito: 25 Enero 2027",
+            color: "#facc15",
+            stroke: "#eab308",
+            textColor: "#713f12"
+          };
+        }
+
+        const totalHeight = Math.max(480, currentY + 40);
+        const rootY = totalHeight / 2 - 26;
+        const rootPos = {
+          x: colX[0],
+          y: rootY,
+          w: nodeW[0],
+          h: 52,
+          label: "Cámara IoT",
+          sub: "Semillero EPN"
+        };
+
+        function bezierCurve(x1, y1, x2, y2) {
+          const dx = (x2 - x1) * 0.55;
+          return `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
+        }
+
+        let pathsSvg = "";
+
+        // Root to Partes
+        if (hasP1 && partePositions['P1']) {
+          pathsSvg += `<path d="${bezierCurve(rootPos.x + rootPos.w, rootPos.y + rootPos.h / 2, partePositions['P1'].x, partePositions['P1'].y + partePositions['P1'].h / 2)}" stroke="#94a3b8" stroke-width="2.5" fill="none" stroke-linecap="round" />`;
+          Object.keys(fasesP1).forEach(fase => {
+            const fPos = fasePositions['P1_' + fase];
+            pathsSvg += `<path d="${bezierCurve(partePositions['P1'].x + partePositions['P1'].w, partePositions['P1'].y + partePositions['P1'].h / 2, fPos.x, fPos.y + fPos.h / 2)}" stroke="#cbd5e1" stroke-width="2" fill="none" stroke-linecap="round" />`;
+            fasesP1[fase].forEach(t => {
+              const tPos = taskPositions[t.id];
+              pathsSvg += `<path d="${bezierCurve(fPos.x + fPos.w, fPos.y + fPos.h / 2, tPos.x, tPos.y + tPos.h / 2)}" stroke="#e2e8f0" stroke-width="1.8" fill="none" stroke-linecap="round" />`;
+            });
+          });
+        }
+
+        if (hasP2 && partePositions['P2']) {
+          pathsSvg += `<path d="${bezierCurve(rootPos.x + rootPos.w, rootPos.y + rootPos.h / 2, partePositions['P2'].x, partePositions['P2'].y + partePositions['P2'].h / 2)}" stroke="#94a3b8" stroke-width="2.5" fill="none" stroke-linecap="round" />`;
+          Object.keys(fasesP2).forEach(fase => {
+            const fPos = fasePositions['P2_' + fase];
+            pathsSvg += `<path d="${bezierCurve(partePositions['P2'].x + partePositions['P2'].w, partePositions['P2'].y + partePositions['P2'].h / 2, fPos.x, fPos.y + fPos.h / 2)}" stroke="#cbd5e1" stroke-width="2" fill="none" stroke-linecap="round" />`;
+            fasesP2[fase].forEach(t => {
+              const tPos = taskPositions[t.id];
+              pathsSvg += `<path d="${bezierCurve(fPos.x + fPos.w, fPos.y + fPos.h / 2, tPos.x, tPos.y + tPos.h / 2)}" stroke="#e2e8f0" stroke-width="1.8" fill="none" stroke-linecap="round" />`;
+            });
+          });
+        }
+
+        const libresCount = allTareas.filter(t => !t.rol_responsable || t.rol_responsable === "Sin asignar" || t.rol_responsable === "Libre").length;
+        const angeloCount = allTareas.filter(t => (t.rol_responsable || "").includes("Angelo") || (t.rol_responsable || "").includes("Integrante 2")).length;
+        const xavierCount = allTareas.filter(t => (t.rol_responsable || "").includes("Xavier") || (t.rol_responsable || "").includes("Integrante 1")).length;
+        const fernandoCount = allTareas.filter(t => (t.rol_responsable || "").includes("Fernando") || (t.rol_responsable || "").includes("Integrante 3")).length;
+        const hechasCount = allTareas.filter(t => t.estado === "Hecha").length;
+
+        return `
+          <!-- FILTROS Y CONTROLES DEL ÁRBOL -->
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:14px; flex-wrap:wrap;">
+            <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+              <button class="btn btn-sm ${this.treeFilter === 'todos' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('todos')">Todas (${allTareas.length})</button>
+              <button class="btn btn-sm ${this.treeFilter === 'libres' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('libres')" style="font-weight:700;">🌟 Bolsa Libre (${libresCount})</button>
+              <button class="btn btn-sm ${this.treeFilter === 'angelo' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('angelo')">Angelo (${angeloCount})</button>
+              <button class="btn btn-sm ${this.treeFilter === 'xavier' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('xavier')">Xavier (${xavierCount})</button>
+              <button class="btn btn-sm ${this.treeFilter === 'fernando' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('fernando')">Fernando (${fernandoCount})</button>
+              <button class="btn btn-sm ${this.treeFilter === 'p1' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('p1')">P1 (23 Nov)</button>
+              <button class="btn btn-sm ${this.treeFilter === 'p2' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('p2')">P2 (25 Ene)</button>
+              <button class="btn btn-sm ${this.treeFilter === 'hechas' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('hechas')" style="color:#059669; font-weight:700;">✔ Finalizadas (${hechasCount})</button>
+            </div>
+
+            <div style="display:flex; gap:8px; align-items:center;">
+              <input type="text" placeholder="Buscar en el árbol..." value="${this.taskSearchQuery || ''}" oninput="App.setTaskSearch(this.value)" style="padding:6px 12px; font-size:12px; border-radius:8px; border:1px solid var(--border); width:180px;" />
+              <button class="btn btn-sm" onclick="App.liberarTodasPendientes()" title="Soltar a la bolsa todas las tareas pendientes" style="font-size:11px;">
+                Soltar a la bolsa
+              </button>
+            </div>
+          </div>
+
+          <!-- CONTENEDOR CON DESPLAZAMIENTO HORIZONTAL SUAVE -->
+          <div class="svg-tree-container">
+            <div style="font-size:11.5px; color:var(--text-muted); margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+              <span>Ruta en Árbol con Conectores Bézier (Izquierda a Derecha) • Toca cualquier tarjeta para ver su contenido completo</span>
+              <span style="font-weight:700;">Total nodos mostrados: ${tareas.length}</span>
+            </div>
+
+            <div style="min-width:1180px; position:relative;">
+              <svg width="1180" height="${totalHeight}" viewBox="0 0 1180 ${totalHeight}" style="display:block; overflow:visible;">
+                <!-- Líneas curvas de conexión Bézier -->
+                ${pathsSvg}
+
+                <!-- NODO RAÍZ (OBJECTIVE) -->
+                <g transform="translate(${rootPos.x}, ${rootPos.y})">
+                  <rect width="${rootPos.w}" height="${rootPos.h}" rx="24" fill="#1e293b" />
+                  <text x="32" y="24" fill="#ffffff" font-size="13" font-weight="800" font-family="system-ui, sans-serif">${rootPos.label}</text>
+                  <text x="32" y="40" fill="#94a3b8" font-size="10.5" font-weight="600" font-family="system-ui, sans-serif">${rootPos.sub}</text>
+                  <circle cx="18" cy="26" r="6" fill="#10b981" />
+                </g>
+
+                <!-- NODOS PARTE 1 Y PARTE 2 (STRATEGY) -->
+                ${hasP1 && partePositions['P1'] ? `
+                  <g transform="translate(${partePositions['P1'].x}, ${partePositions['P1'].y})">
+                    <rect width="${partePositions['P1'].w}" height="${partePositions['P1'].h}" rx="14" fill="#facc15" stroke="#eab308" stroke-width="1.5" />
+                    <text x="14" y="22" fill="#713f12" font-size="12.5" font-weight="800" font-family="system-ui, sans-serif">${partePositions['P1'].label}</text>
+                    <text x="14" y="38" fill="#854d0e" font-size="11" font-weight="700" font-family="system-ui, sans-serif">${partePositions['P1'].sub}</text>
+                  </g>
+                ` : ''}
+
+                ${hasP2 && partePositions['P2'] ? `
+                  <g transform="translate(${partePositions['P2'].x}, ${partePositions['P2'].y})">
+                    <rect width="${partePositions['P2'].w}" height="${partePositions['P2'].h}" rx="14" fill="#facc15" stroke="#eab308" stroke-width="1.5" />
+                    <text x="14" y="22" fill="#713f12" font-size="12.5" font-weight="800" font-family="system-ui, sans-serif">${partePositions['P2'].label}</text>
+                    <text x="14" y="38" fill="#854d0e" font-size="11" font-weight="700" font-family="system-ui, sans-serif">${partePositions['P2'].sub}</text>
+                  </g>
+                ` : ''}
+
+                <!-- NODOS DE FASES (TACTIC) -->
+                ${Object.keys(fasePositions).map(k => {
+                  const f = fasePositions[k];
+                  return `
+                    <g transform="translate(${f.x}, ${f.y})">
+                      <rect width="${f.w}" height="${f.h}" rx="12" fill="#c084fc" stroke="#a855f7" stroke-width="1.5" />
+                      <text x="14" y="24" fill="#ffffff" font-size="11.5" font-weight="700" font-family="system-ui, sans-serif">${f.label}</text>
+                    </g>
+                  `;
+                }).join("")}
+
+                <!-- NODOS DE TAREAS INDIVIDUALES (KPIs / PASTEL CARDS) -->
+                ${Object.keys(taskPositions).map(k => {
+                  const item = taskPositions[k];
+                  const t = item.task;
+                  const isHecha = t.estado === "Hecha";
+                  const isLibre = !t.rol_responsable || t.rol_responsable === "Sin asignar" || t.rol_responsable === "Libre";
+                  const isAngelo = (t.rol_responsable || "").includes("Angelo") || (t.rol_responsable || "").includes("Integrante 2");
+                  const isXavier = (t.rol_responsable || "").includes("Xavier") || (t.rol_responsable || "").includes("Integrante 1");
+                  const isFernando = (t.rol_responsable || "").includes("Fernando") || (t.rol_responsable || "").includes("Integrante 3");
+                  const isRev = t.estado === "En revisión";
+
+                  let bg = "#ffffff";
+                  let border = "#cbd5e1";
+                  let textCol = "#0f172a";
+                  let badgeBg = "#f1f5f9";
+                  let badgeText = "#475569";
+                  let statusTxt = isLibre ? "+ Tomar tarea" : (t.rol_responsable.split(" ")[0]);
+
+                  if (isHecha) {
+                    bg = "#dcfce7";
+                    border = "#86efac";
+                    textCol = "#14532d";
+                    badgeBg = "#bbf7d0";
+                    badgeText = "#166534";
+                    statusTxt = "Finalizada";
+                  } else if (isRev) {
+                    bg = "#ffe4e6";
+                    border = "#fda4af";
+                    textCol = "#9f1239";
+                    badgeBg = "#fecdd3";
+                    badgeText = "#be123c";
+                    statusTxt = "En revisión";
+                  } else if (isAngelo) {
+                    bg = "#e0f2fe";
+                    border = "#7dd3fc";
+                    textCol = "#0369a1";
+                    badgeBg = "#bae6fd";
+                    badgeText = "#0284c7";
+                  } else if (isXavier) {
+                    bg = "#fef3c7";
+                    border = "#fde047";
+                    textCol = "#92400e";
+                    badgeBg = "#fef08a";
+                    badgeText = "#854d0e";
+                  } else if (isFernando) {
+                    bg = "#f3e8ff";
+                    border = "#d8b4fe";
+                    textCol = "#6b21a8";
+                    badgeBg = "#e9d5ff";
+                    badgeText = "#7e22ce";
+                  } else if (isLibre) {
+                    bg = "#ffffff";
+                    border = "#93c5fd";
+                    textCol = "#1e40af";
+                    badgeBg = "#eff6ff";
+                    badgeText = "#2563eb";
+                  }
+
+                  const safeTitle = (t.titulo || "").length > 25 ? (t.titulo.slice(0, 24) + "…") : t.titulo;
+
+                  return `
+                    <g transform="translate(${item.x}, ${item.y})" onclick="App.openTaskModal('${t.id}')" style="cursor:pointer;">
+                      <rect width="${item.w}" height="${item.h}" rx="12" fill="${bg}" stroke="${border}" stroke-width="1.5" ${isLibre ? 'stroke-dasharray="4 3"' : ''} />
+                      <!-- ID badge -->
+                      <rect x="8" y="10" width="46" height="24" rx="6" fill="${badgeBg}" />
+                      <text x="31" y="26" text-anchor="middle" fill="${badgeText}" font-size="10.5" font-weight="800" font-family="monospace">${t.id}</text>
+                      
+                      <!-- Title -->
+                      <text x="62" y="26" fill="${textCol}" font-size="11.5" font-weight="700" font-family="system-ui, sans-serif">${safeTitle}</text>
+                      
+                      <!-- Status / User Pill -->
+                      <rect x="${item.w - 82}" y="11" width="74" height="22" rx="6" fill="${badgeBg}" />
+                      <text x="${item.w - 45}" y="26" text-anchor="middle" fill="${badgeText}" font-size="10" font-weight="800" font-family="system-ui, sans-serif">${statusTxt}</text>
+                    </g>
+                  `;
+                }).join("")}
+              </svg>
+            </div>
+          </div>
+        `;
       },
 
       /* ========================================================================
-         3. VISTA TABLERO (KANBAN CON TARJETAS PASTEL)
+         3. VISTA GRID DE TARJETAS PASTEL (Directamente inspirada en 002553.png y 002424.png)
          ======================================================================== */
+      renderVistaGridTareas() {
+        const st = DataStore.state;
+        let tareas = st.tareas;
+        const u = st.config.usuario_actual || "Angelo Conterón";
+        const miNombre = u === "Todos" ? "Angelo Conterón" : u;
+
+        if (this.treeFilter === 'libres') {
+          tareas = tareas.filter(t => !t.rol_responsable || t.rol_responsable === "Sin asignar" || t.rol_responsable === "Libre");
+        } else if (this.treeFilter === 'angelo') {
+          tareas = tareas.filter(t => (t.rol_responsable || "").includes("Angelo") || (t.rol_responsable || "").includes("Integrante 2"));
+        } else if (this.treeFilter === 'xavier') {
+          tareas = tareas.filter(t => (t.rol_responsable || "").includes("Xavier") || (t.rol_responsable || "").includes("Integrante 1"));
+        } else if (this.treeFilter === 'fernando') {
+          tareas = tareas.filter(t => (t.rol_responsable || "").includes("Fernando") || (t.rol_responsable || "").includes("Integrante 3"));
+        } else if (this.treeFilter === 'p1') {
+          tareas = tareas.filter(t => t.parte === 1);
+        } else if (this.treeFilter === 'p2') {
+          tareas = tareas.filter(t => t.parte === 2);
+        } else if (this.treeFilter === 'hechas') {
+          tareas = tareas.filter(t => t.estado === "Hecha");
+        } else if (this.treeFilter === 'mis' && u !== "Todos") {
+          tareas = tareas.filter(t => Logic.taskBelongsToUser(t, u));
+        }
+
+        if (this.taskSearchQuery) {
+          const q = this.taskSearchQuery;
+          tareas = tareas.filter(t => t.id.toLowerCase().includes(q) || t.titulo.toLowerCase().includes(q) || (t.descripcion || "").toLowerCase().includes(q));
+        }
+
+        return `
+          <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(290px, 1fr)); gap:16px;">
+            ${tareas.map(t => {
+              const isHecha = t.estado === "Hecha";
+              const isLibre = !t.rol_responsable || t.rol_responsable === "Sin asignar" || t.rol_responsable === "Libre";
+              const isAngelo = (t.rol_responsable || "").includes("Angelo") || (t.rol_responsable || "").includes("Integrante 2");
+              const isXavier = (t.rol_responsable || "").includes("Xavier") || (t.rol_responsable || "").includes("Integrante 1");
+              const isFernando = (t.rol_responsable || "").includes("Fernando") || (t.rol_responsable || "").includes("Integrante 3");
+              const isRev = t.estado === "En revisión";
+              const prog = Logic.getTaskProgress(t);
+
+              let pastelClass = "pastel-libre";
+              let badgeText = "Libre en Bolsa";
+              let avatarInitial = "+";
+
+              if (isHecha) {
+                pastelClass = "pastel-hecha";
+                badgeText = "✔ Finalizada";
+                avatarInitial = "✔";
+              } else if (isRev) {
+                pastelClass = "pastel-en-revision";
+                badgeText = "En revisión";
+                avatarInitial = "R";
+              } else if (isAngelo) {
+                pastelClass = "pastel-user-angelo";
+                badgeText = "Angelo Conterón";
+                avatarInitial = "A";
+              } else if (isXavier) {
+                pastelClass = "pastel-user-xavier";
+                badgeText = "Xavier Anatoa";
+                avatarInitial = "X";
+              } else if (isFernando) {
+                pastelClass = "pastel-user-fernando";
+                badgeText = "Fernando Guarderas";
+                avatarInitial = "F";
+              }
+
+              return `
+                <div class="dribbble-pastel-card ${pastelClass}" onclick="App.openTaskModal('${t.id}')">
+                  <!-- Header de la tarjeta -->
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:11.5px; font-weight:700; opacity:0.8;">
+                      Parte ${t.parte} • Sem ${t.semana_inicio}-${t.semana_fin}
+                    </span>
+                    <span class="badge" style="font-size:11px; font-weight:800; padding:3px 8px;">
+                      ${badgeText}
+                    </span>
+                  </div>
+
+                  <!-- Título y ID -->
+                  <div>
+                    <div style="font-family:monospace; font-size:11px; font-weight:800; opacity:0.75; margin-bottom:2px;">${t.id}</div>
+                    <div style="font-size:15px; font-weight:800; line-height:1.3; color:inherit;">
+                      ${this.escapeHtml(t.titulo)}
+                    </div>
+                    <div style="font-size:12px; opacity:0.8; margin-top:4px;">
+                      ${this.escapeHtml(t.fase || '')}
+                    </div>
+                  </div>
+
+                  <!-- Barra de progreso -->
+                  <div style="margin-top:auto; padding-top:8px;">
+                    <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px; font-size:11.5px; font-weight:700;">
+                      <span>Progreso</span>
+                      <span>${prog}%</span>
+                    </div>
+                    <div class="progress-wrap" style="height:6px; background:rgba(0,0,0,0.06);">
+                      <div class="progress-bar" style="width:${prog}%; background:${isHecha ? '#10b981' : (t.parte === 1 ? '#3b82f6' : '#8b5cf6')};"></div>
+                    </div>
+                  </div>
+
+                  <!-- Footer con Avatar y Acción rápida -->
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; padding-top:8px; border-top:1px solid rgba(0,0,0,0.06);" onclick="event.stopPropagation();">
+                    <div style="display:flex; align-items:center; gap:6px;">
+                      <div style="width:26px; height:26px; border-radius:50%; background:currentColor; color:#ffffff; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800;">
+                        <span style="color:#ffffff;">${avatarInitial}</span>
+                      </div>
+                      <span style="font-size:11px; font-weight:700;">${this.escapeHtml(t.rol_responsable)}</span>
+                    </div>
+
+                    ${isLibre ? `
+                      <button class="btn btn-sm btn-primary" onclick="App.tomarTarea('${t.id}')" style="padding:4px 10px; font-size:11.5px; font-weight:800; gap:4px;">
+                        ${Icons.plus} Tomar
+                      </button>
+                    ` : (isHecha ? `
+                      <span style="font-size:11px; font-weight:800; color:#15803d; display:inline-flex; align-items:center; gap:3px;">
+                        ${Icons.check} Aprobado
+                      </span>
+                    ` : `
+                      <button class="btn btn-sm" onclick="App.finalizarTarea('${t.id}')" style="padding:3px 8px; font-size:11px; font-weight:700; background:#10b981; color:#fff;">
+                        Finalizar
+                      </button>
+                    `)}
+                  </div>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        `;
+      },
+
       renderVistaTablero() {
         const st = DataStore.state;
         const f = this.kanbanFilters;

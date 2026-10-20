@@ -1,6 +1,6 @@
 // Service Worker para funcionamiento 100% offline y soporte PWA
 // Estrategia Network-First con fallback a Cache para garantizar actualizaciones automáticas
-const CACHE_NAME = 'germinacion-iot-v2.1';
+const CACHE_NAME = 'germinacion-iot-v3.0';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
