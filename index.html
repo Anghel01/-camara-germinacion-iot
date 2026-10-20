@@ -6,6 +6,7 @@
   <title>Cámara de Germinación Inteligente — Plan Maestro v2.0 (Grupo 1 EPN)</title>
   <meta name="theme-color" content="#10b981" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2310b981' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M11 20A7 7 0 0 1 4 13a7 7 0 0 1 7-7c4 0 9 3 9 7a7 7 0 0 1-7 7z'/%3E%3Cpath d='M11 20V10'/%3E%3Cpath d='M11 14h4'/%3E%3C/svg%3E" />
@@ -594,6 +595,76 @@
       .topbar, .nav-tabs, .no-print { display: none !important; }
       body { background: #ffffff; color: #000000; }
       .card { box-shadow: none; border: 1px solid #999; break-inside: avoid; }
+    }
+
+    
+    /* NAVEGACIÓN INFERIOR PARA MÓVILES (BOTTOM NAV BAR) */
+    .bottom-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 64px;
+      background: var(--bg-panel);
+      border-top: 1px solid var(--border);
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+      z-index: 1000;
+      justify-content: space-around;
+      align-items: center;
+      padding: 0 6px;
+    }
+    .bottom-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 5px 8px;
+      border-radius: 10px;
+      cursor: pointer;
+      gap: 3px;
+      min-width: 48px;
+      transition: all 0.18s ease;
+      touch-action: manipulation;
+    }
+    .bottom-nav-item.active {
+      color: #2563eb;
+      background: var(--info-soft);
+    }
+    .bottom-nav-item svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    @media (max-width: 768px) {
+      .bottom-nav { display: flex; }
+      body { padding-bottom: 76px; }
+      .nav-tabs {
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 6px;
+      }
+      .nav-btn {
+        flex-shrink: 0;
+      }
+      .brand-title {
+        font-size: 14px !important;
+      }
+      .brand-sub {
+        display: none;
+      }
+      .topbar {
+        padding: 8px 12px;
+      }
+      .svg-tree-container {
+        padding: 14px 10px;
+      }
     }
 
     @media (max-width: 768px) {
@@ -2492,7 +2563,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
        INTERFAZ DE USUARIO (11 MÓDULOS)
        ============================================================================ */
     const App = {
-      currentTab: "arbol",
+      currentTab: "panel",
       treeFilter: "todos",
       treeCollapsed: {},
       kanbanFilters: { parte: "todas", responsable: "todos", etiqueta: "todas", busqueda: "" },
@@ -2744,26 +2815,11 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
         alert(`Listo: ${count} tareas quedaron disponibles en la bolsa para que cualquiera las tome.`);
       },
 
+      
       switchTab(tab) {
-        // Mapeo inteligente sin redundancias
-        if (tab === "arbol" || tab === "tablero" || tab === "dependencias") {
-          this.currentTab = "tareas";
-          if (tab === "tablero") this.tasksSubView = "tablero";
-          else if (tab === "dependencias") this.tasksSubView = "grafo";
-          else this.tasksSubView = "arbol";
-        } else if (tab === "semana") {
-          this.currentTab = "cronograma";
-          this.cronoSubView = "semana";
-        } else if (tab === "compras" || tab === "listas" || tab === "referencia" || tab === "config") {
-          this.currentTab = "recursos";
-          this.recursosSubTab = tab;
-        } else {
-          this.currentTab = tab;
-        }
-
-        // Actualizar tabs de escritorio y móvil
-        document.querySelectorAll(".nav-btn").forEach(b => b.classList.toggle("active", b.getAttribute("data-tab") === this.currentTab));
-        document.querySelectorAll(".bottom-nav-item").forEach(b => b.classList.toggle("active", b.getAttribute("data-tab") === this.currentTab));
+        this.currentTab = tab;
+        document.querySelectorAll(".nav-btn").forEach(b => b.classList.toggle("active", b.getAttribute("data-tab") === tab));
+        document.querySelectorAll(".bottom-nav-item").forEach(b => b.classList.toggle("active", b.getAttribute("data-tab") === tab));
         this.render();
         window.scrollTo({ top: 0, behavior: "smooth" });
       },
@@ -2816,29 +2872,150 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
           `${DataStore.state.config.asignatura} • ${DataStore.state.config.docente} • ${i1} | ${i2} | ${i3}`;
 
         switch (this.currentTab) {
-          case "panel": c.innerHTML = this.renderPanelPrincipal(); break;
-          case "tareas":
+          case "panel":
+          case "inicio":
+            c.innerHTML = this.renderPanelPrincipal();
+            break;
           case "arbol":
+            c.innerHTML = this.renderVistaArbol();
+            break;
+          case "grid":
+            c.innerHTML = this.renderVistaGridTareas();
+            break;
           case "tablero":
-          case "dependencias":
-            c.innerHTML = this.renderVistaTareasHub();
+            c.innerHTML = this.renderVistaTablero();
             break;
           case "cronograma":
-          case "semana":
-            c.innerHTML = this.renderVistaCronogramaHub();
+            c.innerHTML = this.renderVistaCronograma();
             break;
-          case "bitacora": c.innerHTML = this.renderVistaBitacora(); break;
-          case "recursos":
+          case "semana":
+            c.innerHTML = this.renderVistaSemana();
+            break;
+          case "dependencias":
+            c.innerHTML = this.renderVistaDependencias();
+            break;
+          case "bitacora":
+            c.innerHTML = this.renderVistaBitacora();
+            break;
           case "compras":
+            c.innerHTML = this.renderVistaCompras();
+            break;
           case "listas":
-          case "referencia":
+            c.innerHTML = this.renderVistaListas();
+            break;
           case "config":
+            c.innerHTML = this.renderVistaConfig();
+            break;
+          case "referencia":
+            c.innerHTML = this.renderVistaReferencia();
+            break;
+          case "tareas":
+            c.innerHTML = this.renderVistaTareasHub();
+            break;
+          case "recursos":
             c.innerHTML = this.renderVistaRecursosHub();
             break;
           default:
             c.innerHTML = this.renderPanelPrincipal();
         }
       },
+
+      renderVistaTareasHub() {
+        const sv = this.tasksSubView || "arbol";
+        return `
+          <div style="margin-bottom:16px; background:var(--bg-panel); border:1px solid var(--border); border-radius:16px; padding:16px 20px; box-shadow:var(--shadow);">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+              <div>
+                <h1 style="font-size:20px; font-weight:800; display:flex; align-items:center; gap:8px; margin:0; color:var(--text-main);">
+                  ${Icons.tree}
+                  <span>Módulo de Tareas y Flujo del Proyecto</span>
+                </h1>
+                <p style="font-size:12.5px; color:var(--text-muted); margin-top:3px; margin-bottom:0;">
+                  Todas las tareas disponibles para que cualquier integrante las tome libremente.
+                </p>
+              </div>
+              <div style="display:flex; background:var(--bg-card); padding:4px; border-radius:10px; border:1px solid var(--border); gap:4px;">
+                <button class="btn btn-sm ${sv === 'arbol' ? 'btn-primary' : ''}" onclick="App.setTasksSubView('arbol')" style="gap:5px; font-weight:700;">
+                  ${Icons.tree} <span>Árbol</span>
+                </button>
+                <button class="btn btn-sm ${sv === 'grid' ? 'btn-primary' : ''}" onclick="App.setTasksSubView('grid')" style="gap:5px; font-weight:700;">
+                  ${Icons.list} <span>Tarjetas Grid</span>
+                </button>
+                <button class="btn btn-sm ${sv === 'tablero' ? 'btn-primary' : ''}" onclick="App.setTasksSubView('tablero')" style="gap:5px; font-weight:700;">
+                  ${Icons.board} <span>Tablero</span>
+                </button>
+                <button class="btn btn-sm ${sv === 'grafo' ? 'btn-primary' : ''}" onclick="App.setTasksSubView('grafo')" style="gap:5px; font-weight:700;">
+                  ${Icons.graph} <span>Dependencias</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          ${sv === 'grid' ? this.renderVistaGridTareas() : (sv === 'tablero' ? this.renderVistaTablero() : (sv === 'grafo' ? this.renderVistaDependencias() : this.renderVistaArbol()))}
+        `;
+      },
+
+      renderVistaCronogramaHub() {
+        const sub = this.cronoSubView || "gantt";
+        return `
+          <div style="margin-bottom:16px; background:var(--bg-panel); border:1px solid var(--border); border-radius:16px; padding:16px 20px; box-shadow:var(--shadow);">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+              <div>
+                <h1 style="font-size:20px; font-weight:800; display:flex; align-items:center; gap:8px; margin:0; color:var(--text-main);">
+                  ${Icons.gantt}
+                  <span>Cronograma y Planificación Temporal</span>
+                </h1>
+                <p style="font-size:12.5px; color:var(--text-muted); margin-top:3px; margin-bottom:0;">
+                  Hitos oficiales: <strong>Parte 1 (23 de Noviembre 2026)</strong> y <strong>Parte 2 (25 de Enero 2027)</strong>.
+                </p>
+              </div>
+              <div style="display:flex; background:var(--bg-card); padding:4px; border-radius:10px; border:1px solid var(--border); gap:4px;">
+                <button class="btn btn-sm ${sub !== 'semana' ? 'btn-primary' : ''}" onclick="App.setCronoSubView('gantt')" style="gap:5px; font-weight:700;">
+                  ${Icons.gantt} <span>Gantt por Semanas</span>
+                </button>
+                <button class="btn btn-sm ${sub === 'semana' ? 'btn-primary' : ''}" onclick="App.setCronoSubView('semana')" style="gap:5px; font-weight:700;">
+                  ${Icons.calendar} <span>Horario y Rutinas</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          ${sub === 'semana' ? this.renderVistaSemana() : this.renderVistaCronograma()}
+        `;
+      },
+
+      renderVistaRecursosHub() {
+        const st = this.recursosSubTab || "compras";
+        return `
+          <div style="margin-bottom:16px; background:var(--bg-panel); border:1px solid var(--border); border-radius:16px; padding:16px 20px; box-shadow:var(--shadow);">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
+              <div>
+                <h1 style="font-size:20px; font-weight:800; display:flex; align-items:center; gap:8px; margin:0; color:var(--text-main);">
+                  ${Icons.storage}
+                  <span>Proyecto y Recursos Técnicos</span>
+                </h1>
+                <p style="font-size:12.5px; color:var(--text-muted); margin-top:3px; margin-bottom:0;">
+                  Compras, decisiones de diseño, matriz de riesgos, pruebas, preguntas a la docente y configuración.
+                </p>
+              </div>
+            </div>
+            <div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:4px; scrollbar-width:thin;">
+              <button class="btn btn-sm ${st === 'compras' ? 'btn-primary' : ''}" onclick="App.setRecursosSubTab('compras')" style="gap:5px;">
+                ${Icons.cart} Compras
+              </button>
+              <button class="btn btn-sm ${st === 'listas' ? 'btn-primary' : ''}" onclick="App.setRecursosSubTab('listas')" style="gap:5px;">
+                ${Icons.list} Decisiones & Pruebas
+              </button>
+              <button class="btn btn-sm ${st === 'referencia' ? 'btn-primary' : ''}" onclick="App.setRecursosSubTab('referencia')" style="gap:5px;">
+                ${Icons.docs} Plan Maestro
+              </button>
+              <button class="btn btn-sm ${st === 'config' ? 'btn-primary' : ''}" onclick="App.setRecursosSubTab('config')" style="gap:5px;">
+                ${Icons.settings} Configuración
+              </button>
+            </div>
+          </div>
+          ${st === 'compras' ? this.renderVistaCompras() : (st === 'listas' ? this.renderVistaListas() : (st === 'referencia' ? this.renderVistaReferencia() : this.renderVistaConfig()))}
+        `;
+      },
+
 
       /* ========================================================================
          2. VISTA ÁRBOL — LÍNEAS DE CHECKOUT DE IZQUIERDA A DERECHA (HORIZONTAL)
@@ -5178,5 +5355,34 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
       });
     }
   </script>
+
+  <!-- BARRA DE NAVEGACIÓN INFERIOR FIJA PARA CELULARES -->
+  <nav class="bottom-nav no-print" aria-label="Navegación móvil inferior">
+    <button class="bottom-nav-item active" data-tab="panel" onclick="App.switchTab('panel')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Inicio</span>
+    </button>
+    <button class="bottom-nav-item" data-tab="arbol" onclick="App.switchTab('arbol')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
+      <span>Árbol</span>
+    </button>
+    <button class="bottom-nav-item" data-tab="tablero" onclick="App.switchTab('tablero')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+      <span>Tablero</span>
+    </button>
+    <button class="bottom-nav-item" data-tab="cronograma" onclick="App.switchTab('cronograma')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="13" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="16" y2="18"/></svg>
+      <span>Gantt</span>
+    </button>
+    <button class="bottom-nav-item" data-tab="bitacora" onclick="App.switchTab('bitacora')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      <span>Bitácora</span>
+    </button>
+    <button class="bottom-nav-item" data-tab="compras" onclick="App.switchTab('compras')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      <span>Compras</span>
+    </button>
+  </nav>
+
 </body>
 </html>
