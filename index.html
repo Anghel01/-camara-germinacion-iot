@@ -10,6 +10,12 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2310b981' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M11 20A7 7 0 0 1 4 13a7 7 0 0 1 7-7c4 0 9 3 9 7a7 7 0 0 1-7 7z'/%3E%3Cpath d='M11 20V10'/%3E%3Cpath d='M11 14h4'/%3E%3C/svg%3E" />
+  <script src="./mqttws31.min.js"></script>
+  <script>
+    if (typeof Paho === "undefined") {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"><\/script>');
+    }
+  </script>
   <style>
     :root[data-theme="oscuro"] {
       --bg-main: #0b111e;
@@ -2510,12 +2516,19 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
             t.etiquetas = initT.etiquetas;
 
             const doneMap = {};
+            const respMap = {};
             (t.pasos || []).forEach(p => {
               if (p.id) doneMap[p.id] = p.hecho;
               if (p.texto) doneMap[p.texto] = p.hecho;
               (p.subpasos || []).forEach(s => {
-                if (s.ref_id) doneMap[s.ref_id] = s.hecho;
-                if (s.texto) doneMap[s.texto] = s.hecho;
+                if (s.ref_id) {
+                  doneMap[s.ref_id] = s.hecho;
+                  if (s.respuesta) respMap[s.ref_id] = s.respuesta;
+                }
+                if (s.texto) {
+                  doneMap[s.texto] = s.hecho;
+                  if (s.respuesta) respMap[s.texto] = s.respuesta;
+                }
               });
             });
 
@@ -2527,9 +2540,11 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
                 subpasos: (p.subpasos || []).map(s => {
                   const sKey = s.ref_id || s.texto;
                   const sDone = doneMap[sKey] !== undefined ? doneMap[sKey] : wasDone;
+                  const sResp = (s.ref_id && respMap[s.ref_id]) || (s.texto && respMap[s.texto]) || s.respuesta || "";
                   return {
                     ...s,
-                    hecho: sDone
+                    hecho: sDone || (!!sResp && sResp.trim() !== ''),
+                    respuesta: sResp
                   };
                 })
               };
@@ -2549,7 +2564,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
           }
         });
 
-        // Sincronizar respuestas ya existentes en preguntas oficiales con el paso T1.02
+        // Sincronizar respuestas en preguntas oficiales con el paso T1.02 de manera bidireccional
         if (this.state.preguntas) {
           const t02 = this.state.tareas.find(x => x.id === "T1.02");
           if (t02 && t02.pasos) {
@@ -2557,9 +2572,14 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
               (p.subpasos || []).forEach(sub => {
                 if (sub.ref_id) {
                   const q = this.state.preguntas.find(x => x.id === sub.ref_id);
-                  if (q && q.respuesta && !sub.respuesta) {
-                    sub.respuesta = q.respuesta;
-                    sub.hecho = true;
+                  if (q) {
+                    if (sub.respuesta && !q.respuesta) {
+                      q.respuesta = sub.respuesta;
+                      q.estado = 'respondida';
+                    } else if (q.respuesta && !sub.respuesta) {
+                      sub.respuesta = q.respuesta;
+                      sub.hecho = true;
+                    }
                   }
                 }
               });
@@ -2568,7 +2588,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
         }
       },
 
-      save() {
+      save(skipMqtt = false) {
         this.state.ultima_actualizacion = new Date().toISOString();
         try {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state));
@@ -2576,6 +2596,9 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
           console.warn("Error guardando en localStorage:", e);
         }
         this.updateSyncBadge();
+        if (!skipMqtt && typeof MqttSync !== "undefined" && MqttSync.debouncedPublish) {
+          MqttSync.debouncedPublish();
+        }
         if (this.state.config && this.state.config.firebase && this.state.config.firebase.activo) {
           clearTimeout(this.syncTimer);
           this.syncTimer = setTimeout(() => this.pushToFirebase(), 600);
@@ -2588,6 +2611,12 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
           u: this.state.ultima_actualizacion,
           cfg: { usuario: this.state.config?.usuario_actual, tema: this.state.config?.tema },
           bitacora: this.state.bitacora || [],
+          preguntas: (this.state.preguntas || []).map(q => ({
+            id: q.id,
+            r: q.respuesta || "",
+            f: q.fecha || "",
+            e: q.estado || "pendiente"
+          })),
           tareas: (this.state.tareas || []).map(t => ({
             id: t.id,
             e: t.estado,
@@ -2623,6 +2652,19 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
         const data = JSON.parse(str);
         if (!data || !Array.isArray(data.tareas)) return null;
         const base = initialData || crearDatosIniciales();
+        
+        // Importar preguntas
+        if (Array.isArray(data.preguntas) && base.preguntas) {
+          data.preguntas.forEach(dp => {
+            const q = base.preguntas.find(x => x.id === dp.id);
+            if (q) {
+              if (dp.r) q.respuesta = dp.r;
+              if (dp.f) q.fecha = dp.f;
+              if (dp.e) q.estado = dp.e;
+            }
+          });
+        }
+
         data.tareas.forEach(dt => {
           const t = base.tareas.find(x => x.id === dt.id);
           if (t) {
@@ -2656,11 +2698,18 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
         const txt = document.getElementById("sync-btn-text");
         const fb = this.state?.config?.firebase;
         const isCloud = fb && fb.activo && fb.databaseURL;
+        const isMqtt = typeof MqttSync !== "undefined" && MqttSync.connected;
         if (btn) {
-          btn.className = `sync-indicator-pill ${isCloud ? 'cloud-synced' : ''}`;
+          btn.className = `sync-indicator-pill ${isMqtt || isCloud ? 'cloud-synced' : ''}`;
         }
         if (txt) {
-          txt.textContent = isCloud ? "Nube En Vivo" : "Sincronizar (PC/Celu)";
+          if (isMqtt) {
+            txt.textContent = "MQTT En Vivo ⚡";
+          } else if (isCloud) {
+            txt.textContent = "Nube En Vivo";
+          } else {
+            txt.textContent = "Sincronizar (PC/Celu)";
+          }
         }
       },
 
@@ -2748,6 +2797,278 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
         } catch (e) {
           alert("Error descargando de Firebase: " + e.message);
         }
+      }
+    };
+
+    /* ============================================================================
+       SINCRONIZACIÓN EN TIEMPO REAL SIN CONFIGURACIÓN (MQTT BROKER IOT EPN 2026)
+       Utiliza Secure WebSockets (WSS) en broker público EMQX con mensajes retenidos.
+       Garantiza que cualquier cambio en PC se refleje en celular al instante y viceversa.
+       ============================================================================ */
+    const MqttSync = {
+      brokerHost: "broker.emqx.io",
+      brokerPort: 8084,
+      brokerPath: "/mqtt",
+      topic: "epn/iot/grupo1/camara_live_sync_2026",
+      clientId: "epn_camara_" + Math.random().toString(16).substring(2, 10),
+      client: null,
+      connected: false,
+      isConnecting: false,
+      publishTimer: null,
+      retryCount: 0,
+
+      init() {
+        if (typeof Paho === "undefined" || !Paho.MQTT) {
+          setTimeout(() => this.init(), 600);
+          return;
+        }
+        this.connect();
+      },
+
+      connect() {
+        if (this.connected || this.isConnecting) return;
+        if (typeof Paho === "undefined" || !Paho.MQTT) return;
+        this.isConnecting = true;
+        this.updateStatusBadge("conectando");
+
+        try {
+          this.client = new Paho.MQTT.Client(this.brokerHost, this.brokerPort, this.brokerPath, this.clientId);
+
+          this.client.onConnectionLost = (responseObject) => {
+            console.warn("MQTT Desconectado:", responseObject.errorMessage);
+            this.connected = false;
+            this.isConnecting = false;
+            this.updateStatusBadge("desconectado");
+            const backoff = Math.min(30000, 3000 * Math.pow(1.5, this.retryCount++));
+            setTimeout(() => this.connect(), backoff);
+          };
+
+          this.client.onMessageArrived = (message) => {
+            try {
+              this.handleIncoming(message.payloadString);
+            } catch (err) {
+              console.error("Error al procesar mensaje MQTT:", err);
+            }
+          };
+
+          this.client.connect({
+            useSSL: true,
+            timeout: 7,
+            keepAliveInterval: 30,
+            cleanSession: true,
+            onSuccess: () => {
+              console.log("MQTT Conectado en tiempo real a " + this.brokerHost);
+              this.connected = true;
+              this.isConnecting = false;
+              this.retryCount = 0;
+              this.updateStatusBadge("conectado");
+              this.client.subscribe(this.topic, {
+                qos: 1,
+                onSuccess: () => {
+                  console.log("Suscripción activa al canal IoT:", this.topic);
+                },
+                onFailure: (err) => {
+                  console.warn("Fallo al suscribirse:", err);
+                }
+              });
+            },
+            onFailure: (err) => {
+              console.warn("Fallo de conexión MQTT:", err);
+              this.connected = false;
+              this.isConnecting = false;
+              this.updateStatusBadge("desconectado");
+              const backoff = Math.min(30000, 3000 * Math.pow(1.5, this.retryCount++));
+              setTimeout(() => this.connect(), backoff);
+            }
+          });
+        } catch (err) {
+          console.warn("Excepción MQTT:", err);
+          this.isConnecting = false;
+          this.updateStatusBadge("desconectado");
+        }
+      },
+
+      debouncedPublish() {
+        clearTimeout(this.publishTimer);
+        this.publishTimer = setTimeout(() => {
+          this.publishCurrentState();
+        }, 300);
+      },
+
+      buildPayload() {
+        const st = DataStore.state;
+        return {
+          v: 2,
+          sender: this.clientId,
+          u: st.ultima_actualizacion || new Date().toISOString(),
+          tareas: (st.tareas || []).map(t => ({
+            id: t.id,
+            e: t.estado,
+            r: t.rol_responsable,
+            p: (t.pasos || []).map(p => ({
+              id: p.id,
+              h: p.hecho ? 1 : 0,
+              s: (p.subpasos || []).map(s => ({
+                ref: s.ref_id || "",
+                h: s.hecho ? 1 : 0,
+                r: s.respuesta || ""
+              }))
+            }))
+          })),
+          preguntas: (st.preguntas || []).map(q => ({
+            id: q.id,
+            r: q.respuesta || "",
+            f: q.fecha || "",
+            e: q.estado || "pendiente"
+          })),
+          bitacora: (st.bitacora || []).slice(0, 50)
+        };
+      },
+
+      publishCurrentState() {
+        if (!this.connected || !this.client) return;
+        try {
+          const payload = JSON.stringify(this.buildPayload());
+          const message = new Paho.MQTT.Message(payload);
+          message.destinationName = this.topic;
+          message.qos = 1;
+          message.retained = true; // Retenido: garantiza que el siguiente dispositivo en abrir la web reciba el estado
+          this.client.send(message);
+          this.flashSyncBadge();
+        } catch (e) {
+          console.warn("Error enviando estado MQTT:", e);
+        }
+      },
+
+      handleIncoming(payloadString) {
+        if (!payloadString) return;
+        let msg;
+        try {
+          msg = JSON.parse(payloadString);
+        } catch (e) {
+          return;
+        }
+        if (!msg || !Array.isArray(msg.tareas)) return;
+
+        // Evitar procesar nuestros propios ecos
+        if (msg.sender && msg.sender === this.clientId) return;
+
+        const remoteTime = msg.u ? new Date(msg.u).getTime() : 0;
+        const localTime = DataStore.state.ultima_actualizacion ? new Date(DataStore.state.ultima_actualizacion).getTime() : 0;
+
+        let changesApplied = false;
+
+        // 1. Sincronizar preguntas oficiales
+        if (Array.isArray(msg.preguntas)) {
+          if (!DataStore.state.preguntas) DataStore.state.preguntas = [];
+          msg.preguntas.forEach(rq => {
+            let lq = DataStore.state.preguntas.find(x => x.id === rq.id);
+            if (lq) {
+              if (rq.r && rq.r !== lq.respuesta) {
+                lq.respuesta = rq.r;
+                lq.estado = rq.e || (rq.r.trim() !== '' ? 'respondida' : lq.estado);
+                if (rq.f) lq.fecha = rq.f;
+                changesApplied = true;
+              }
+            }
+          });
+        }
+
+        // 2. Sincronizar tareas, estados y subpasos
+        msg.tareas.forEach(rt => {
+          const lt = DataStore.state.tareas.find(x => x.id === rt.id);
+          if (lt) {
+            // Actualizar estado o responsable si el remoto es más nuevo o si difiere
+            if (remoteTime >= localTime || rt.e !== lt.estado || rt.r !== lt.rol_responsable) {
+              if (lt.estado !== rt.e || lt.rol_responsable !== rt.r) {
+                lt.estado = rt.e;
+                lt.rol_responsable = rt.r;
+                changesApplied = true;
+              }
+            }
+
+            // Pasos y subpasos (incluyendo respuestas de texto como ESP32-CAM)
+            if (Array.isArray(rt.p) && Array.isArray(lt.pasos)) {
+              rt.p.forEach((rp, pIdx) => {
+                const lp = lt.pasos[pIdx];
+                if (lp) {
+                  if (remoteTime >= localTime && lp.hecho !== !!rp.h) {
+                    lp.hecho = !!rp.h;
+                    changesApplied = true;
+                  }
+                  if (Array.isArray(rp.s) && Array.isArray(lp.subpasos)) {
+                    rp.s.forEach((rs, sIdx) => {
+                      const ls = lp.subpasos[sIdx];
+                      if (ls) {
+                        // Si remoto tiene una respuesta no vacía y local no, o remoto es más nuevo
+                        if (rs.r !== undefined && rs.r !== ls.respuesta && (rs.r.trim() !== '' || remoteTime >= localTime)) {
+                          ls.respuesta = rs.r;
+                          if (rs.r.trim() !== '') ls.hecho = true;
+                          changesApplied = true;
+                        }
+                        if (remoteTime >= localTime && ls.hecho !== !!rs.h) {
+                          ls.hecho = !!rs.h || (!!ls.respuesta && ls.respuesta.trim() !== '');
+                          changesApplied = true;
+                        }
+                      }
+                    });
+                  }
+                }
+              });
+            }
+          }
+        });
+
+        // 3. Bitácora si es más nueva
+        if (Array.isArray(msg.bitacora) && msg.bitacora.length > 0 && remoteTime >= localTime) {
+          DataStore.state.bitacora = msg.bitacora;
+          changesApplied = true;
+        }
+
+        if (changesApplied || remoteTime > localTime) {
+          DataStore.state.ultima_actualizacion = msg.u || new Date().toISOString();
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(DataStore.state));
+          } catch (e) {}
+          DataStore.updateSyncBadge();
+
+          // Renderizar interfaz de inmediato
+          if (typeof App !== "undefined" && App.render) {
+            App.render();
+            // Si el usuario tiene el modal de tarea abierto (ej. T1.02), actualizarlo en vivo en su pantalla
+            if (App.activeModalTaskId) {
+              App.openModal(App.activeModalTaskId);
+            }
+          }
+
+          this.flashSyncBadge();
+        }
+      },
+
+      updateStatusBadge(status) {
+        const btn = document.getElementById("sync-indicator-btn");
+        const txt = document.getElementById("sync-btn-text");
+        if (!btn || !txt) return;
+
+        if (status === "conectado" || this.connected) {
+          btn.className = "sync-indicator-pill cloud-synced";
+          txt.textContent = "MQTT En Vivo ⚡";
+        } else if (status === "conectando") {
+          btn.className = "sync-indicator-pill";
+          txt.textContent = "Conectando MQTT...";
+        } else {
+          btn.className = "sync-indicator-pill";
+          txt.textContent = "MQTT Reconectando...";
+        }
+      },
+
+      flashSyncBadge() {
+        const btn = document.getElementById("sync-indicator-btn");
+        if (!btn) return;
+        btn.style.boxShadow = "0 0 12px #10b981";
+        setTimeout(() => {
+          if (btn) btn.style.boxShadow = "";
+        }, 600);
       }
     };
 
@@ -2938,6 +3259,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
     const App = {
       currentTab: "arbol",
       treeFilter: "todos",
+      treeViewMode: "arbol",
       treeCollapsed: {},
       kanbanFilters: { parte: "todas", responsable: "todos", etiqueta: "todas", busqueda: "" },
       bitacoraSubtab: "listado",
@@ -2949,6 +3271,9 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
 
       init() {
         DataStore.init();
+        if (typeof MqttSync !== "undefined" && MqttSync.init) {
+          MqttSync.init();
+        }
         document.documentElement.setAttribute("data-theme", DataStore.state.config.tema || "claro");
         const userSel = document.getElementById("user-selector");
         if (userSel) userSel.value = DataStore.state.config.usuario_actual || "Angelo Conterón";
@@ -3298,12 +3623,12 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
             c.innerHTML = this.renderVistaArbol();
         }
 
-        // Auto-enfoque en la columna de tareas para celulares (evita espacios vacíos a la izquierda)
-        if (this.currentTab === "arbol" || (this.currentTab === "tareas" && this.tasksSubView === "arbol")) {
+        // Auto-enfoque en la columna de tareas para celulares (WhatsApp 00.26.53: tarjeta ovalada completa)
+        if ((this.currentTab === "arbol" || (this.currentTab === "tareas" && this.tasksSubView === "arbol")) && this.treeViewMode !== "grid") {
           setTimeout(() => {
             const el = document.getElementById("svg-tree-scroll");
             if (el && typeof window !== "undefined" && window.innerWidth <= 768) {
-              el.scrollLeft = 720;
+              el.scrollLeft = 815;
             }
           }, 50);
         }
@@ -3312,6 +3637,11 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
       scrollTreeTo(x) {
         const el = document.getElementById("svg-tree-scroll");
         if (el) el.scrollTo({ left: x, behavior: "smooth" });
+      },
+
+      setTreeViewMode(mode) {
+        this.treeViewMode = mode;
+        this.render();
       },
 
       openSyncModal() {
@@ -3354,21 +3684,34 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
           </div>
 
           <div class="modal-body" style="padding:16px 20px; display:flex; flex-direction:column; gap:14px;">
-            <!-- ESTADO ACTUAL -->
-            <div style="padding:12px 14px; border-radius:12px; background:${isCloud ? '#ecfdf5' : 'var(--bg-card)'}; border:1px solid ${isCloud ? '#6ee7b7' : 'var(--border)'}; display:flex; justify-content:space-between; align-items:center;">
-              <div>
-                <div style="font-size:11px; text-transform:uppercase; letter-spacing:0.5px; font-weight:800; color:${isCloud ? '#047857' : 'var(--text-muted)'};">
-                  ${isCloud ? '🟢 Nube en Vivo Conectada (Firebase)' : '⚪ Almacenamiento Local (en este navegador)'}
+            <!-- ESTADO MQTT EN TIEMPO REAL (SIN CONFIGURACIÓN) -->
+            <div style="padding:14px; border-radius:12px; background:linear-gradient(135deg, rgba(16,185,129,0.12), rgba(59,130,246,0.08)); border:1.5px solid var(--accent); display:flex; flex-direction:column; gap:8px;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:${(typeof MqttSync !== 'undefined' && MqttSync.connected) ? '#10b981' : '#f59e0b'}; box-shadow:0 0 8px ${(typeof MqttSync !== 'undefined' && MqttSync.connected) ? '#10b981' : '#f59e0b'};"></span>
+                  <strong style="font-size:13px; color:var(--text-main);">
+                    ${(typeof MqttSync !== 'undefined' && MqttSync.connected) ? 'Sincronización Automática En Vivo (MQTT Conectado ⚡)' : 'Conectando al Broker MQTT IoT...'}
+                  </strong>
                 </div>
-                <div style="font-size:12px; color:var(--text-main); margin-top:2px;">
-                  Última sincronización: <strong>${lastSync}</strong>
-                </div>
+                <span class="badge" style="background:var(--accent-soft); color:var(--accent); font-weight:800; font-size:10px;">
+                  Broker EPN IoT 2026
+                </span>
               </div>
-              ${isCloud ? `
-                <button class="btn btn-sm" onclick="DataStore.checkRemoteSync(false)" style="font-size:11.5px; gap:4px;">
-                  ${Icons.refresh || Icons.clock} <span>Comprobar ahora</span>
+              <div style="font-size:11.5px; color:var(--text-muted); line-height:1.4;">
+                Cualquier cambio que hagas en tu computadora o en tu celular (como escribir respuestas, marcar pasos o tomar tareas) se sincroniza solito y al instante sin necesidad de cuentas ni contraseñas.
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px; font-size:11px; color:var(--text-muted); background:var(--bg-card); padding:8px 10px; border-radius:8px; border:1px solid var(--border);">
+                <div>Canal: <code style="font-size:10.5px; color:var(--accent); font-weight:700;">epn/iot/grupo1/camara_live_sync_2026</code></div>
+                <div>Última actualización: <strong>${lastSync}</strong></div>
+              </div>
+              <div style="display:flex; gap:8px; margin-top:4px;">
+                <button class="btn btn-sm btn-primary" onclick="if (typeof MqttSync !== 'undefined') { MqttSync.publishCurrentState(); alert('¡Estado actual publicado al broker MQTT para todos tus dispositivos!'); }" style="flex:1; justify-content:center; gap:6px; font-weight:700;">
+                  <span>⚡ Sincronizar Todos los Dispositivos Ahora</span>
                 </button>
-              ` : ''}
+                <button class="btn btn-sm" onclick="if (typeof MqttSync !== 'undefined') { MqttSync.connect(); alert('Reconectando con el broker MQTT...'); }" style="gap:5px;">
+                  <span>🔄 Reconectar</span>
+                </button>
+              </div>
             </div>
 
             <!-- OPCIÓN 1: TRANSFERENCIA EN 1 CLIC VÍA ENLACE DIRECTO (CERO CUENTAS) -->
@@ -3976,10 +4319,33 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
         const fernandoCount = allTareas.filter(t => (t.rol_responsable || "").includes("Fernando") || (t.rol_responsable || "").includes("Integrante 3")).length;
         const hechasCount = allTareas.filter(t => t.estado === "Hecha").length;
 
-        return `
-          <!-- FILTROS Y CONTROLES DEL ÁRBOL (DISEÑO LIMPIO DE PIZARRA) -->
-          <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap;">
-            <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+        if (this.treeViewMode === 'grid') {
+          return `
+            <!-- BARRA SUPERIOR: SELECTOR DE MODO (ÁRBOL / GRID) Y BÚSQUEDA -->
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap;">
+              <!-- SELECTOR EN ESTA MISMA VENTANA -->
+              <div style="display:inline-flex; background:var(--bg-card); padding:3px; border-radius:10px; border:1px solid var(--border); box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+                <button class="btn btn-sm ${this.treeViewMode !== 'grid' ? 'btn-primary' : ''}" onclick="App.setTreeViewMode('arbol')" style="font-weight:700; font-size:12px; padding:5px 12px; border-radius:7px; display:inline-flex; align-items:center; gap:6px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v12"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
+                  <span>🌿 Árbol de Ramas</span>
+                </button>
+                <button class="btn btn-sm ${this.treeViewMode === 'grid' ? 'btn-primary' : ''}" onclick="App.setTreeViewMode('grid')" style="font-weight:700; font-size:12px; padding:5px 12px; border-radius:7px; display:inline-flex; align-items:center; gap:6px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                  <span>▦ Tarjetas Grid</span>
+                </button>
+              </div>
+
+              <!-- BÚSQUEDA Y SOLTAR BOLSA -->
+              <div style="display:flex; gap:6px; align-items:center;">
+                <input type="text" placeholder="Buscar tarea..." value="${this.escapeHtml(this.taskSearchQuery || '')}" oninput="App.setTaskSearch(this.value)" style="padding:5px 10px; font-size:11.5px; border-radius:8px; border:1px solid var(--border); width:140px;" />
+                <button class="btn btn-sm" onclick="App.liberarTodasPendientes()" title="Soltar a la bolsa todas las tareas pendientes" style="font-size:11px;">
+                  Soltar bolsa
+                </button>
+              </div>
+            </div>
+
+            <!-- FILTROS COMPARTIDOS -->
+            <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-bottom:14px;">
               <button class="btn btn-sm ${this.treeFilter === 'todos' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('todos')">Todas (${allTareas.length})</button>
               <button class="btn btn-sm ${this.treeFilter === 'libres' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('libres')" style="font-weight:700;">🌟 Bolsa Libre (${libresCount})</button>
               <button class="btn btn-sm ${this.treeFilter === 'p1' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('p1')">P1 (23 Nov)</button>
@@ -3991,19 +4357,61 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
                 <option value="xavier" ${this.treeFilter === 'xavier' ? 'selected' : ''}>Xavier (${xavierCount})</option>
                 <option value="fernando" ${this.treeFilter === 'fernando' ? 'selected' : ''}>Fernando (${fernandoCount})</option>
               </select>
+              <span style="flex:1;"></span>
+              <span style="font-size:11px; color:var(--text-muted); font-weight:700;">
+                ${tareas.length} tareas en cuadrícula
+              </span>
+            </div>
+
+            ${this.renderVistaGridTareas()}
+          `;
+        }
+
+        return `
+          <!-- FILTROS Y CONTROLES DEL ÁRBOL (DISEÑO LIMPIO DE PIZARRA) -->
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap;">
+            <!-- SELECTOR EN ESTA MISMA VENTANA -->
+            <div style="display:inline-flex; background:var(--bg-card); padding:3px; border-radius:10px; border:1px solid var(--border); box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+              <button class="btn btn-sm ${this.treeViewMode !== 'grid' ? 'btn-primary' : ''}" onclick="App.setTreeViewMode('arbol')" style="font-weight:700; font-size:12px; padding:5px 12px; border-radius:7px; display:inline-flex; align-items:center; gap:6px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v12"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
+                <span>🌿 Árbol de Ramas</span>
+              </button>
+              <button class="btn btn-sm ${this.treeViewMode === 'grid' ? 'btn-primary' : ''}" onclick="App.setTreeViewMode('grid')" style="font-weight:700; font-size:12px; padding:5px 12px; border-radius:7px; display:inline-flex; align-items:center; gap:6px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                <span>▦ Tarjetas Grid</span>
+              </button>
             </div>
 
             <div style="display:flex; gap:6px; align-items:center;">
-              <input type="text" placeholder="Buscar tarea..." value="${this.taskSearchQuery || ''}" oninput="App.setTaskSearch(this.value)" style="padding:5px 10px; font-size:11.5px; border-radius:8px; border:1px solid var(--border); width:140px;" />
+              <input type="text" placeholder="Buscar tarea..." value="${this.escapeHtml(this.taskSearchQuery || '')}" oninput="App.setTaskSearch(this.value)" style="padding:5px 10px; font-size:11.5px; border-radius:8px; border:1px solid var(--border); width:140px;" />
               <button class="btn btn-sm" onclick="App.liberarTodasPendientes()" title="Soltar a la bolsa todas las tareas pendientes" style="font-size:11px;">
                 Soltar bolsa
               </button>
             </div>
           </div>
 
-          <!-- BARRA DE ENFOQUE RÁPIDO PARA CELULAR Y COMPUTADORA -->
+          <!-- FILTROS DE INTEGRANTES Y PARTES -->
+          <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-bottom:12px;">
+            <button class="btn btn-sm ${this.treeFilter === 'todos' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('todos')">Todas (${allTareas.length})</button>
+            <button class="btn btn-sm ${this.treeFilter === 'libres' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('libres')" style="font-weight:700;">🌟 Bolsa Libre (${libresCount})</button>
+            <button class="btn btn-sm ${this.treeFilter === 'p1' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('p1')">P1 (23 Nov)</button>
+            <button class="btn btn-sm ${this.treeFilter === 'p2' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('p2')">P2 (25 Ene)</button>
+            <button class="btn btn-sm ${this.treeFilter === 'hechas' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('hechas')" style="color:#059669; font-weight:700;">✔ Finalizadas (${hechasCount})</button>
+            <select onchange="App.setTreeFilter(this.value)" style="padding:4px 8px; font-size:11.5px; border-radius:8px; border:1px solid var(--border); background:var(--bg-card); color:var(--text-main);" aria-label="Filtrar por integrante">
+              <option value="todos" ${this.treeFilter === 'todos' ? 'selected' : ''}>Equipo Completo</option>
+              <option value="angelo" ${this.treeFilter === 'angelo' ? 'selected' : ''}>Angelo (${angeloCount})</option>
+              <option value="xavier" ${this.treeFilter === 'xavier' ? 'selected' : ''}>Xavier (${xavierCount})</option>
+              <option value="fernando" ${this.treeFilter === 'fernando' ? 'selected' : ''}>Fernando (${fernandoCount})</option>
+            </select>
+            <span style="flex:1;"></span>
+            <span style="font-size:11px; color:var(--text-muted); font-weight:700;">
+              ${tareas.length} tareas mostradas
+            </span>
+          </div>
+
+          <!-- BARRA DE ENFOQUE RÁPIDO PARA CELULAR Y COMPUTADORA (X=815 EXACTO PARA TARJETA OVALADA COMPLETA) -->
           <div class="tree-quick-scroll-bar">
-            <button class="btn btn-sm btn-primary" onclick="App.scrollTreeTo(720)" style="font-weight:800; font-size:11px; padding:4px 10px; display:inline-flex; align-items:center; gap:4px;">
+            <button class="btn btn-sm btn-primary" onclick="App.scrollTreeTo(815)" style="font-weight:800; font-size:11px; padding:4px 10px; display:inline-flex; align-items:center; gap:4px;">
               <span>🎯 Ver Tareas Directas</span>
             </button>
             <button class="btn btn-sm" onclick="App.scrollTreeTo(420)" style="font-size:11px; padding:4px 10px;">
@@ -4015,10 +4423,6 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
             <button class="btn btn-sm" onclick="App.scrollTreeTo(0)" style="font-size:11px; padding:4px 10px;">
               <span>🌿 Raíz Completa</span>
             </button>
-            <span style="flex:1;"></span>
-            <span style="font-size:11px; color:var(--text-muted); font-weight:700;">
-              ${tareas.length} tareas mostradas
-            </span>
           </div>
 
           <!-- CONTENEDOR CON DESPLAZAMIENTO HORIZONTAL SUAVE Y AUTO-ENFOQUE -->
@@ -4841,7 +5245,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
                                     ${sub.tipo === 'pregunta' ? `
                                       <div style="margin-left:26px; margin-top:4px; background:var(--bg-card); padding:8px; border-radius:6px; border:1px dashed var(--border);">
                                         <label style="font-size:11px; font-weight:800; color:var(--accent); display:block; margin-bottom:2px;">Respuesta de la Ing. Soraya Sinche:</label>
-                                        <input type="text" placeholder="Escribe aquí la respuesta obtenida de la docente..." value="${this.escapeHtml(sub.respuesta || '')}" onchange="App.actualizarRespuestaSubpaso('${t.id}', '${p.id}', ${sIdx}, '${sub.ref_id || ''}', this.value)" style="width:100%; font-size:12px; padding:5px 8px; border-radius:4px;" />
+                                        <input type="text" placeholder="Escribe aquí la respuesta obtenida de la docente..." value="${this.escapeHtml(sub.respuesta || '')}" onchange="App.actualizarRespuestaSubpaso('${t.id}', '${p.id}', ${sIdx}, '${sub.ref_id || ''}', this.value)" onblur="App.actualizarRespuestaSubpaso('${t.id}', '${p.id}', ${sIdx}, '${sub.ref_id || ''}', this.value)" style="width:100%; font-size:12px; padding:5px 8px; border-radius:4px;" />
                                       </div>
                                     ` : ''}
                                   </div>
@@ -5704,7 +6108,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
                   <div style="font-weight:700; margin:6px 0; font-size:13.5px;">${this.escapeHtml(q.pregunta)}</div>
                   <div style="margin-top:6px;">
                     <label style="font-size:11px; font-weight:700; color:var(--accent);">Respuesta oficial de la docente:</label>
-                    <textarea rows="2" placeholder="Escribir respuesta..." onchange="App.actualizarRespuestaPregunta('${q.id}', this.value)">${this.escapeHtml(q.respuesta || '')}</textarea>
+                    <textarea rows="2" placeholder="Escribir respuesta..." onchange="App.actualizarRespuestaPregunta('${q.id}', this.value)" onblur="App.actualizarRespuestaPregunta('${q.id}', this.value)">${this.escapeHtml(q.respuesta || '')}</textarea>
                   </div>
                 </div>
               `).join("")}

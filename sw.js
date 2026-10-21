@@ -1,10 +1,11 @@
 // Service Worker para funcionamiento 100% offline y soporte PWA
 // Estrategia Network-First con fallback a Cache para garantizar actualizaciones automáticas
-const CACHE_NAME = 'germinacion-iot-v3.4';
+const CACHE_NAME = 'germinacion-iot-v3.5';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './manifest.json'
+  './manifest.json',
+  './mqttws31.min.js'
 ];
 
 self.addEventListener('install', (event) => {
