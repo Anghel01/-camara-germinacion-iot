@@ -746,6 +746,55 @@
       height: 18px;
     }
 
+    /* PÍLDORA DE SINCRONIZACIÓN EN BARRA SUPERIOR */
+    .sync-indicator-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 5px 11px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      user-select: none;
+    }
+    .sync-indicator-pill:hover {
+      background: var(--bg-hover);
+      border-color: #3b82f6;
+      transform: translateY(-1px);
+    }
+    .sync-indicator-pill:active {
+      transform: scale(0.96);
+    }
+    .sync-indicator-pill.cloud-synced {
+      background: #ecfdf5;
+      color: #065f46;
+      border-color: #6ee7b7;
+    }
+    .sync-indicator-pill.cloud-synced svg {
+      color: #059669;
+    }
+
+    /* BARRA DE NAVEGACIÓN RÁPIDA EN ÁRBOL (PARA CELULAR Y PC) */
+    .tree-quick-scroll-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 12px;
+      overflow-x: auto;
+      padding: 4px 2px;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .tree-quick-scroll-bar::-webkit-scrollbar {
+      display: none;
+    }
+
     @media (max-width: 768px) {
       .bottom-nav {
         display: flex;
@@ -845,10 +894,10 @@
           <option value="Todos">Todos (Equipo)</option>
         </select>
       </div>
-      <span id="sync-indicator" class="badge status-Pendiente" style="display:inline-flex; align-items:center; gap:5px;" title="Almacenamiento local activo">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-        <span>Local</span>
-      </span>
+      <button id="sync-indicator-btn" class="sync-indicator-pill" onclick="App.openSyncModal()" title="Gestionar sincronización celular y nube">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span id="sync-btn-text">Sincronizar</span>
+      </button>
       <button class="btn btn-sm" onclick="App.toggleTheme()" style="gap:4px;" title="Cambiar modo claro/oscuro">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
         <span>Tema</span>
@@ -910,6 +959,11 @@
   <!-- MODAL DETALLE DE TAREA (MÓDULO 7) -->
   <div class="modal-backdrop" id="task-modal" role="dialog" aria-modal="true" aria-labelledby="modal-task-title" onclick="if(event.target===this) App.closeTaskModal()">
     <div class="modal-panel" id="task-modal-content"></div>
+  </div>
+
+  <!-- MODAL DE SINCRONIZACIÓN MULTI-DISPOSITIVO (PC ⟷ CELULAR) -->
+  <div class="modal-backdrop" id="sync-modal" role="dialog" aria-modal="true" aria-labelledby="modal-sync-title" onclick="if(event.target===this) App.closeSyncModal()" style="display:none;">
+    <div class="modal-panel" id="sync-modal-content" style="max-width:540px;"></div>
   </div>
 
   <script>
@@ -2369,89 +2423,275 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
     }
 
     /* ============================================================================
-       DATASTORE (LocalStorage + Adaptador Opcional Firebase Realtime)
+       DATASTORE (Multi-dispositivo: LocalStorage + Nube Firebase + Hash URL)
        ============================================================================ */
-    const STORAGE_KEY = "epn_iot_grupo1_camara_v2";
+    const STORAGE_KEY = "epn_iot_grupo1_camara_v3";
 
     const DataStore = {
       state: null,
       syncTimer: null,
+      isSyncing: false,
 
       init() {
-        const raw = localStorage.getItem(STORAGE_KEY);
         const initialData = crearDatosIniciales();
-        if (raw) {
+        
+        // 1. Detectar si la URL contiene un hash de sincronización instantánea (#sync=...)
+        if (typeof location !== "undefined" && location.hash && location.hash.startsWith("#sync=")) {
           try {
-            this.state = JSON.parse(raw);
-            if (this.state && Array.isArray(this.state.tareas)) {
-              this.state.tareas.forEach(t => {
-                if (t.estado === "Pendiente" && t.rol_responsable && t.rol_responsable.startsWith("Integrante")) {
-                  t.rol_sugerido_pdf = t.rol_responsable;
-                  t.rol_responsable = "Sin asignar";
-                }
-                // Enriquecer tareas existentes con los pasos completos, desplegables y sub-tareas
-                const initT = initialData.tareas.find(x => x.id === t.id);
-                if (initT && initT.pasos) {
-                  const needsEnrichment = !t.pasos || t.pasos.some(p => !p.detalle && (!p.subpasos || p.subpasos.length === 0));
-                  if (needsEnrichment) {
-                    const doneMap = {};
-                    (t.pasos || []).forEach(p => { doneMap[p.id] = p.hecho; });
-                    t.pasos = initT.pasos.map(p => {
-                      const wasDone = doneMap[p.id] !== undefined ? doneMap[p.id] : (t.estado === "Hecha");
-                      return {
-                        ...p,
-                        hecho: wasDone,
-                        subpasos: (p.subpasos || []).map(s => ({
-                          ...s,
-                          hecho: wasDone ? true : (s.hecho || false)
-                        }))
-                      };
-                    });
-                  }
-                }
-              });
-
-              // Sincronizar respuestas ya existentes en preguntas oficiales con el paso T1.02
-              if (this.state.preguntas) {
-                const t02 = this.state.tareas.find(x => x.id === "T1.02");
-                if (t02 && t02.pasos) {
-                  t02.pasos.forEach(p => {
-                    (p.subpasos || []).forEach(sub => {
-                      if (sub.ref_id) {
-                        const q = this.state.preguntas.find(x => x.id === sub.ref_id);
-                        if (q && q.respuesta && !sub.respuesta) {
-                          sub.respuesta = q.respuesta;
-                          sub.hecho = true;
-                        }
-                      }
-                    });
-                  });
-                }
+            const rawHash = location.hash.slice(6);
+            const imported = this.importCompactHash(rawHash, initialData);
+            if (imported) {
+              this.state = imported;
+              this.save();
+              if (typeof history !== "undefined" && history.replaceState) {
+                history.replaceState(null, "", location.pathname);
               }
             }
           } catch (e) {
-            this.state = initialData;
+            console.warn("Fallo import hash sync:", e);
           }
-        } else {
-          this.state = initialData;
-          this.save();
         }
+
+        if (!this.state) {
+          // 2. Cargar desde almacenamiento local con migración retrocompatible
+          const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem("epn_iot_grupo1_camara_v2") || localStorage.getItem("epn_iot_grupo1_camara");
+          if (raw) {
+            try {
+              this.state = JSON.parse(raw);
+              this.reconciliarConPlanMaestro(initialData);
+            } catch (e) {
+              this.state = initialData;
+            }
+          } else {
+            this.state = initialData;
+            this.save();
+          }
+        }
+
+        if (!this.state.config) this.state.config = {};
         if (!this.state.config.fecha_entrega_p1) this.state.config.fecha_entrega_p1 = "2026-11-23";
         if (!this.state.config.fecha_entrega_p2) this.state.config.fecha_entrega_p2 = "2027-01-25";
         if (!this.state.config.tema || this.state.config.tema === "oscuro") {
           this.state.config.tema = "claro";
-          document.documentElement.setAttribute("data-theme", "claro");
+          if (typeof document !== "undefined") document.documentElement.setAttribute("data-theme", "claro");
         }
+        
         this.updateSyncBadge();
+
+        // 3. Iniciar sondeo periódico de sincronización remota si Firebase está activo
+        if (typeof window !== "undefined") {
+          window.addEventListener("focus", () => this.checkRemoteSync(true));
+          window.addEventListener("online", () => this.checkRemoteSync(true));
+          if (typeof document !== "undefined") {
+            document.addEventListener("visibilitychange", () => {
+              if (document.visibilityState === "visible") this.checkRemoteSync(true);
+            });
+          }
+          setInterval(() => this.checkRemoteSync(true), 12000);
+        }
+      },
+
+      reconciliarConPlanMaestro(initialData) {
+        if (!this.state || !Array.isArray(this.state.tareas)) return;
+
+        // Reconciliación canónica: títulos, preguntas Q1-Q6, descripciones y criterios siempre alineados
+        this.state.tareas.forEach(t => {
+          const initT = initialData.tareas.find(x => x.id === t.id);
+          if (initT) {
+            t.titulo = initT.titulo;
+            t.descripcion = initT.descripcion;
+            t.criterio_aceptacion = initT.criterio_aceptacion;
+            t.fase = initT.fase;
+            t.parte = initT.parte;
+            t.semana_inicio = initT.semana_inicio;
+            t.semana_fin = initT.semana_fin;
+            t.depende_de = initT.depende_de;
+            t.peso_porcentaje = initT.peso_porcentaje;
+            t.etiquetas = initT.etiquetas;
+
+            const doneMap = {};
+            (t.pasos || []).forEach(p => {
+              if (p.id) doneMap[p.id] = p.hecho;
+              if (p.texto) doneMap[p.texto] = p.hecho;
+              (p.subpasos || []).forEach(s => {
+                if (s.ref_id) doneMap[s.ref_id] = s.hecho;
+                if (s.texto) doneMap[s.texto] = s.hecho;
+              });
+            });
+
+            t.pasos = initT.pasos.map(p => {
+              const wasDone = doneMap[p.id] !== undefined ? doneMap[p.id] : (doneMap[p.texto] !== undefined ? doneMap[p.texto] : (t.estado === "Hecha"));
+              return {
+                ...p,
+                hecho: wasDone,
+                subpasos: (p.subpasos || []).map(s => {
+                  const sKey = s.ref_id || s.texto;
+                  const sDone = doneMap[sKey] !== undefined ? doneMap[sKey] : wasDone;
+                  return {
+                    ...s,
+                    hecho: sDone
+                  };
+                })
+              };
+            });
+          }
+
+          if (t.estado === "Pendiente" && t.rol_responsable && t.rol_responsable.startsWith("Integrante")) {
+            t.rol_sugerido_pdf = t.rol_responsable;
+            t.rol_responsable = "Sin asignar";
+          }
+        });
+
+        // Asegurar que todas las 33 tareas existan
+        initialData.tareas.forEach(initT => {
+          if (!this.state.tareas.some(t => t.id === initT.id)) {
+            this.state.tareas.push(JSON.parse(JSON.stringify(initT)));
+          }
+        });
+
+        // Sincronizar respuestas ya existentes en preguntas oficiales con el paso T1.02
+        if (this.state.preguntas) {
+          const t02 = this.state.tareas.find(x => x.id === "T1.02");
+          if (t02 && t02.pasos) {
+            t02.pasos.forEach(p => {
+              (p.subpasos || []).forEach(sub => {
+                if (sub.ref_id) {
+                  const q = this.state.preguntas.find(x => x.id === sub.ref_id);
+                  if (q && q.respuesta && !sub.respuesta) {
+                    sub.respuesta = q.respuesta;
+                    sub.hecho = true;
+                  }
+                }
+              });
+            });
+          }
+        }
       },
 
       save() {
         this.state.ultima_actualizacion = new Date().toISOString();
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state));
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state));
+        } catch (e) {
+          console.warn("Error guardando en localStorage:", e);
+        }
         this.updateSyncBadge();
-        if (this.state.config.firebase && this.state.config.firebase.activo) {
+        if (this.state.config && this.state.config.firebase && this.state.config.firebase.activo) {
           clearTimeout(this.syncTimer);
-          this.syncTimer = setTimeout(() => this.pushToFirebase(), 800);
+          this.syncTimer = setTimeout(() => this.pushToFirebase(), 600);
+        }
+      },
+
+      exportCompactHash() {
+        const compact = {
+          v: this.state.schema_version,
+          u: this.state.ultima_actualizacion,
+          cfg: { usuario: this.state.config?.usuario_actual, tema: this.state.config?.tema },
+          bitacora: this.state.bitacora || [],
+          tareas: (this.state.tareas || []).map(t => ({
+            id: t.id,
+            e: t.estado,
+            r: t.rol_responsable,
+            p: (t.pasos || []).map(p => ({
+              h: p.hecho ? 1 : 0,
+              s: (p.subpasos || []).map(s => ({
+                q: s.ref_id || "",
+                h: s.hecho ? 1 : 0,
+                r: s.respuesta || ""
+              }))
+            }))
+          }))
+        };
+        const str = JSON.stringify(compact);
+        if (typeof btoa !== "undefined") {
+          return btoa(unescape(encodeURIComponent(str)));
+        } else if (typeof Buffer !== "undefined") {
+          return Buffer.from(str, "utf8").toString("base64");
+        }
+        return encodeURIComponent(str);
+      },
+
+      importCompactHash(hash, initialData) {
+        let str;
+        if (typeof atob !== "undefined") {
+          str = decodeURIComponent(escape(atob(hash)));
+        } else if (typeof Buffer !== "undefined") {
+          str = Buffer.from(hash, "base64").toString("utf8");
+        } else {
+          str = decodeURIComponent(hash);
+        }
+        const data = JSON.parse(str);
+        if (!data || !Array.isArray(data.tareas)) return null;
+        const base = initialData || crearDatosIniciales();
+        data.tareas.forEach(dt => {
+          const t = base.tareas.find(x => x.id === dt.id);
+          if (t) {
+            t.estado = dt.e || t.estado;
+            t.rol_responsable = dt.r || t.rol_responsable;
+            if (Array.isArray(dt.p)) {
+              dt.p.forEach((dp, pIdx) => {
+                if (t.pasos && t.pasos[pIdx]) {
+                  t.pasos[pIdx].hecho = !!dp.h;
+                  if (Array.isArray(dp.s) && t.pasos[pIdx].subpasos) {
+                    dp.s.forEach((ds, sIdx) => {
+                      if (t.pasos[pIdx].subpasos[sIdx]) {
+                        t.pasos[pIdx].subpasos[sIdx].hecho = !!ds.h;
+                        if (ds.r) t.pasos[pIdx].subpasos[sIdx].respuesta = ds.r;
+                      }
+                    });
+                  }
+                }
+              });
+            }
+          }
+        });
+        if (data.bitacora) base.bitacora = data.bitacora;
+        if (data.cfg?.usuario) base.config.usuario_actual = data.cfg.usuario;
+        base.ultima_actualizacion = data.u || new Date().toISOString();
+        return base;
+      },
+
+      updateSyncBadge() {
+        const btn = document.getElementById("sync-indicator-btn");
+        const txt = document.getElementById("sync-btn-text");
+        const fb = this.state?.config?.firebase;
+        const isCloud = fb && fb.activo && fb.databaseURL;
+        if (btn) {
+          btn.className = `sync-indicator-pill ${isCloud ? 'cloud-synced' : ''}`;
+        }
+        if (txt) {
+          txt.textContent = isCloud ? "Nube En Vivo" : "Sincronizar (PC/Celu)";
+        }
+      },
+
+      async checkRemoteSync(silencioso = true) {
+        const fb = this.state?.config?.firebase;
+        if (!fb || !fb.activo || !fb.databaseURL || this.isSyncing) return;
+        this.isSyncing = true;
+        try {
+          const clean = fb.databaseURL.replace(/\/$/, "");
+          const auth = fb.secretToken ? `?auth=${encodeURIComponent(fb.secretToken)}` : "";
+          const url = `${clean}/${fb.rutaNodo || "epn_iot_grupo1_camara"}.json${auth}`;
+          const res = await fetch(url, { headers: { "Cache-Control": "no-cache" } });
+          if (!res.ok) return;
+          const remoteData = await res.json();
+          if (remoteData && remoteData.tareas && remoteData.ultima_actualizacion) {
+            const localTime = new Date(this.state.ultima_actualizacion || 0).getTime();
+            const remoteTime = new Date(remoteData.ultima_actualizacion).getTime();
+            if (remoteTime > localTime) {
+              const localFb = { ...this.state.config.firebase };
+              this.state = remoteData;
+              this.state.config.firebase = localFb;
+              this.reconciliarConPlanMaestro(crearDatosIniciales());
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state));
+              this.updateSyncBadge();
+              if (typeof App !== "undefined" && App.render) App.render();
+            }
+          }
+        } catch (e) {
+          // En modo silencioso no interrumpir
+        } finally {
+          this.isSyncing = false;
         }
       },
 
@@ -2461,19 +2701,6 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
           this.save();
           App.render();
           alert("Datos restablecidos con éxito.");
-        }
-      },
-
-      updateSyncBadge() {
-        const el = document.getElementById("sync-indicator");
-        if (!el) return;
-        const fb = this.state?.config?.firebase;
-        if (fb && fb.activo && fb.databaseURL) {
-          el.className = "badge status-Hecha";
-          el.innerHTML = `${Icons.cloud || ''} <span>Firebase Activo</span>`;
-        } else {
-          el.className = "badge status-Pendiente";
-          el.innerHTML = `${Icons.storage || ''} <span>LocalStorage</span>`;
         }
       },
 
@@ -2488,6 +2715,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
           // Evitar subir token local dentro del nodo público
           safeCopy.config.firebase = { activo: true, databaseURL: fb.databaseURL, rutaNodo: fb.rutaNodo };
           await fetch(url, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(safeCopy) });
+          this.updateSyncBadge();
         } catch (e) {
           console.warn("Fallo sync Firebase:", e);
         }
@@ -2496,7 +2724,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
       async pullFromFirebase() {
         const fb = this.state.config.firebase;
         if (!fb || !fb.databaseURL) {
-          alert("Ingresa primero la URL de Firebase en Configuración.");
+          alert("Ingresa primero la URL de Firebase en Configuración o en Sincronizar.");
           return;
         }
         try {
@@ -2510,9 +2738,10 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
             const fbLocal = { ...this.state.config.firebase };
             this.state = data;
             this.state.config.firebase = fbLocal;
+            this.reconciliarConPlanMaestro(crearDatosIniciales());
             this.save();
             App.render();
-            alert("Datos descargados correctamente de Firebase.");
+            alert("¡Datos descargados y sincronizados correctamente desde la nube!");
           } else {
             alert("El nodo en Firebase está vacío. Usa 'Subir a Firebase' primero.");
           }
@@ -2707,7 +2936,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
        INTERFAZ DE USUARIO (11 MÓDULOS)
        ============================================================================ */
     const App = {
-      currentTab: "panel",
+      currentTab: "arbol",
       treeFilter: "todos",
       treeCollapsed: {},
       kanbanFilters: { parte: "todas", responsable: "todos", etiqueta: "todas", busqueda: "" },
@@ -2720,12 +2949,18 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
 
       init() {
         DataStore.init();
-        document.documentElement.setAttribute("data-theme", DataStore.state.config.tema || "oscuro");
-        document.getElementById("user-selector").value = DataStore.state.config.usuario_actual || "Todos";
-        this.render();
+        document.documentElement.setAttribute("data-theme", DataStore.state.config.tema || "claro");
+        const userSel = document.getElementById("user-selector");
+        if (userSel) userSel.value = DataStore.state.config.usuario_actual || "Angelo Conterón";
+        
+        // Cargar inmediatamente la vista de tareas en Árbol sin redirecciones ni clics extras
+        this.switchTab(this.currentTab, false);
 
         window.addEventListener("keydown", e => {
-          if (e.key === "Escape" && this.activeModalTaskId) this.closeTaskModal();
+          if (e.key === "Escape") {
+            if (this.activeModalTaskId) this.closeTaskModal();
+            this.closeSyncModal();
+          }
         });
       },
 
@@ -3060,7 +3295,175 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
             c.innerHTML = this.renderVistaRecursosHub();
             break;
           default:
-            c.innerHTML = this.renderPanelPrincipal();
+            c.innerHTML = this.renderVistaArbol();
+        }
+
+        // Auto-enfoque en la columna de tareas para celulares (evita espacios vacíos a la izquierda)
+        if (this.currentTab === "arbol" || (this.currentTab === "tareas" && this.tasksSubView === "arbol")) {
+          setTimeout(() => {
+            const el = document.getElementById("svg-tree-scroll");
+            if (el && typeof window !== "undefined" && window.innerWidth <= 768) {
+              el.scrollLeft = 720;
+            }
+          }, 50);
+        }
+      },
+
+      scrollTreeTo(x) {
+        const el = document.getElementById("svg-tree-scroll");
+        if (el) el.scrollTo({ left: x, behavior: "smooth" });
+      },
+
+      openSyncModal() {
+        const modal = document.getElementById("sync-modal");
+        const content = document.getElementById("sync-modal-content");
+        if (!modal || !content) return;
+        content.innerHTML = this.renderSyncModalContent();
+        modal.style.display = "flex";
+      },
+
+      closeSyncModal() {
+        const modal = document.getElementById("sync-modal");
+        if (modal) modal.style.display = "none";
+      },
+
+      renderSyncModalContent() {
+        const st = DataStore.state;
+        const fb = st.config?.firebase || {};
+        const isCloud = fb.activo && fb.databaseURL;
+        const lastSync = st.ultima_actualizacion ? new Date(st.ultima_actualizacion).toLocaleString() : "Sin registro";
+
+        return `
+          <div class="modal-header">
+            <div class="modal-drag-handle"></div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div style="width:36px; height:36px; border-radius:10px; background:var(--info-soft); display:flex; align-items:center; justify-content:center; color:#2563eb;">
+                ${Icons.cloud}
+              </div>
+              <div>
+                <h2 id="modal-sync-title" class="modal-title" style="margin:0; font-size:16px;">Sincronización PC ⟷ Celular</h2>
+                <div class="modal-subtitle">Conecta tus dispositivos y los de tu equipo en tiempo real</div>
+              </div>
+            </div>
+            <button class="modal-close-btn" onclick="App.closeSyncModal()" aria-label="Cerrar ventana de sincronización">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+
+          <div class="modal-body" style="padding:16px 20px; display:flex; flex-direction:column; gap:14px;">
+            <!-- ESTADO ACTUAL -->
+            <div style="padding:12px 14px; border-radius:12px; background:${isCloud ? '#ecfdf5' : 'var(--bg-card)'}; border:1px solid ${isCloud ? '#6ee7b7' : 'var(--border)'}; display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <div style="font-size:11px; text-transform:uppercase; letter-spacing:0.5px; font-weight:800; color:${isCloud ? '#047857' : 'var(--text-muted)'};">
+                  ${isCloud ? '🟢 Nube en Vivo Conectada (Firebase)' : '⚪ Almacenamiento Local (en este navegador)'}
+                </div>
+                <div style="font-size:12px; color:var(--text-main); margin-top:2px;">
+                  Última sincronización: <strong>${lastSync}</strong>
+                </div>
+              </div>
+              ${isCloud ? `
+                <button class="btn btn-sm" onclick="DataStore.checkRemoteSync(false)" style="font-size:11.5px; gap:4px;">
+                  ${Icons.refresh || Icons.clock} <span>Comprobar ahora</span>
+                </button>
+              ` : ''}
+            </div>
+
+            <!-- OPCIÓN 1: TRANSFERENCIA EN 1 CLIC VÍA ENLACE DIRECTO (CERO CUENTAS) -->
+            <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:14px;">
+              <div style="display:flex; align-items:center; gap:6px; font-weight:800; font-size:13px; margin-bottom:4px; color:var(--text-main);">
+                <span>1. Enlace Mágico Directo a Celular (1 Clic)</span>
+              </div>
+              <p style="font-size:11.5px; color:var(--text-muted); margin:0 0 10px 0;">
+                Envía este enlace a tu WhatsApp o correo y ábrelo en tu teléfono. Se sincronizarán todas las 33 tareas, responsables y pasos de inmediato.
+              </p>
+              <div style="display:flex; gap:8px;">
+                <button class="btn btn-sm btn-primary" onclick="App.copiarEnlaceSync()" style="flex:1; justify-content:center; gap:6px; font-weight:700;">
+                  ${Icons.check || ''} <span>📋 Copiar Enlace para Celular</span>
+                </button>
+                <button class="btn btn-sm" onclick="App.copiarJSONSync()" style="gap:5px;">
+                  <span>📋 Copiar JSON</span>
+                </button>
+              </div>
+              <div id="sync-copy-toast" style="font-size:11.5px; color:#059669; font-weight:700; margin-top:8px; display:none;">
+                ✔ ¡Enlace copiado al portapapeles! Pégalo en tu celular para sincronizar.
+              </div>
+            </div>
+
+            <!-- OPCIÓN 2: SINCRONIZACIÓN EN TIEMPO REAL CON FIREBASE -->
+            <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:14px;">
+              <div style="display:flex; align-items:center; gap:6px; font-weight:800; font-size:13px; margin-bottom:4px; color:var(--text-main);">
+                <span>2. Sincronización Automática en la Nube (Firebase)</span>
+              </div>
+              <p style="font-size:11.5px; color:var(--text-muted); margin:0 0 8px 0;">
+                Permite a Angelo, Xavier y Fernando compartir tareas y avances en vivo sin necesidad de servidor propio.
+              </p>
+              <div style="display:flex; flex-direction:column; gap:8px;">
+                <label style="display:flex; align-items:center; gap:6px; font-size:12px; font-weight:700;">
+                  <input type="checkbox" id="sync-fb-activo" ${fb.activo ? 'checked' : ''} onchange="App.actualizarFirebase('activo', this.checked)" />
+                  <span>Activar sincronización en vivo</span>
+                </label>
+                <div>
+                  <label style="font-size:11px; color:var(--text-muted);">URL de Firebase Realtime Database:</label>
+                  <input type="text" id="sync-fb-url" placeholder="https://tu-proyecto-rtdb.firebaseio.com" value="${this.escapeHtml(fb.databaseURL || '')}" onchange="App.actualizarFirebase('databaseURL', this.value)" style="width:100%; font-size:12px; padding:6px 10px; border-radius:8px; border:1px solid var(--border);" />
+                </div>
+                <div style="display:flex; gap:6px; margin-top:4px;">
+                  <button class="btn btn-sm btn-primary" onclick="DataStore.pushToFirebase(); alert('¡Datos subidos a la nube con éxito!');" style="flex:1; justify-content:center; gap:5px;">
+                    ${Icons.upload} <span>Subir a Firebase</span>
+                  </button>
+                  <button class="btn btn-sm" onclick="DataStore.pullFromFirebase()" style="flex:1; justify-content:center; gap:5px;">
+                    ${Icons.download} <span>Descargar de Firebase</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- OPCIÓN 3: RECONCILIACIÓN CANÓNICA OFICIAL -->
+            <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:12px; display:flex; justify-content:space-between; align-items:center; gap:10px;">
+              <div>
+                <div style="font-weight:700; font-size:12px; color:var(--text-main);">Actualizar al Plan Maestro Oficial</div>
+                <div style="font-size:11px; color:var(--text-muted);">Alinea títulos de tareas (Q1-Q6) y fechas oficiales sin perder tu progreso.</div>
+              </div>
+              <button class="btn btn-sm" onclick="DataStore.reconciliarConPlanMaestro(crearDatosIniciales()); DataStore.save(); App.render(); alert('Títulos y preguntas actualizados al Plan Maestro Oficial.');" style="font-size:11px; white-space:nowrap;">
+                ✨ Actualizar
+              </button>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button class="modal-footer-close-btn" onclick="App.closeSyncModal()" type="button">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+              <span>Cerrar ventana</span>
+            </button>
+          </div>
+        `;
+      },
+
+      copiarEnlaceSync() {
+        const link = window.location.origin + window.location.pathname + "#sync=" + DataStore.exportCompactHash();
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(link).then(() => {
+            const t = document.getElementById("sync-copy-toast");
+            if (t) { t.style.display = "block"; setTimeout(() => { t.style.display = "none"; }, 5000); }
+          });
+        } else {
+          prompt("Copia este enlace para enviártelo a tu celular:", link);
+        }
+      },
+
+      copiarJSONSync() {
+        const json = JSON.stringify(DataStore.state, null, 2);
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(json).then(() => {
+            alert("¡JSON completo copiado al portapapeles!");
+          });
+        } else {
+          prompt("JSON del proyecto:", json);
         }
       },
 
@@ -3444,7 +3847,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
 
         // Parámetros de coordenadas SVG
         const colX = [30, 240, 520, 850];
-        const nodeW = [160, 220, 270, 310];
+        const nodeW = [160, 220, 270, 324];
         const rowHeight = 46;
         const rowGap = 10;
 
@@ -3574,34 +3977,52 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
         const hechasCount = allTareas.filter(t => t.estado === "Hecha").length;
 
         return `
-          <!-- FILTROS Y CONTROLES DEL ÁRBOL -->
-          <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:14px; flex-wrap:wrap;">
+          <!-- FILTROS Y CONTROLES DEL ÁRBOL (DISEÑO LIMPIO DE PIZARRA) -->
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap;">
             <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
               <button class="btn btn-sm ${this.treeFilter === 'todos' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('todos')">Todas (${allTareas.length})</button>
               <button class="btn btn-sm ${this.treeFilter === 'libres' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('libres')" style="font-weight:700;">🌟 Bolsa Libre (${libresCount})</button>
-              <button class="btn btn-sm ${this.treeFilter === 'angelo' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('angelo')">Angelo (${angeloCount})</button>
-              <button class="btn btn-sm ${this.treeFilter === 'xavier' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('xavier')">Xavier (${xavierCount})</button>
-              <button class="btn btn-sm ${this.treeFilter === 'fernando' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('fernando')">Fernando (${fernandoCount})</button>
               <button class="btn btn-sm ${this.treeFilter === 'p1' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('p1')">P1 (23 Nov)</button>
               <button class="btn btn-sm ${this.treeFilter === 'p2' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('p2')">P2 (25 Ene)</button>
               <button class="btn btn-sm ${this.treeFilter === 'hechas' ? 'btn-primary' : ''}" onclick="App.setTreeFilter('hechas')" style="color:#059669; font-weight:700;">✔ Finalizadas (${hechasCount})</button>
+              <select onchange="App.setTreeFilter(this.value)" style="padding:4px 8px; font-size:11.5px; border-radius:8px; border:1px solid var(--border); background:var(--bg-card); color:var(--text-main);" aria-label="Filtrar por integrante">
+                <option value="todos" ${this.treeFilter === 'todos' ? 'selected' : ''}>Equipo Completo</option>
+                <option value="angelo" ${this.treeFilter === 'angelo' ? 'selected' : ''}>Angelo (${angeloCount})</option>
+                <option value="xavier" ${this.treeFilter === 'xavier' ? 'selected' : ''}>Xavier (${xavierCount})</option>
+                <option value="fernando" ${this.treeFilter === 'fernando' ? 'selected' : ''}>Fernando (${fernandoCount})</option>
+              </select>
             </div>
 
-            <div style="display:flex; gap:8px; align-items:center;">
-              <input type="text" placeholder="Buscar en el árbol..." value="${this.taskSearchQuery || ''}" oninput="App.setTaskSearch(this.value)" style="padding:6px 12px; font-size:12px; border-radius:8px; border:1px solid var(--border); width:180px;" />
+            <div style="display:flex; gap:6px; align-items:center;">
+              <input type="text" placeholder="Buscar tarea..." value="${this.taskSearchQuery || ''}" oninput="App.setTaskSearch(this.value)" style="padding:5px 10px; font-size:11.5px; border-radius:8px; border:1px solid var(--border); width:140px;" />
               <button class="btn btn-sm" onclick="App.liberarTodasPendientes()" title="Soltar a la bolsa todas las tareas pendientes" style="font-size:11px;">
-                Soltar a la bolsa
+                Soltar bolsa
               </button>
             </div>
           </div>
 
-          <!-- CONTENEDOR CON DESPLAZAMIENTO HORIZONTAL SUAVE -->
-          <div class="svg-tree-container">
-            <div style="font-size:11.5px; color:var(--text-muted); margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
-              <span>Ruta en Árbol con Conectores Bézier (Izquierda a Derecha) • Toca cualquier tarjeta para ver su contenido completo</span>
-              <span style="font-weight:700;">Total nodos mostrados: ${tareas.length}</span>
-            </div>
+          <!-- BARRA DE ENFOQUE RÁPIDO PARA CELULAR Y COMPUTADORA -->
+          <div class="tree-quick-scroll-bar">
+            <button class="btn btn-sm btn-primary" onclick="App.scrollTreeTo(720)" style="font-weight:800; font-size:11px; padding:4px 10px; display:inline-flex; align-items:center; gap:4px;">
+              <span>🎯 Ver Tareas Directas</span>
+            </button>
+            <button class="btn btn-sm" onclick="App.scrollTreeTo(420)" style="font-size:11px; padding:4px 10px;">
+              <span>📂 Fases</span>
+            </button>
+            <button class="btn btn-sm" onclick="App.scrollTreeTo(180)" style="font-size:11px; padding:4px 10px;">
+              <span>📌 Parte 1 / 2</span>
+            </button>
+            <button class="btn btn-sm" onclick="App.scrollTreeTo(0)" style="font-size:11px; padding:4px 10px;">
+              <span>🌿 Raíz Completa</span>
+            </button>
+            <span style="flex:1;"></span>
+            <span style="font-size:11px; color:var(--text-muted); font-weight:700;">
+              ${tareas.length} tareas mostradas
+            </span>
+          </div>
 
+          <!-- CONTENEDOR CON DESPLAZAMIENTO HORIZONTAL SUAVE Y AUTO-ENFOQUE -->
+          <div class="svg-tree-container" id="svg-tree-scroll">
             <div style="min-width:1180px; position:relative;">
               <svg width="1180" height="${totalHeight}" viewBox="0 0 1180 ${totalHeight}" style="display:block; overflow:visible;">
                 <!-- Líneas curvas de conexión Bézier -->
@@ -3701,7 +4122,7 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
                     badgeText = "#2563eb";
                   }
 
-                  const safeTitle = (t.titulo || "").length > 25 ? (t.titulo.slice(0, 24) + "…") : t.titulo;
+                  const safeTitle = (t.titulo || "").length > 27 ? (t.titulo.slice(0, 26) + "…") : t.titulo;
 
                   return `
                     <g transform="translate(${item.x}, ${item.y})" onclick="App.openTaskModal('${t.id}')" style="cursor:pointer;">
@@ -3714,8 +4135,8 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
                       <text x="62" y="26" fill="${textCol}" font-size="11.5" font-weight="700" font-family="system-ui, sans-serif">${safeTitle}</text>
                       
                       <!-- Status / User Pill -->
-                      <rect x="${item.w - 82}" y="11" width="74" height="22" rx="6" fill="${badgeBg}" />
-                      <text x="${item.w - 45}" y="26" text-anchor="middle" fill="${badgeText}" font-size="10" font-weight="800" font-family="system-ui, sans-serif">${statusTxt}</text>
+                      <rect x="${item.w - 86}" y="11" width="78" height="24" rx="7" fill="${badgeBg}" />
+                      <text x="${item.w - 47}" y="27" text-anchor="middle" fill="${badgeText}" font-size="10" font-weight="800" font-family="system-ui, sans-serif">${statusTxt}</text>
                     </g>
                   `;
                 }).join("")}
@@ -5525,13 +5946,13 @@ MODO FOTO (Sección 7.4): 00:00, 06:00, 12:00 y 18:00 (4 fotos/día).
 
   <!-- BARRA DE NAVEGACIÓN INFERIOR FIJA PARA CELULARES -->
   <nav class="bottom-nav no-print" aria-label="Navegación móvil inferior">
-    <button class="bottom-nav-item active" data-tab="panel" onclick="App.switchTab('panel')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      <span>Inicio</span>
-    </button>
-    <button class="bottom-nav-item" data-tab="arbol" onclick="App.switchTab('arbol')">
+    <button class="bottom-nav-item active" data-tab="arbol" onclick="App.switchTab('arbol')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
       <span>Árbol</span>
+    </button>
+    <button class="bottom-nav-item" data-tab="panel" onclick="App.switchTab('panel')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Inicio</span>
     </button>
     <button class="bottom-nav-item" data-tab="tablero" onclick="App.switchTab('tablero')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
